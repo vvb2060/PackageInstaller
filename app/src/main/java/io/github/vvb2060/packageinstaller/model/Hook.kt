@@ -1,9 +1,11 @@
 package io.github.vvb2060.packageinstaller.model
 
 import android.app.ActivityThread
+import android.app.IActivityManager
 import android.content.AttributionSource
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageInstallerSession
 import android.content.pm.IPackageManager
@@ -12,13 +14,16 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import android.provider.Settings
+import android.system.Os
 import androidx.annotation.RequiresApi
 import org.lsposed.hiddenapibypass.LSPass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
+import rikka.shizuku.SystemServiceHelper
 
 object Hook {
     private var hooked = false
+    private lateinit var am: IActivityManager
 
     init {
         LSPass.setHiddenApiExemptions("")
@@ -26,6 +31,10 @@ object Hook {
 
     fun wrapBinder(context: Context) {
         if (hooked) return
+
+        val ibinder = SystemServiceHelper.getSystemService(Context.ACTIVITY_SERVICE)
+        am = IActivityManager.Stub.asInterface(ShizukuBinderWrapper(ibinder))
+
         val pm = context.packageManager
         val pi = pm.packageInstaller
 
@@ -76,6 +85,14 @@ object Hook {
             val wrapper = ShizukuBinderWrapper(mSession.asBinder())
             set(this@wrap, IPackageInstallerSession.Stub.asInterface(wrapper))
         }
+    }
+
+    fun startActivity(intent: Intent) {
+        val userId = Os.getuid() / 100000
+        am.startActivityAsUser(
+            null, "com.android.shell", intent, intent.type,
+            null, null, 0, 0, null, null, userId
+        )
     }
 }
 

@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
+import io.github.vvb2060.packageinstaller.model.Hook;
 import io.github.vvb2060.packageinstaller.model.InstallSuccess;
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
@@ -44,7 +45,7 @@ public class InstallSuccessFragment extends DialogFragment {
                 (dialog, which) -> cleanAndFinish())
             .setPositiveButton(R.string.launch, (dialog, which) -> {
                 cleanAndFinish();
-                requireActivity().startActivity(mDialogData.getStartIntent());
+                Hook.INSTANCE.startActivity(mDialogData.getStartIntent());
             })
             .create();
         return mDialog;
