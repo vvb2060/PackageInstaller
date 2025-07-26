@@ -111,18 +111,22 @@ object Hook {
     }
 
     fun addPreferredActivity(pm: PackageManager) {
-        rawPm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
         val type = "application/vnd.android.package-archive"
         val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
+        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            setDataAndType(uri, type)
+        }
+        val info = pm.resolveActivity(installIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        if (info?.activityInfo?.packageName == BuildConfig.APPLICATION_ID) {
+            return
+        }
+        rawPm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_VIEW)
             addAction(Intent.ACTION_INSTALL_PACKAGE)
             addCategory(Intent.CATEGORY_DEFAULT)
             addDataType(type)
-        }
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            addCategory(Intent.CATEGORY_DEFAULT)
-            setDataAndType(uri, type)
         }
         val set = pm.queryIntentActivities(
             installIntent,
