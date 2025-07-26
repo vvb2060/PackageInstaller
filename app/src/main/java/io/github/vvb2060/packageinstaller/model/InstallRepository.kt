@@ -2,8 +2,10 @@ package io.github.vvb2060.packageinstaller.model
 
 import android.Manifest
 import android.app.Application
+import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.IntentSender
 import android.content.Intent_rename
 import android.content.pm.PackageInstaller
@@ -29,6 +31,7 @@ import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_P
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SHIZUKU
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SPLIT
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_WRITE
+import io.github.vvb2060.packageinstaller.ui.InstallLaunch
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
 import java.io.IOException
@@ -64,7 +67,14 @@ class InstallRepository(private val context: Application) {
         Log.v(TAG, "Intent: $intent")
 
         Hook.wrapBinder(context)
+        addPreferredActivity()
+        disableAdbVerify()
 
+        installResult.value = InstallParse()
+        return true
+    }
+
+    fun disableAdbVerify() {
         val verifierIncludeAdb = Settings.Global.getInt(
             context.contentResolver,
             "verifier_verify_adb_installs", 1
@@ -76,9 +86,31 @@ class InstallRepository(private val context: Application) {
                 Settings.Global.putInt(cr, "verifier_verify_adb_installs", 0)
             }
         }
+    }
 
-        installResult.value = InstallParse()
-        return true
+    fun addPreferredActivity() {
+        val type = "application/vnd.android.package-archive"
+        val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_VIEW)
+            addAction(Intent.ACTION_INSTALL_PACKAGE)
+            addCategory(Intent.CATEGORY_DEFAULT)
+            addDataType(type)
+        }
+        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            setDataAndType(uri, type)
+        }
+        val set = packageManager.queryIntentActivities(
+            installIntent,
+            PackageManager.MATCH_DEFAULT_ONLY
+        ).map { info ->
+            packageManager.clearPackagePreferredActivities(info.activityInfo.packageName)
+            ComponentName(info.activityInfo.packageName, info.activityInfo.name)
+        }.toTypedArray()
+        val activity = ComponentName(context, InstallLaunch::class.java)
+        val match = IntentFilter.MATCH_CATEGORY_TYPE or IntentFilter.MATCH_ADJUSTMENT_MASK
+        packageManager.addPreferredActivity(filter, match, set, activity)
     }
 
     fun parseUri() {
