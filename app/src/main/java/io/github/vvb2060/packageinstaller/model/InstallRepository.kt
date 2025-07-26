@@ -27,6 +27,7 @@ import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_C
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_NOINSTALL
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_PARSE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SHIZUKU
+import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SPLIT
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_WRITE
 import io.github.vvb2060.packageinstaller.wrap
 import rikka.shizuku.Shizuku
@@ -191,7 +192,7 @@ class InstallRepository(private val context: App) {
                 if (old != null && old.longVersionCode == apk.versionCode) {
                     fullInstall = false
                 } else {
-                    return InstallAborted(ABORT_PARSE)
+                    return InstallAborted(ABORT_SPLIT)
                 }
             }
         }

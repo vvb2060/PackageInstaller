@@ -36,6 +36,7 @@
 
     <string name="error_title">Error</string>
     <string name="error_parse">There was a problem parsing the package.</string>
+    <string name="error_split">Missing matching base package.</string>
     <string name="error_noinstalled">The app wasn\'t found in the list of installed apps.</string>
     <string name="error_shizuku">Shizuku unavailable.</string>
     <string name="error_create">Failed to create a install session.</string>

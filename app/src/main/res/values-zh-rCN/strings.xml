@@ -36,6 +36,7 @@
 
     <string name="error_title">"错误"</string>
     <string name="error_parse">"解析软件包时出现问题。"</string>
+    <string name="error_split">缺失匹配的基础包。</string>
     <string name="error_noinstalled">"在已安装应用列表中找不到该应用。"</string>
     <string name="error_shizuku">Shizuku 不可用。</string>
     <string name="error_create">无法开始安装。</string>

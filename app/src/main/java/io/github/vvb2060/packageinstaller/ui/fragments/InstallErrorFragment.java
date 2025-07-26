@@ -58,6 +58,7 @@ public class InstallErrorFragment extends DialogFragment {
         return switch (code) {
             case InstallAborted.ABORT_SHIZUKU -> R.string.error_shizuku;
             case InstallAborted.ABORT_PARSE -> R.string.error_parse;
+            case InstallAborted.ABORT_SPLIT -> R.string.error_split;
             case InstallAborted.ABORT_NOINSTALL -> R.string.error_noinstalled;
             case InstallAborted.ABORT_CREATE -> R.string.error_create;
             case InstallAborted.ABORT_WRITE -> R.string.error_write;
