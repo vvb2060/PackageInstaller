@@ -26,6 +26,7 @@ public class InstallConfirmationFragment extends DialogFragment {
 
     private final InstallUserAction mDialogData;
     private InstallViewModel mViewModel;
+    private InstallViewModel mViewModel2;
     private AlertDialog mDialog;
     private CheckBox mCheckBox;
 
@@ -37,6 +38,8 @@ public class InstallConfirmationFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(requireActivity())
+            .get(InstallViewModel.class);
+        mViewModel2 = new ViewModelProvider(requireActivity())
             .get(InstallViewModel.class);
     }
 
@@ -65,7 +68,8 @@ public class InstallConfirmationFragment extends DialogFragment {
                 question = R.string.install_confirm_question_update;
             }
         }
-        if (!mDialogData.getFullInstall()) {
+        var full = mDialogData.getFullInstall();
+        if (!full) {
             question = R.string.install_confirm_question_split;
         }
         sb.append(context.getString(question), new StyleSpan(Typeface.ITALIC),
@@ -78,7 +82,7 @@ public class InstallConfirmationFragment extends DialogFragment {
             .setView(dialogView)
             .setPositiveButton(old != null ? R.string.update : R.string.install,
                 (dialogInt, which) -> {
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), true);
+                    mViewModel.initiateInstall(mCheckBox.isChecked(), true, full);
                 })
             .setNegativeButton(android.R.string.cancel,
                 (dialogInt, which) -> {
@@ -86,7 +90,7 @@ public class InstallConfirmationFragment extends DialogFragment {
                 })
             .setNeutralButton(R.string.add_more,
                 (dialogInt, which) -> {
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), false);
+                    mViewModel.initiateInstall(mCheckBox.isChecked(), false, full);
                 })
             .create();
         return mDialog;

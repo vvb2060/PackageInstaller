@@ -44,7 +44,6 @@ class InstallRepository(private val context: App) {
     private var callingUid = Process.INVALID_UID
     private lateinit var intent: Intent
     private var apkLite: ApkLite? = null
-    private var fullInstall = true
 
     fun preCheck(intent: Intent): Boolean {
         if (!Shizuku.pingBinder()
@@ -103,7 +102,7 @@ class InstallRepository(private val context: App) {
         installResult.postValue(InstallAborted(ABORT_PARSE))
     }
 
-    fun install(setInstaller: Boolean, commit: Boolean) {
+    fun install(setInstaller: Boolean, commit: Boolean, full: Boolean) {
         val uri = intent.data!!
         installResult.postValue(InstallInstalling(apkLite!!))
         if (ContentResolver.SCHEME_CONTENT != uri.scheme) {
@@ -113,7 +112,7 @@ class InstallRepository(private val context: App) {
 
         if (stagedSessionId == SessionInfo.INVALID_ID) {
             try {
-                val params: SessionParams = createSessionParams(setInstaller)
+                val params: SessionParams = createSessionParams(setInstaller, full)
                 stagedSessionId = packageInstaller.createSession(params)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create a staging session", e)
@@ -172,6 +171,7 @@ class InstallRepository(private val context: App) {
         } catch (_: PackageManager.NameNotFoundException) {
             null
         }
+        var full = true
         if (apk.isSplit()) {
             for (item in packageInstaller.allSessions) {
                 var info = item as PackageInstaller_rename.SessionInfo
@@ -182,7 +182,7 @@ class InstallRepository(private val context: App) {
                     info = packageInstaller.getSessionInfo(info.sessionId)
                         as PackageInstaller_rename.SessionInfo
                     stagedSessionId = info.sessionId
-                    fullInstall = info.mode == SessionParams.MODE_FULL_INSTALL
+                    full = info.mode == SessionParams.MODE_FULL_INSTALL
                     apk.label = info.appLabel as String?
                     apk.icon = info.appIcon?.toDrawable(context.resources)
                     break
@@ -190,7 +190,7 @@ class InstallRepository(private val context: App) {
             }
             if (stagedSessionId == SessionInfo.INVALID_ID) {
                 if (old != null && old.longVersionCode == apk.versionCode) {
-                    fullInstall = false
+                    full = false
                 } else {
                     return InstallAborted(ABORT_SPLIT)
                 }
@@ -216,7 +216,7 @@ class InstallRepository(private val context: App) {
         }
         apkLite = apk
         val skipCreate = stagedSessionId != SessionInfo.INVALID_ID
-        return InstallUserAction(apk, old, fullInstall, skipCreate)
+        return InstallUserAction(apk, old, full, skipCreate)
     }
 
     private fun processPackageUri(packageName: String): InstallStage {
@@ -229,7 +229,7 @@ class InstallRepository(private val context: App) {
 
         val apk = PackageUtil.getApkLite(packageManager, info!!)
         apkLite = apk
-        return InstallUserAction(apk, info, fullInstall, true)
+        return InstallUserAction(apk, info, fullInstall = true, skipCreate = true)
     }
 
     private fun installPackageUri() {
@@ -251,8 +251,8 @@ class InstallRepository(private val context: App) {
         }
     }
 
-    private fun createSessionParams(setInstaller: Boolean): SessionParams {
-        val mode = if (fullInstall) {
+    private fun createSessionParams(setInstaller: Boolean, full: Boolean): SessionParams {
+        val mode = if (full) {
             SessionParams.MODE_FULL_INSTALL
         } else {
             SessionParams.MODE_INHERIT_EXISTING
