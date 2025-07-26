@@ -30,6 +30,7 @@ import rikka.shizuku.SystemServiceHelper
 
 object Hook {
     private var hooked = false
+    private lateinit var rawPm: IPackageManager
     private lateinit var am: IActivityManager
 
     init {
@@ -48,6 +49,7 @@ object Hook {
         ActivityThread::class.java.getDeclaredField("sPackageManager").apply {
             isAccessible = true
             val sPackageManager = get(null) as IPackageManager
+            rawPm = sPackageManager
             val wrapper = ShizukuBinderWrapper(sPackageManager.asBinder())
             set(null, IPackageManager.Stub.asInterface(wrapper))
         }
@@ -109,7 +111,7 @@ object Hook {
     }
 
     fun addPreferredActivity(pm: PackageManager) {
-        pm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
+        rawPm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
         val type = "application/vnd.android.package-archive"
         val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
         val filter = IntentFilter().apply {

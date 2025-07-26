@@ -7,8 +7,8 @@ import android.os.RemoteException;
 
 public interface IPackageManager extends IInterface {
 
-    IPackageInstaller getPackageInstaller()
-            throws RemoteException;
+    IPackageInstaller getPackageInstaller() throws RemoteException;
+    void clearPackagePreferredActivities(String packageName) throws RemoteException;
 
     abstract class Stub extends Binder implements IPackageManager {
 
