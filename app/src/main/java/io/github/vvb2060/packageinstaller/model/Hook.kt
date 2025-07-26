@@ -1,7 +1,6 @@
-package io.github.vvb2060.packageinstaller
+package io.github.vvb2060.packageinstaller.model
 
 import android.app.ActivityThread
-import android.app.Application
 import android.content.AttributionSource
 import android.content.Context
 import android.content.ContextWrapper
@@ -18,18 +17,16 @@ import org.lsposed.hiddenapibypass.LSPass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 
-class App : Application() {
+object Hook {
     private var hooked = false
 
-    companion object {
-        init {
-            LSPass.setHiddenApiExemptions("")
-        }
+    init {
+        LSPass.setHiddenApiExemptions("")
     }
 
-    fun wrapBinder() {
+    fun wrapBinder(context: Context) {
         if (hooked) return
-        val pm = packageManager
+        val pm = context.packageManager
         val pi = pm.packageInstaller
 
         ActivityThread::class.java.getDeclaredField("sPackageManager").apply {
@@ -71,14 +68,14 @@ class App : Application() {
             set(provider, binder)
         }
     }
-}
 
-fun PackageInstaller.Session.wrap() {
-    return this::class.java.getDeclaredField("mSession").run {
-        isAccessible = true
-        val mSession = get(this@wrap) as IPackageInstallerSession
-        val wrapper = ShizukuBinderWrapper(mSession.asBinder())
-        set(this@wrap, IPackageInstallerSession.Stub.asInterface(wrapper))
+    fun PackageInstaller.Session.wrap() {
+        return this::class.java.getDeclaredField("mSession").run {
+            isAccessible = true
+            val mSession = get(this@wrap) as IPackageInstallerSession
+            val wrapper = ShizukuBinderWrapper(mSession.asBinder())
+            set(this@wrap, IPackageInstallerSession.Stub.asInterface(wrapper))
+        }
     }
 }
 

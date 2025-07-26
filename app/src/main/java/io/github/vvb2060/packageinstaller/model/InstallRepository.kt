@@ -1,6 +1,7 @@
 package io.github.vvb2060.packageinstaller.model
 
 import android.Manifest
+import android.app.Application
 import android.content.ContentResolver
 import android.content.Intent
 import android.content.IntentSender
@@ -20,8 +21,7 @@ import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.MutableLiveData
-import io.github.vvb2060.packageinstaller.App
-import io.github.vvb2060.packageinstaller.ShizukuContext
+import io.github.vvb2060.packageinstaller.model.Hook.wrap
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_CLOSE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_CREATE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_NOINSTALL
@@ -29,12 +29,11 @@ import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_P
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SHIZUKU
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SPLIT
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_WRITE
-import io.github.vvb2060.packageinstaller.wrap
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
 import java.io.IOException
 
-class InstallRepository(private val context: App) {
+class InstallRepository(private val context: Application) {
     private val TAG = InstallRepository::class.java.simpleName
     val installResult = MutableLiveData<InstallStage>()
     val stagingProgress = MutableLiveData<Int>()
@@ -64,14 +63,14 @@ class InstallRepository(private val context: App) {
         this.intent = intent
         Log.v(TAG, "Intent: $intent")
 
-        context.wrapBinder()
+        Hook.wrapBinder(context)
 
         val verifierIncludeAdb = Settings.Global.getInt(
             context.contentResolver,
             "verifier_verify_adb_installs", 1
         ) != 0
         if (verifierIncludeAdb) {
-            context.wrapGlobalSettings {
+            Hook.wrapGlobalSettings {
                 val contextWrapper = ShizukuContext(context)
                 val cr = object : ContentResolver(contextWrapper) {}
                 Settings.Global.putInt(cr, "verifier_verify_adb_installs", 0)
