@@ -132,9 +132,11 @@ public class InstallConfirmationFragment extends DialogFragment {
         var apk = mDialogData.getApkLite();
         var old = mDialogData.getOldApk();
         append(sb, R.string.package_name, null, apk.getPackageName());
-        append(sb, R.string.split_name, null, apk.getSplitName());
-        append(sb, R.string.split_types, null, apk.getSplitTypes());
-        append(sb, R.string.required_split_types, null, apk.getRequiredSplitTypes());
+        if (apk.needSplit()) {
+            append(sb, R.string.split_name, null, apk.getSplitName());
+            append(sb, R.string.split_types, null, apk.getSplitTypes());
+            append(sb, R.string.required_split_types, null, apk.getRequiredSplitTypes());
+        }
         if (apk.isSplit()) return;
         var ver = apk.getVersionName() + " (" + apk.getVersionCode() + ")";
         var min = getAndroidName(apk.getMinSdkVersion());
