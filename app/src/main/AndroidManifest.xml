@@ -57,7 +57,7 @@
         </activity>
 
         <provider
-            android:name="rikka.shizuku.ShizukuProvider"
+            android:name=".provider.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
             android:exported="true"
             android:multiprocess="false"
