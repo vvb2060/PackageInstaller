@@ -114,7 +114,11 @@ class InstallRepository(private val context: Application) {
     }
 
     fun parseUri() {
-        val uri = intent.data
+        var uri = intent.data
+        if (uri == null) {
+            uri = intent.getParcelableExtra(Intent.EXTRA_STREAM)
+            intent.setData(uri)
+        }
         if (uri != null && "package" == uri.scheme) {
             val packageName = uri.schemeSpecificPart
             installResult.postValue(processPackageUri(packageName))
