@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">"Shizuku 安装器"</string>
+
+    <string name="install">"安装"</string>
+    <string name="update">"更新"</string>
+    <string name="add_more">继续添加</string>
+    <string name="done">"完成"</string>
+    <string name="launch">"打开"</string>
+
+    <string name="copying">正在复制…</string>
+    <string name="installing">"正在安装…"</string>
+    <string name="parsing">"正在解析…"</string>
+
+    <string name="set_installer">伪造安装者</string>
+
+    <string name="package_name">"包名："</string>
+    <string name="split_name">"拆分: "</string>
+    <string name="split_types">"类型: "</string>
+    <string name="required_split_types">"需求: "</string>
+    <string name="version">"版本："</string>
+    <string name="min_sdk">"兼容："</string>
+    <string name="target_sdk">"适配："</string>
+
+    <string name="install_confirm_question">"要安装此应用吗？"</string>
+    <string name="install_confirm_question_update">"要更新此应用吗？"</string>
+    <string name="install_confirm_question_split">要添加拆分包吗？</string>
+
+    <string name="install_done">"已安装应用。"</string>
+
+    <string name="install_failed">"未安装应用。"</string>
+    <string name="install_failed_blocked">"系统已禁止安装该应用。"</string>
+    <string name="install_failed_conflict">"与现有应用存在冲突。"</string>
+    <string name="install_failed_incompatible">"应用与您的设备不兼容。"</string>
+    <string name="install_failed_invalid_apk">"软件包似乎无效。"</string>
+    <string name="install_failed_storage">"空间不足"</string>
+
+    <string name="error_title">"错误"</string>
+    <string name="error_parse">"解析软件包时出现问题。"</string>
+    <string name="error_noinstalled">"在已安装应用列表中找不到该应用。"</string>
+    <string name="error_shizuku">Shizuku 不可用。</string>
+    <string name="error_create">无法开始安装。</string>
+    <string name="error_write">无法写入文件。</string>
+</resources>

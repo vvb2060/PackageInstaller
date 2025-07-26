@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Shizuku installer</string>
+
+    <string name="install">Install</string>
+    <string name="update">Update</string>
+    <string name="add_more">Add more</string>
+    <string name="done">Done</string>
+    <string name="launch">Open</string>
+
+    <string name="copying">Copying…</string>
+    <string name="installing">Installing…</string>
+    <string name="parsing">Parsing…</string>
+
+    <string name="set_installer">Set installer</string>
+
+    <string name="package_name">"Package: "</string>
+    <string name="split_name">"Split: "</string>
+    <string name="split_types">"Types: "</string>
+    <string name="required_split_types">"Required: "</string>
+    <string name="version">"Version: "</string>
+    <string name="min_sdk">"Min: "</string>
+    <string name="target_sdk">"Target: "</string>
+
+    <string name="install_confirm_question">Do you want to install this app?</string>
+    <string name="install_confirm_question_update">Do you want to update this app?</string>
+    <string name="install_confirm_question_split">Do you want to add split package to this app?</string>
+
+    <string name="install_done">App installed.</string>
+
+    <string name="install_failed">App not installed.</string>
+    <string name="install_failed_blocked">The package was blocked from being installed.</string>
+    <string name="install_failed_conflict">App not installed as package conflicts with an existing package.</string>
+    <string name="install_failed_incompatible">App not installed as app isn\'t compatible with your device.</string>
+    <string name="install_failed_invalid_apk">App not installed as package appears to be invalid.</string>
+    <string name="install_failed_storage">Out of space</string>
+
+    <string name="error_title">Error</string>
+    <string name="error_parse">There was a problem parsing the package.</string>
+    <string name="error_noinstalled">The app wasn\'t found in the list of installed apps.</string>
+    <string name="error_shizuku">Shizuku unavailable.</string>
+    <string name="error_create">Failed to create a install session.</string>
+    <string name="error_write">Failed to copy apk.</string>
+</resources>
