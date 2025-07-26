@@ -3,19 +3,26 @@ package io.github.vvb2060.packageinstaller.model
 import android.app.ActivityThread
 import android.app.IActivityManager
 import android.content.AttributionSource
+import android.content.ComponentName
+import android.content.ContentResolver
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageInstallerSession
 import android.content.pm.IPackageManager
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import android.provider.Settings
 import android.system.Os
 import androidx.annotation.RequiresApi
+import io.github.vvb2060.packageinstaller.BuildConfig
+import io.github.vvb2060.packageinstaller.ui.InstallLaunch
 import org.lsposed.hiddenapibypass.LSPass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
@@ -29,7 +36,7 @@ object Hook {
         LSPass.setHiddenApiExemptions("")
     }
 
-    fun wrapBinder(context: Context) {
+    fun init(context: Context) {
         if (hooked) return
 
         val ibinder = SystemServiceHelper.getSystemService(Context.ACTIVITY_SERVICE)
@@ -59,7 +66,7 @@ object Hook {
         hooked = true
     }
 
-    fun wrapGlobalSettings(callback: Runnable) {
+    private fun wrapGlobalSettings(callback: Runnable) {
         val holder = Settings.Global::class.java.getDeclaredField("sProviderHolder").run {
             isAccessible = true
             get(null)
@@ -87,6 +94,45 @@ object Hook {
         }
     }
 
+    fun disableAdbVerify(context: Context) {
+        val verifierIncludeAdb = Settings.Global.getInt(
+            context.contentResolver,
+            "verifier_verify_adb_installs", 1
+        ) != 0
+        if (verifierIncludeAdb) {
+            wrapGlobalSettings {
+                val contextWrapper = ShizukuContext(context)
+                val cr = object : ContentResolver(contextWrapper) {}
+                Settings.Global.putInt(cr, "verifier_verify_adb_installs", 0)
+            }
+        }
+    }
+
+    fun addPreferredActivity(pm: PackageManager) {
+        pm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
+        val type = "application/vnd.android.package-archive"
+        val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_VIEW)
+            addAction(Intent.ACTION_INSTALL_PACKAGE)
+            addCategory(Intent.CATEGORY_DEFAULT)
+            addDataType(type)
+        }
+        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            setDataAndType(uri, type)
+        }
+        val set = pm.queryIntentActivities(
+            installIntent,
+            PackageManager.MATCH_DEFAULT_ONLY
+        ).map { info ->
+            ComponentName(info.activityInfo.packageName, info.activityInfo.name)
+        }.toTypedArray()
+        val activity = ComponentName(BuildConfig.APPLICATION_ID, InstallLaunch::class.java.name)
+        val match = IntentFilter.MATCH_CATEGORY_TYPE or IntentFilter.MATCH_ADJUSTMENT_MASK
+        pm.addPreferredActivity(filter, match, set, activity)
+    }
+
     fun startActivity(intent: Intent) {
         val userId = Os.getuid() / 100000
         am.startActivityAsUser(
@@ -96,7 +142,7 @@ object Hook {
     }
 }
 
-class ShizukuContext(context: Context) : ContextWrapper(context) {
+private class ShizukuContext(context: Context) : ContextWrapper(context) {
     @RequiresApi(Build.VERSION_CODES.S)
     override fun getAttributionSource(): AttributionSource {
         val builder = AttributionSource.Builder(Shizuku.getUid())
