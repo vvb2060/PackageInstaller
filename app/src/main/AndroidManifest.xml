@@ -21,7 +21,7 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:excludeFromRecents="true"
             android:exported="true">
-            <intent-filter>
+            <intent-filter android:priority="10">
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
 
@@ -29,10 +29,16 @@
 
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
                 <data android:mimeType="application/zip" />
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:priority="10">
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
