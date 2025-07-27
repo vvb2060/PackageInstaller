@@ -164,13 +164,8 @@ class InstallRepository(private val context: Application) {
         var full = true
         if (apk.isSplit()) {
             for (item in packageInstaller.allSessions) {
-                var info = item as PackageInstaller_rename.SessionInfo
-                if (info.active &&
-                    info.resolvedBaseCodePath != null &&
-                    info.appPackageName == apk.packageName
-                ) {
-                    info = packageInstaller.getSessionInfo(info.sessionId)
-                        as PackageInstaller_rename.SessionInfo
+                if (item.isActive && item.appPackageName == apk.packageName) {
+                    val info = packageInstaller.getSessionInfo(item.sessionId)!!
                     stagedSessionId = info.sessionId
                     full = info.mode == SessionParams.MODE_FULL_INSTALL
                     apk.label = info.appLabel as String?
