@@ -1,0 +1,5 @@
+<resources>
+    <string name="copyright" translatable="false">Copyright © vvb2060</string>
+    <string name="shizuku_url" translatable="false">https://shizuku.rikka.app</string>
+    <string name="license" translatable="false">Apache License 2.0</string>
+</resources>

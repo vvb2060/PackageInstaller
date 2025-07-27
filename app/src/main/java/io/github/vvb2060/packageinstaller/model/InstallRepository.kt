@@ -23,7 +23,8 @@ import androidx.lifecycle.MutableLiveData
 import io.github.vvb2060.packageinstaller.model.Hook.wrap
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_CLOSE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_CREATE
-import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_NOINSTALL
+import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_INFO
+import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_NOTFOUND
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_PARSE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SHIZUKU
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SPLIT
@@ -49,9 +50,6 @@ class InstallRepository(private val context: Application) {
             || Shizuku.checkRemotePermission(Manifest.permission.INSTALL_PACKAGES)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            if (Shizuku.pingBinder()) {
-                Shizuku.requestPermission(0)
-            }
             installResult.value = InstallAborted(
                 ABORT_SHIZUKU,
                 packageManager.getLaunchIntentForPackage(ShizukuProvider.MANAGER_APPLICATION_ID)
@@ -91,7 +89,7 @@ class InstallRepository(private val context: Application) {
             installResult.postValue(processContentUri(uri))
             return
         }
-        installResult.postValue(InstallAborted(ABORT_PARSE))
+        installResult.postValue(InstallAborted(ABORT_INFO))
     }
 
     fun install(setInstaller: Boolean, commit: Boolean, full: Boolean) {
@@ -216,7 +214,7 @@ class InstallRepository(private val context: Application) {
             packageManager.getPackageInfo(packageName, PackageManager_rename.MATCH_KNOWN_PACKAGES)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(TAG, "Requested package not available.", e)
-            return InstallAborted(ABORT_NOINSTALL)
+            return InstallAborted(ABORT_NOTFOUND)
         }
 
         val apk = PackageUtil.getApkLite(packageManager, info!!)

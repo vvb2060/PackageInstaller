@@ -49,8 +49,9 @@ data class InstallAborted(
         const val ABORT_SHIZUKU = 1
         const val ABORT_PARSE = 2
         const val ABORT_SPLIT = 3
-        const val ABORT_NOINSTALL = 4
+        const val ABORT_NOTFOUND = 4
         const val ABORT_CREATE = 5
         const val ABORT_WRITE = 6
+        const val ABORT_INFO = 7
     }
 }

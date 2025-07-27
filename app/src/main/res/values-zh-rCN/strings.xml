@@ -37,8 +37,12 @@
     <string name="error_title">"错误"</string>
     <string name="error_parse">"解析软件包时出现问题。"</string>
     <string name="error_split">缺失匹配的基础包。</string>
-    <string name="error_noinstalled">"在已安装应用列表中找不到该应用。"</string>
-    <string name="error_shizuku">Shizuku 不可用。</string>
+    <string name="error_notfound">"在已安装应用列表中找不到该应用。"</string>
+    <string name="error_shizuku_notfound">Shizuku 未安装。</string>
+    <string name="error_shizuku_notrunning">Shizuku 未运行。</string>
+    <string name="error_shizuku_notpermitted">Shizuku 未授权。</string>
+    <string name="error_shizuku_unavailable">Shizuku 不可用。</string>
     <string name="error_create">无法开始安装。</string>
     <string name="error_write">无法写入文件。</string>
+    <string name="error_info">此软件是 %s 下的开源软件。</string>
 </resources>
