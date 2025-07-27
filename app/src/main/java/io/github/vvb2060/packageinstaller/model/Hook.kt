@@ -110,6 +110,22 @@ object Hook {
         }
     }
 
+    fun getPreferredActivity(pm: PackageManager): String {
+        val type = "application/vnd.android.package-archive"
+        val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
+        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            setDataAndType(uri, type)
+        }
+        val info = pm.resolveActivity(installIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        info?.run {
+            if (activityInfo.packageName != BuildConfig.APPLICATION_ID) {
+                return activityInfo.name
+            }
+        }
+        return ""
+    }
+
     fun addPreferredActivity(pm: PackageManager) {
         val type = "application/vnd.android.package-archive"
         val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
