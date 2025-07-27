@@ -62,26 +62,29 @@ public class InstallErrorFragment extends DialogFragment {
     }
 
     private void checkShizuku(Context context) {
+        if (Shizuku.pingBinder()) {
+            Shizuku.requestPermission(1);
+            return;
+        }
         var intent = mAborted.getIntent();
         if (intent == null) {
             Uri web = Uri.parse(context.getString(R.string.shizuku_url));
             intent = new Intent(Intent.ACTION_VIEW, web);
-            requireActivity().startActivity(intent);
-        } else if (!Shizuku.pingBinder()) {
-            requireActivity().startActivity(intent);
-        } else {
-            Shizuku.requestPermission(1);
         }
+        requireActivity().startActivity(intent);
     }
 
     private String getErrorMessage(Context context, int code) {
         switch (code) {
             case InstallAborted.ABORT_SHIZUKU -> {
-                if (mAborted.getIntent() == null) {
-                    return context.getString(R.string.error_shizuku_notfound);
-                } else if (!Shizuku.pingBinder()) {
-                    return context.getString(R.string.error_shizuku_notrunning);
-                } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+                if (!Shizuku.pingBinder()) {
+                    if (mAborted.getIntent() == null) {
+                        return context.getString(R.string.error_shizuku_notfound);
+                    } else {
+                        return context.getString(R.string.error_shizuku_notrunning);
+                    }
+                }
+                if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
                     return context.getString(R.string.error_shizuku_notpermitted);
                 } else {
                     return context.getString(R.string.error_shizuku_unavailable);
