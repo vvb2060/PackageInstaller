@@ -15,8 +15,8 @@ plugins {
 android {
     namespace = "io.github.vvb2060.packageinstaller"
     defaultConfig {
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.4"
         optimization {
             keepRules {
                 ignoreFromAllExternalDependencies(true)
