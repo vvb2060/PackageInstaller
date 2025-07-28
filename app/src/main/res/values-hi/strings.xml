@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">शिज़ुकु इंस्टॉलर</string>
+
+    <string name="install">इंस्टॉल करें</string>
+    <string name="update">अपडेट करें</string>
+    <string name="add_more">और जोड़ें</string>
+    <string name="done">हो गया</string>
+    <string name="launch">खोलें</string>
+
+    <string name="copying">कॉपी हो रहा है…</string>
+    <string name="installing">इंस्टॉल हो रहा है…</string>
+    <string name="parsing">पार्स हो रहा है…</string>
+
+    <string name="set_installer">इंस्टॉलर सेट करें</string>
+
+    <string name="package_name">"पैकेज: "</string>
+    <string name="split_name">"स्प्लिट: "</string>
+    <string name="split_types">"प्रकार: "</string>
+    <string name="required_split_types">"आवश्यक: "</string>
+    <string name="version">"संस्करण: "</string>
+    <string name="min_sdk">"न्यूनतम: "</string>
+    <string name="target_sdk">"लक्ष्य: "</string>
+
+    <string name="install_confirm_question">क्या आप इस ऐप को इंस्टॉल करना चाहते हैं?</string>
+    <string name="install_confirm_question_update">क्या आप इस ऐप को अपडेट करना चाहते हैं?</string>
+    <string name="install_confirm_question_split">क्या आप इस ऐप में स्प्लिट पैकेज जोड़ना चाहते हैं?</string>
+
+    <string name="install_done">ऐप इंस्टॉल हो गया।</string>
+
+    <string name="install_failed">ऐप इंस्टॉल नहीं हुआ।</string>
+    <string name="install_failed_blocked">पैकेज को इंस्टॉल होने से रोक दिया गया था।</string>
+    <string name="install_failed_conflict">ऐप इंस्टॉल नहीं हुआ क्योंकि पैकेज मौजूदा पैकेज से टकराता है।</string>
+    <string name="install_failed_incompatible">ऐप इंस्टॉल नहीं हुआ क्योंकि ऐप आपके डिवाइस के साथ संगत नहीं है।</string>
+    <string name="install_failed_invalid_apk">ऐप इंस्टॉल नहीं हुआ क्योंकि पैकेज अमान्य प्रतीत होता है।</string>
+    <string name="install_failed_storage">जगह खत्म</string>
+
+    <string name="error_title">त्रुटि</string>
+    <string name="error_parse">पैकेज को पार्स करते समय एक समस्या हुई।</string>
+    <string name="error_split">मिलान वाला बेस पैकेज गायब है।</string>
+    <string name="error_notfound">ऐप इंस्टॉल किए गए ऐप्स की सूची में नहीं मिला।</string>
+    <string name="error_shizuku_notfound">शिज़ुकु इंस्टॉल नहीं है।</string>
+    <string name="error_shizuku_notrunning">शिज़ुकु नहीं चल रहा है।</string>
+    <string name="error_shizuku_notpermitted">शिज़ुकु की अनुमति नहीं है।</string>
+    <string name="error_shizuku_unavailable">शिज़ुकु अनुपलब्ध है।</string>
+    <string name="error_create">इंस्टॉल सत्र बनाने में विफल।</string>
+    <string name="error_write">एपीके कॉपी करने में विफल।</string>
+    <string name="error_info">यह सॉफ्टवेयर %s के तहत ओपन सोर्स है।</string>
+</resources>

@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">"Shizuku 安裝器"</string>
+
+    <string name="install">"安裝"</string>
+    <string name="update">"更新"</string>
+    <string name="add_more">繼續新增</string>
+    <string name="done">"完成"</string>
+    <string name="launch">"開啟"</string>
+
+    <string name="copying">正在複製…</string>
+    <string name="installing">"正在安裝…"</string>
+    <string name="parsing">"正在解析…"</string>
+
+    <string name="set_installer">設定安裝來源</string>
+
+    <string name="package_name">"套件名稱："</string>
+    <string name="split_name">"分割："</string>
+    <string name="split_types">"類型："</string>
+    <string name="required_split_types">"需求："</string>
+    <string name="version">"版本："</string>
+    <string name="min_sdk">"最低："</string>
+    <string name="target_sdk">"目標："</string>
+
+    <string name="install_confirm_question">"要安裝此應用程式嗎？"</string>
+    <string name="install_confirm_question_update">"要更新此應用程式嗎？"</string>
+    <string name="install_confirm_question_split">"要將分割套件新增至此應用程式嗎？"</string>
+
+    <string name="install_done">"已安裝應用程式。"</string>
+
+    <string name="install_failed">"未安裝應用程式。"</string>
+    <string name="install_failed_blocked">"系統已禁止安裝此套件。"</string>
+    <string name="install_failed_conflict">"應用程式未安裝，因為套件與現有套件衝突。"</string>
+    <string name="install_failed_incompatible">"應用程式未安裝，因為與您的裝置不相容。"</string>
+    <string name="install_failed_invalid_apk">"應用程式未安裝，因為套件似乎無效。"</string>
+    <string name="install_failed_storage">"儲存空間不足"</string>
+
+    <string name="error_title">"錯誤"</string>
+    <string name="error_parse">"解析套件時發生問題。"</string>
+    <string name="error_split">"找不到相符的基礎套件。"</string>
+    <string name="error_notfound">"在已安裝的應用程式清單中找不到此應用程式。"</string>
+    <string name="error_shizuku_notfound">"尚未安裝 Shizuku。"</string>
+    <string name="error_shizuku_notrunning">"Shizuku 尚未執行。"</string>
+    <string name="error_shizuku_notpermitted">"尚未授予 Shizuku 權限。"</string>
+    <string name="error_shizuku_unavailable">"無法使用 Shizuku。"</string>
+    <string name="error_create">"無法建立安裝工作階段。"</string>
+    <string name="error_write">"無法複製 APK。"</string>
+    <string name="error_info">"此軟體是 %s 授權下的開放原始碼軟體。"</string>
+</resources>

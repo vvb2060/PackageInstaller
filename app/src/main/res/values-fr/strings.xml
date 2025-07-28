@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Installateur Shizuku</string>
+
+    <string name="install">Installer</string>
+    <string name="update">Mettre à jour</string>
+    <string name="add_more">Ajouter plus</string>
+    <string name="done">Terminé</string>
+    <string name="launch">Ouvrir</string>
+
+    <string name="copying">Copie en cours…</string>
+    <string name="installing">Installation en cours…</string>
+    <string name="parsing">Analyse en cours…</string>
+
+    <string name="set_installer">Définir l\'installateur</string>
+
+    <string name="package_name">"Paquet : "</string>
+    <string name="split_name">"Split : "</string>
+    <string name="split_types">"Types : "</string>
+    <string name="required_split_types">"Requis : "</string>
+    <string name="version">"Version : "</string>
+    <string name="min_sdk">"Min : "</string>
+    <string name="target_sdk">"Cible : "</string>
+
+    <string name="install_confirm_question">Voulez-vous installer cette application ?</string>
+    <string name="install_confirm_question_update">Voulez-vous mettre à jour cette application ?</string>
+    <string name="install_confirm_question_split">Voulez-vous ajouter un paquet divisé à cette application ?</string>
+
+    <string name="install_done">Application installée.</string>
+
+    <string name="install_failed">Application non installée.</string>
+    <string name="install_failed_blocked">L\'installation du paquet a été bloquée.</string>
+    <string name="install_failed_conflict">Application non installée car le paquet est en conflit avec un paquet existant.</string>
+    <string name="install_failed_incompatible">Application non installée car l\'application n\'est pas compatible avec votre appareil.</string>
+    <string name="install_failed_invalid_apk">Application non installée car le paquet semble invalide.</string>
+    <string name="install_failed_storage">Espace insuffisant</string>
+
+    <string name="error_title">Erreur</string>
+    <string name="error_parse">Un problème est survenu lors de l\'analyse du paquet.</string>
+    <string name="error_split">Paquet de base correspondant manquant.</string>
+    <string name="error_notfound">L\'application n\'a pas été trouvée dans la liste des applications installées.</string>
+    <string name="error_shizuku_notfound">Shizuku n\'est pas installé.</string>
+    <string name="error_shizuku_notrunning">Shizuku n\'est pas en cours d\'exécution.</string>
+    <string name="error_shizuku_notpermitted">Shizuku n\'est pas autorisé.</string>
+    <string name="error_shizuku_unavailable">Shizuku n\'est pas disponible.</string>
+    <string name="error_create">Échec de la création d\'une session d\'installation.</string>
+    <string name="error_write">Échec de la copie de l\'apk.</string>
+    <string name="error_info">Ce logiciel est open source sous %s.</string>
+</resources>

@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Установщик Shizuku</string>
+
+    <string name="install">Установить</string>
+    <string name="update">Обновить</string>
+    <string name="add_more">Добавить еще</string>
+    <string name="done">Готово</string>
+    <string name="launch">Открыть</string>
+
+    <string name="copying">Копирование…</string>
+    <string name="installing">Установка…</string>
+    <string name="parsing">Анализ…</string>
+
+    <string name="set_installer">Задать установщик</string>
+
+    <string name="package_name">"Пакет: "</string>
+    <string name="split_name">"Разделение: "</string>
+    <string name="split_types">"Типы: "</string>
+    <string name="required_split_types">"Требуется: "</string>
+    <string name="version">"Версия: "</string>
+    <string name="min_sdk">"Мин. SDK: "</string>
+    <string name="target_sdk">"Цел. SDK: "</string>
+
+    <string name="install_confirm_question">Установить это приложение?</string>
+    <string name="install_confirm_question_update">Обновить это приложение?</string>
+    <string name="install_confirm_question_split">Добавить разделенный пакет в это приложение?</string>
+
+    <string name="install_done">Приложение установлено.</string>
+
+    <string name="install_failed">Приложение не установлено.</string>
+    <string name="install_failed_blocked">Установка пакета была заблокирована.</string>
+    <string name="install_failed_conflict">Приложение не установлено, так как пакет конф��иктует с существующим пакетом.</string>
+    <string name="install_failed_incompatible">Приложение не установлено, так как оно несовместимо с вашим устройством.</string>
+    <string name="install_failed_invalid_apk">Приложение не установлено, так как пакет поврежден.</string>
+    <string name="install_failed_storage">Недостаточно места</string>
+
+    <string name="error_title">Ошибка</string>
+    <string name="error_parse">Возникла проблема при синтаксическом анализе пакета.</string>
+    <string name="error_split">Отсутствует соответствующий базовый пакет.</string>
+    <string name="error_notfound">Приложение не найдено в списке установленных приложений.</string>
+    <string name="error_shizuku_notfound">Shizuku не установлен.</string>
+    <string name="error_shizuku_notrunning">Shizuku не запущен.</string>
+    <string name="error_shizuku_notpermitted">Shizuku не разрешен.</string>
+    <string name="error_shizuku_unavailable">Shizuku недоступен.</string>
+    <string name="error_create">Не удалось создать сеанс установки.</string>
+    <string name="error_write">Не удалось скопировать apk.</string>
+    <string name="error_info">Это программное обеспечение является открытым исходным кодом под %s.</string>
+</resources>

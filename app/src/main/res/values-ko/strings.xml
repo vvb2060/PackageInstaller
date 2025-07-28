@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Shizuku 설치 프로그램</string>
+
+    <string name="install">설치</string>
+    <string name="update">업데이트</string>
+    <string name="add_more">더 추가</string>
+    <string name="done">완료</string>
+    <string name="launch">열기</string>
+
+    <string name="copying">복사 중…</string>
+    <string name="installing">설치 중…</string>
+    <string name="parsing">파싱 중…</string>
+
+    <string name="set_installer">설치 프로그램 설정</string>
+
+    <string name="package_name">"패키지: "</string>
+    <string name="split_name">"분할: "</string>
+    <string name="split_types">"유형: "</string>
+    <string name="required_split_types">"필수: "</string>
+    <string name="version">"버전: "</string>
+    <string name="min_sdk">"최소: "</string>
+    <string name="target_sdk">"대상: "</string>
+
+    <string name="install_confirm_question">이 앱을 설치하시겠습니까?</string>
+    <string name="install_confirm_question_update">이 앱을 업데이트하시겠습니까?</string>
+    <string name="install_confirm_question_split">이 앱에 분할 패키지를 추가하시겠습니까?</string>
+
+    <string name="install_done">앱이 설치되었습니다.</string>
+
+    <string name="install_failed">앱이 설치되지 않았습니다.</string>
+    <string name="install_failed_blocked">패키지 설치가 차단되었습니다.</string>
+    <string name="install_failed_conflict">기존 패키지와 충돌하여 앱이 설치되지 않았습니다.</string>
+    <string name="install_failed_incompatible">앱이 기기와 호환되지 않아 설치되지 않았습니다.</string>
+    <string name="install_failed_invalid_apk">패키지가 잘못된 것 같아 앱이 설치되지 않았습니다.</string>
+    <string name="install_failed_storage">공간 부족</string>
+
+    <string name="error_title">오류</string>
+    <string name="error_parse">패키지를 파싱하는 중에 문제가 발생했습니다.</string>
+    <string name="error_split">일치하는 기본 패키지가 없습니다.</string>
+    <string name="error_notfound">설치된 앱 목록에서 앱을 찾을 수 없습니다.</string>
+    <string name="error_shizuku_notfound">Shizuku가 설치되어 있지 않습니다.</string>
+    <string name="error_shizuku_notrunning">Shizuku가 실행되고 있지 않습니다.</string>
+    <string name="error_shizuku_notpermitted">Shizuku가 허용되지 않았습니다.</string>
+    <string name="error_shizuku_unavailable">Shizuku를 사용할 수 없습니다.</string>
+    <string name="error_create">설치 세션을 만들지 못했습니다.</string>
+    <string name="error_write">apk를 복사하지 못했습니다.</string>
+    <string name="error_info">이 소프트웨어는 %s에 따라 오픈 소스입니다.</string>
+</resources>

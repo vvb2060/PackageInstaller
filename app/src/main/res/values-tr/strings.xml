@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Shizuku yükleyici</string>
+
+    <string name="install">Yükle</string>
+    <string name="update">Güncelle</string>
+    <string name="add_more">Daha fazla ekle</string>
+    <string name="done">Bitti</string>
+    <string name="launch">Aç</string>
+
+    <string name="copying">Kopyalanıyor…</string>
+    <string name="installing">Yükleniyor…</string>
+    <string name="parsing">Ayrıştırılıyor…</string>
+
+    <string name="set_installer">Yükleyiciyi ayarla</string>
+
+    <string name="package_name">"Paket: "</string>
+    <string name="split_name">"Bölünmüş: "</string>
+    <string name="split_types">"Türler: "</string>
+    <string name="required_split_types">"Gerekli: "</string>
+    <string name="version">"Sürüm: "</string>
+    <string name="min_sdk">"Min: "</string>
+    <string name="target_sdk">"Hedef: "</string>
+
+    <string name="install_confirm_question">Bu uygulamayı yüklemek istiyor musunuz?</string>
+    <string name="install_confirm_question_update">Bu uygulamayı güncellemek istiyor musunuz?</string>
+    <string name="install_confirm_question_split">Bu uygulamaya bölünmüş paket eklemek istiyor musunuz?</string>
+
+    <string name="install_done">Uygulama yüklendi.</string>
+
+    <string name="install_failed">Uygulama yüklenmedi.</string>
+    <string name="install_failed_blocked">Paketin yüklenmesi engellendi.</string>
+    <string name="install_failed_conflict">Paket mevcut bir paketle çakıştığı için uygulama yüklenmedi.</string>
+    <string name="install_failed_incompatible">Uygulama cihazınızla uyumlu olmadığı için yüklenmedi.</string>
+    <string name="install_failed_invalid_apk">Paket geçersiz göründüğü için uygulama yüklenmedi.</string>
+    <string name="install_failed_storage">Yetersiz alan</string>
+
+    <string name="error_title">Hata</string>
+    <string name="error_parse">Paket ayrıştırılırken bir sorun oluştu.</string>
+    <string name="error_split">Eşleşen temel paket eksik.</string>
+    <string name="error_notfound">Uygulama, yüklü uygulamalar listesinde bulunamadı.</string>
+    <string name="error_shizuku_notfound">Shizuku yüklü değil.</string>
+    <string name="error_shizuku_notrunning">Shizuku çalışmıyor.</string>
+    <string name="error_shizuku_notpermitted">Shizuku\'ya izin verilmedi.</string>
+    <string name="error_shizuku_unavailable">Shizuku kullanılamıyor.</string>
+    <string name="error_create">Yükleme oturumu oluşturulamadı.</string>
+    <string name="error_write">Apk kopyalanamadı.</string>
+    <string name="error_info">Bu yazılım, %s altında açık kaynaklıdır.</string>
+</resources>

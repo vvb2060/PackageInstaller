@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">"Shizuku インストーラー"</string>
+
+    <string name="install">"インストール"</string>
+    <string name="update">"更新"</string>
+    <string name="add_more">"追加"</string>
+    <string name="done">"完了"</string>
+    <string name="launch">"開く"</string>
+
+    <string name="copying">"コピー中…"</string>
+    <string name="installing">"インストール中…"</string>
+    <string name="parsing">"解析中…"</string>
+
+    <string name="set_installer">"インストーラーを設定"</string>
+
+    <string name="package_name">"パッケージ: "</string>
+    <string name="split_name">"Split: "</string>
+    <string name="split_types">"タイプ: "</string>
+    <string name="required_split_types">"必須: "</string>
+    <string name="version">"バージョン: "</string>
+    <string name="min_sdk">"最小SDK: "</string>
+    <string name="target_sdk">"対象SDK: "</string>
+
+    <string name="install_confirm_question">"このアプリをインストールしますか？"</string>
+    <string name="install_confirm_question_update">"このアプリを更新しますか？"</string>
+    <string name="install_confirm_question_split">"このアプリに分割パッケージを追加しますか？"</string>
+
+    <string name="install_done">"アプリはインストールされました。"</string>
+
+    <string name="install_failed">"アプリはインストールされませんでした。"</string>
+    <string name="install_failed_blocked">"パッケージのインストールはブロックされました。"</string>
+    <string name="install_failed_conflict">"既存のパッケージと競合するため、アプリはインストールされませんでした。"</string>
+    <string name="install_failed_incompatible">"お使いのデバイスと互換性がないため、アプリはインストールされませんでした。"</string>
+    <string name="install_failed_invalid_apk">"パッケージが無効なため、アプリはインストールされませんでした。"</string>
+    <string name="install_failed_storage">"空き容量がありません"</string>
+
+    <string name="error_title">"エラー"</string>
+    <string name="error_parse">"パッケージの解析中に問題が発生しました。"</string>
+    <string name="error_split">"一致するベースパッケージが見つかりません。"</string>
+    <string name="error_notfound">"インストール済みのアプリ一覧にこのアプリが見つかりませんでした。"</string>
+    <string name="error_shizuku_notfound">"Shizukuがインストールされていません。"</string>
+    <string name="error_shizuku_notrunning">"Shizukuが実行されていません。"</string>
+    <string name="error_shizuku_notpermitted">"Shizukuが許可されていません。"</string>
+    <string name="error_shizuku_unavailable">"Shizukuは利用できません。"</string>
+    <string name="error_create">"インストールセッションの作成に失敗しました。"</string>
+    <string name="error_write">"APKのコピーに失敗しました。"</string>
+    <string name="error_info">"このソフトウェアは%sの下でオープンソースです。"</string>
+</resources>

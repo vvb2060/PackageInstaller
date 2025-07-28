@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Pemasang Shizuku</string>
+
+    <string name="install">Pasang</string>
+    <string name="update">Perbarui</string>
+    <string name="add_more">Tambah lagi</string>
+    <string name="done">Selesai</string>
+    <string name="launch">Buka</string>
+
+    <string name="copying">Menyalin…</string>
+    <string name="installing">Memasang…</string>
+    <string name="parsing">Mengurai…</string>
+
+    <string name="set_installer">Setel pemasang</string>
+
+    <string name="package_name">"Paket: "</string>
+    <string name="split_name">"Pisahan: "</string>
+    <string name="split_types">"Jenis: "</string>
+    <string name="required_split_types">"Diperlukan: "</string>
+    <string name="version">"Versi: "</string>
+    <string name="min_sdk">"Min: "</string>
+    <string name="target_sdk">"Target: "</string>
+
+    <string name="install_confirm_question">Anda ingin memasang aplikasi ini?</string>
+    <string name="install_confirm_question_update">Anda ingin memperbarui aplikasi ini?</string>
+    <string name="install_confirm_question_split">Anda ingin menambahkan paket terpisah ke aplikasi ini?</string>
+
+    <string name="install_done">Aplikasi terpasang.</string>
+
+    <string name="install_failed">Aplikasi tidak terpasang.</string>
+    <string name="install_failed_blocked">Paket diblokir agar tidak dipasang.</string>
+    <string name="install_failed_conflict">Aplikasi tidak dipasang karena paket berkonflik dengan paket yang ada.</string>
+    <string name="install_failed_incompatible">Aplikasi tidak dipasang karena tidak kompatibel dengan perangkat Anda.</string>
+    <string name="install_failed_invalid_apk">Aplikasi tidak dipasang karena paket tampaknya tidak valid.</string>
+    <string name="install_failed_storage">Kehabisan ruang</string>
+
+    <string name="error_title">Kesalahan</string>
+    <string name="error_parse">Terjadi masalah saat mengurai paket.</string>
+    <string name="error_split">Paket dasar yang cocok tidak ada.</string>
+    <string name="error_notfound">Aplikasi tidak ditemukan di daftar aplikasi yang terpasang.</string>
+    <string name="error_shizuku_notfound">Shizuku tidak terpasang.</string>
+    <string name="error_shizuku_notrunning">Shizuku tidak berjalan.</string>
+    <string name="error_shizuku_notpermitted">Shizuku tidak diizinkan.</string>
+    <string name="error_shizuku_unavailable">Shizuku tidak tersedia.</string>
+    <string name="error_create">Gagal membuat sesi pemasangan.</string>
+    <string name="error_write">Gagal menyalin apk.</string>
+    <string name="error_info">Perangkat lunak ini adalah sumber terbuka di bawah %s.</string>
+</resources>

@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Instalator Shizuku</string>
+
+    <string name="install">Zainstaluj</string>
+    <string name="update">Zaktualizuj</string>
+    <string name="add_more">Dodaj więcej</string>
+    <string name="done">Gotowe</string>
+    <string name="launch">Otwórz</string>
+
+    <string name="copying">Kopiowanie…</string>
+    <string name="installing">Instalowanie…</string>
+    <string name="parsing">Analizowanie…</string>
+
+    <string name="set_installer">Ustaw instalator</string>
+
+    <string name="package_name">"Pakiet: "</string>
+    <string name="split_name">"Podział: "</string>
+    <string name="split_types">"Typy: "</string>
+    <string name="required_split_types">"Wymagane: "</string>
+    <string name="version">"Wersja: "</string>
+    <string name="min_sdk">"Min: "</string>
+    <string name="target_sdk">"Cel: "</string>
+
+    <string name="install_confirm_question">Czy chcesz zainstalować tę aplikację?</string>
+    <string name="install_confirm_question_update">Czy chcesz zaktualizować tę aplikację?</string>
+    <string name="install_confirm_question_split">Czy chcesz dodać podzielony pakiet do tej aplikacji?</string>
+
+    <string name="install_done">Aplikacja zainstalowana.</string>
+
+    <string name="install_failed">Aplikacja nie została zainstalowana.</string>
+    <string name="install_failed_blocked">Instalacja pakietu została zablokowana.</string>
+    <string name="install_failed_conflict">Aplikacja nie została zainstalowana, ponieważ pakiet jest w konflikcie z istniejącym pakietem.</string>
+    <string name="install_failed_incompatible">Aplikacja nie została zainstalowana, ponieważ nie jest zgodna z Twoim urządzeniem.</string>
+    <string name="install_failed_invalid_apk">Aplikacja nie została zainstalowana, ponieważ pakiet wydaje się być nieprawidłowy.</string>
+    <string name="install_failed_storage">Brak miejsca</string>
+
+    <string name="error_title">Błąd</string>
+    <string name="error_parse">Wystąpił problem podczas analizowania pakietu.</string>
+    <string name="error_split">Brak pasującego pakietu podstawowego.</string>
+    <string name="error_notfound">Aplikacji nie znaleziono na liście zainstalowanych aplikacji.</string>
+    <string name="error_shizuku_notfound">Shizuku nie jest zainstalowany.</string>
+    <string name="error_shizuku_notrunning">Shizuku nie jest uruchomiony.</string>
+    <string name="error_shizuku_notpermitted">Shizuku nie ma uprawnień.</string>
+    <string name="error_shizuku_unavailable">Shizuku jest niedostępny.</string>
+    <string name="error_create">Nie udało się utworzyć sesji instalacyjnej.</string>
+    <string name="error_write">Nie udało się skopiować pliku apk.</string>
+    <string name="error_info">To oprogramowanie jest oprogramowaniem typu open source na licencji %s.</string>
+</resources>

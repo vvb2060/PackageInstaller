@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Trình cài đặt Shizuku</string>
+
+    <string name="install">Cài đặt</string>
+    <string name="update">Cập nhật</string>
+    <string name="add_more">Thêm</string>
+    <string name="done">Xong</string>
+    <string name="launch">Mở</string>
+
+    <string name="copying">Đang sao chép…</string>
+    <string name="installing">Đang cài đặt…</string>
+    <string name="parsing">Đang phân tích…</string>
+
+    <string name="set_installer">Đặt trình cài đặt</string>
+
+    <string name="package_name">"Gói: "</string>
+    <string name="split_name">"Tách: "</string>
+    <string name="split_types">"Loại: "</string>
+    <string name="required_split_types">"Yêu cầu: "</string>
+    <string name="version">"Phiên bản: "</string>
+    <string name="min_sdk">"Tối thiểu: "</string>
+    <string name="target_sdk">"Mục tiêu: "</string>
+
+    <string name="install_confirm_question">Bạn có muốn cài đặt ứng dụng này không?</string>
+    <string name="install_confirm_question_update">Bạn có muốn cập nhật ứng dụng này không?</string>
+    <string name="install_confirm_question_split">Bạn có muốn thêm gói tách vào ứng dụng này không?</string>
+
+    <string name="install_done">Đã cài đặt ứng dụng.</string>
+
+    <string name="install_failed">Chưa cài đặt ứng dụng.</string>
+    <string name="install_failed_blocked">Gói đã bị chặn cài đặt.</string>
+    <string name="install_failed_conflict">Ứng dụng chưa được cài đặt vì gói xung đột với một gói hiện có.</string>
+    <string name="install_failed_incompatible">Ứng dụng chưa được cài đặt vì không tương thích với thiết bị của bạn.</string>
+    <string name="install_failed_invalid_apk">Ứng dụng chưa được cài đặt vì gói có vẻ không hợp lệ.</string>
+    <string name="install_failed_storage">Hết dung lượng</string>
+
+    <string name="error_title">Lỗi</string>
+    <string name="error_parse">Đã xảy ra sự cố khi phân tích cú pháp gói.</string>
+    <string name="error_split">Thiếu gói cơ sở phù hợp.</string>
+    <string name="error_notfound">Không tìm thấy ứng dụng trong danh sách các ứng dụng đã cài đặt.</string>
+    <string name="error_shizuku_notfound">Shizuku chưa được cài đặt.</string>
+    <string name="error_shizuku_notrunning">Shizuku không chạy.</string>
+    <string name="error_shizuku_notpermitted">Shizuku không được phép.</string>
+    <string name="error_shizuku_unavailable">Shizuku không khả dụng.</string>
+    <string name="error_create">Không thể tạo phiên cài đặt.</string>
+    <string name="error_write">Không thể sao chép apk.</string>
+    <string name="error_info">Phần mềm này là mã nguồn mở theo %s.</string>
+</resources>

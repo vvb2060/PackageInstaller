@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Shizuku-Installationsprogramm</string>
+
+    <string name="install">Installieren</string>
+    <string name="update">Aktualisieren</string>
+    <string name="add_more">Mehr hinzufügen</string>
+    <string name="done">Fertig</string>
+    <string name="launch">Öffnen</string>
+
+    <string name="copying">Kopieren…</string>
+    <string name="installing">Installieren…</string>
+    <string name="parsing">Analysieren…</string>
+
+    <string name="set_installer">Installationsprogramm festlegen</string>
+
+    <string name="package_name">"Paket: "</string>
+    <string name="split_name">"Split: "</string>
+    <string name="split_types">"Typen: "</string>
+    <string name="required_split_types">"Erforderlich: "</string>
+    <string name="version">"Version: "</string>
+    <string name="min_sdk">"Min: "</string>
+    <string name="target_sdk">"Ziel: "</string>
+
+    <string name="install_confirm_question">Möchten Sie diese App installieren?</string>
+    <string name="install_confirm_question_update">Möchten Sie diese App aktualisieren?</string>
+    <string name="install_confirm_question_split">Möchten Sie dieser App ein geteiltes Paket hinzufügen?</string>
+
+    <string name="install_done">App installiert.</string>
+
+    <string name="install_failed">App nicht installiert.</string>
+    <string name="install_failed_blocked">Die Installation des Pakets wurde blockiert.</string>
+    <string name="install_failed_conflict">App nicht installiert, da das Paket mit einem vorhandenen Paket in Konflikt steht.</string>
+    <string name="install_failed_incompatible">App nicht installiert, da die App nicht mit Ihrem Gerät kompatibel ist.</string>
+    <string name="install_failed_invalid_apk">App nicht installiert, da das Paket ungültig zu sein scheint.</string>
+    <string name="install_failed_storage">Nicht genügend Speicherplatz</string>
+
+    <string name="error_title">Fehler</string>
+    <string name="error_parse">Beim Analysieren des Pakets ist ein Problem aufgetreten.</string>
+    <string name="error_split">Fehlendes passendes Basispaket.</string>
+    <string name="error_notfound">Die App wurde nicht in der Liste der installierten Apps gefunden.</string>
+    <string name="error_shizuku_notfound">Shizuku ist nicht installiert.</string>
+    <string name="error_shizuku_notrunning">Shizuku wird nicht ausgeführt.</string>
+    <string name="error_shizuku_notpermitted">Shizuku ist nicht zulässig.</string>
+    <string name="error_shizuku_unavailable">Shizuku ist nicht verfügbar.</string>
+    <string name="error_create">Fehler beim Erstellen einer Installationssitzung.</string>
+    <string name="error_write">Fehler beim Kopieren der APK.</string>
+    <string name="error_info">Diese Software ist Open Source unter %s.</string>
+</resources>
