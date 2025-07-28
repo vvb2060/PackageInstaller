@@ -2,13 +2,18 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
+import android.text.style.ReplacementSpan;
 import android.text.style.StyleSpan;
+import android.text.style.TabStopSpan;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -26,9 +31,9 @@ public class InstallConfirmationFragment extends DialogFragment {
 
     private final InstallUserAction mDialogData;
     private InstallViewModel mViewModel;
-    private InstallViewModel mViewModel2;
     private AlertDialog mDialog;
     private CheckBox mCheckBox;
+    private TextView mTextView;
 
     public InstallConfirmationFragment(InstallUserAction dialogData) {
         mDialogData = dialogData;
@@ -39,8 +44,6 @@ public class InstallConfirmationFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(requireActivity())
             .get(InstallViewModel.class);
-        mViewModel2 = new ViewModelProvider(requireActivity())
-            .get(InstallViewModel.class);
     }
 
     @NonNull
@@ -49,14 +52,14 @@ public class InstallConfirmationFragment extends DialogFragment {
         var context = requireContext();
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
         dialogView.requireViewById(R.id.install_confirm).setVisibility(View.VISIBLE);
-        TextView textView = dialogView.requireViewById(R.id.message);
+        mTextView = dialogView.requireViewById(R.id.message);
         mCheckBox = dialogView.requireViewById(R.id.set_installer);
         if (mDialogData.getSkipCreate()) {
             mCheckBox.setVisibility(View.GONE);
         }
 
         var sb = new SpannableStringBuilder();
-        getInfo(sb);
+        getInfo(context, sb);
         var old = mDialogData.getOldApk();
         int question = R.string.install_confirm_question;
         if (old != null) {
@@ -74,24 +77,20 @@ public class InstallConfirmationFragment extends DialogFragment {
         }
         sb.append(context.getString(question), new StyleSpan(Typeface.ITALIC),
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
-        textView.setText(sb);
+        mTextView.setText(sb, TextView.BufferType.SPANNABLE);
 
         mDialog = new AlertDialog.Builder(context)
             .setIcon(mDialogData.getApkLite().getIcon())
             .setTitle(mDialogData.getApkLite().getLabel())
             .setView(dialogView)
             .setPositiveButton(old != null ? R.string.update : R.string.install,
-                (dialogInt, which) -> {
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), true, full);
-                })
+                (dialogInt, which) ->
+                    mViewModel.initiateInstall(mCheckBox.isChecked(), true, full))
             .setNegativeButton(android.R.string.cancel,
-                (dialogInt, which) -> {
-                    cleanAndFinish();
-                })
+                (dialogInt, which) -> cleanAndFinish())
             .setNeutralButton(R.string.add_more,
-                (dialogInt, which) -> {
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), false, full);
-                })
+                (dialogInt, which) ->
+                    mViewModel.initiateInstall(mCheckBox.isChecked(), false, full))
             .create();
         return mDialog;
     }
@@ -128,39 +127,45 @@ public class InstallConfirmationFragment extends DialogFragment {
         requireActivity().finish();
     }
 
-    private void getInfo(SpannableStringBuilder sb) {
+    private void getInfo(Context context, SpannableStringBuilder sb) {
         var apk = mDialogData.getApkLite();
         var old = mDialogData.getOldApk();
-        append(sb, R.string.package_name, null, apk.getPackageName());
+        append(context, sb, R.string.package_name, apk.getPackageName());
         if (apk.needSplit()) {
-            append(sb, R.string.split_name, null, apk.getSplitName());
-            append(sb, R.string.split_types, null, apk.getSplitTypes());
-            append(sb, R.string.required_split_types, null, apk.getRequiredSplitTypes());
+            append(context, sb, R.string.split_name, apk.getSplitName());
+            append(context, sb, R.string.split_types, apk.getSplitTypes());
+            append(context, sb, R.string.required_split_types, apk.getRequiredSplitTypes());
         }
         if (apk.isSplit()) return;
+
         var ver = apk.getVersionName() + " (" + apk.getVersionCode() + ")";
         var min = getAndroidName(apk.getMinSdkVersion());
         var target = getAndroidName(apk.getTargetSdkVersion());
-        String oldVer = null;
-        String oldMin = null;
-        String oldTarget = null;
         if (old != null) {
-            oldVer = old.versionName + " (" + old.getLongVersionCode() + ")";
-            oldMin = getAndroidName(old.applicationInfo.minSdkVersion);
-            oldTarget = getAndroidName(old.applicationInfo.targetSdkVersion);
+            var oldVer = old.versionName + " (" + old.getLongVersionCode() + ")";
+            var oldMin = getAndroidName(old.applicationInfo.minSdkVersion);
+            var oldTarget = getAndroidName(old.applicationInfo.targetSdkVersion);
+            append(context, sb, oldVer, old.getLongVersionCode(), ver, apk.getVersionCode());
+            append(context, sb, R.string.min_sdk, oldMin, min);
+            append(context, sb, R.string.target_sdk, oldTarget, target);
+        } else {
+            append(context, sb, R.string.version, ver);
+            append(context, sb, R.string.min_sdk, min);
+            append(context, sb, R.string.target_sdk, target);
         }
-        append(sb, R.string.version, oldVer, ver);
-        append(sb, R.string.min_sdk, oldMin, min);
-        append(sb, R.string.target_sdk, oldTarget, target);
     }
 
-    private void append(SpannableStringBuilder sb, int label, String old, String now) {
-        var context = requireContext();
-        if (old == null || old.equals(now)) {
-            if (now != null && !now.isEmpty()) {
-                sb.append(context.getString(label));
-                sb.append(now).append("\n");
-            }
+    private void append(Context context, SpannableStringBuilder sb, int label, String now) {
+        if (now != null && !now.isEmpty()) {
+            sb.append(context.getString(label));
+            sb.append(now).append("\n");
+        }
+    }
+
+    private void append(Context context, SpannableStringBuilder sb,
+                        int label, String old, String now) {
+        if (old.equals(now)) {
+            append(context, sb, label, now);
         } else {
             sb.append(context.getString(label));
             sb.append(old);
@@ -169,6 +174,55 @@ public class InstallConfirmationFragment extends DialogFragment {
                 SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append("\n");
         }
+    }
+
+    private void append(Context context, SpannableStringBuilder sb,
+                        String old, long oldVer,
+                        String now, long nowVer) {
+        if (old.equals(now)) {
+            append(context, sb, R.string.version, now);
+            return;
+        }
+        var label = context.getString(R.string.version);
+        var start = sb.length();
+        sb.append(label).append("\t");
+        sb.append(old).append("\n");
+        var indicatorStart = sb.length();
+        sb.append("\t");
+        sb.append(now, new StyleSpan(Typeface.BOLD),
+            SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append("\n");
+        var end = sb.length();
+        var paint = mTextView.getPaint();
+        int offset = (int) paint.measureText(label) + 1;
+        sb.setSpan(new TabStopSpan.Standard(offset), start, end,
+            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE);
+
+        String indicator;
+        if (oldVer < nowVer) {
+            indicator = "▲";
+        } else if (oldVer > nowVer) {
+            indicator = "▼";
+        } else {
+            indicator = "=";
+        }
+        var indicatorWidth = paint.measureText(indicator);
+        var indicatorSpan = new ReplacementSpan() {
+            @Override
+            public int getSize(@NonNull Paint paint, CharSequence text, int start, int end,
+                               @Nullable Paint.FontMetricsInt fm) {
+                return offset;
+            }
+
+            @Override
+            public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
+                             float x, int top, int y, int bottom, @NonNull Paint paint) {
+                float textX = x + (offset - indicatorWidth) / 2;
+                canvas.drawText(indicator, textX, y, paint);
+            }
+        };
+        sb.setSpan(indicatorSpan, indicatorStart, indicatorStart + 1,
+            SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private static String getAndroidName(String apiLevel) {
