@@ -16,30 +16,30 @@ sealed class InstallStage(val stageCode: Int) {
 
 class InstallParse : InstallStage(STAGE_PARSE)
 
-data class InstallUserAction(
+class InstallUserAction(
     val apkLite: ApkLite,
     val oldApk: PackageInfo?,
     val fullInstall: Boolean,
     val skipCreate: Boolean,
 ) : InstallStage(STAGE_USER_ACTION)
 
-data class InstallInstalling(
+class InstallInstalling(
     val apkLite: ApkLite,
 ) : InstallStage(STAGE_INSTALLING)
 
-data class InstallSuccess(
+class InstallSuccess(
     val apkLite: ApkLite,
     val startIntent: Intent?,
 ) : InstallStage(STAGE_SUCCESS)
 
-data class InstallFailed(
+class InstallFailed(
     val apkLite: ApkLite,
     val legacyCode: Int,
     val statusCode: Int,
     val message: String?,
 ) : InstallStage(STAGE_FAILED)
 
-data class InstallAborted(
+class InstallAborted(
     val abortReason: Int,
     val intent: Intent? = null,
 ) : InstallStage(STAGE_ABORTED) {
