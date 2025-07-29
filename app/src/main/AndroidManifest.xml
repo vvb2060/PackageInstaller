@@ -21,7 +21,7 @@
         tools:remove="android:appComponentFactory">
 
         <activity
-            android:name="io.github.vvb2060.packageinstaller.ui.InstallLaunch"
+            android:name=".ui.InstallLaunch"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:excludeFromRecents="true"
             android:exported="true">
