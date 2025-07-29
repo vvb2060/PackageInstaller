@@ -3,7 +3,9 @@ package io.github.vvb2060.packageinstaller.ui
 import android.os.Bundle
 import android.view.Window
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import io.github.vvb2060.packageinstaller.model.InstallAborted
@@ -19,6 +21,7 @@ import io.github.vvb2060.packageinstaller.ui.fragments.InstallInstallingFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallParseFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallSuccessFragment
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel
+import java.lang.reflect.Constructor
 
 class InstallLaunch : FragmentActivity() {
 
@@ -26,12 +29,25 @@ class InstallLaunch : FragmentActivity() {
     private lateinit var fragmentManager: FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         fragmentManager = supportFragmentManager
         installViewModel = ViewModelProvider(this)[InstallViewModel::class.java]
+        fragmentManager.fragmentFactory = object : FragmentFactory() {
+            override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+                val cls = loadFragmentClass(classLoader, className)
+                val constructor = cls.constructors[0]!! as Constructor<Fragment>
+                return if (constructor.parameterCount == 1) {
+                    constructor.newInstance(installViewModel.currentInstallStage.value)
+                } else {
+                    constructor.newInstance()
+                }
+            }
+        }
 
-        installViewModel.preprocessIntent(this.intent)
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            installViewModel.preprocessIntent(this.intent)
+        }
         installViewModel.currentInstallStage.observe(this) { installStage: InstallStage ->
             onInstallStageChange(installStage)
         }
@@ -83,15 +99,9 @@ class InstallLaunch : FragmentActivity() {
 
     private fun showDialogInner(newDialog: DialogFragment?) {
         val currentDialog = fragmentManager.findFragmentByTag("dialog") as DialogFragment?
+        if (currentDialog?.javaClass == newDialog?.javaClass) return
         currentDialog?.dismissAllowingStateLoss()
         newDialog?.show(fragmentManager, "dialog")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (isChangingConfigurations()) {
-            showDialogInner(null)
-        }
     }
 
 }

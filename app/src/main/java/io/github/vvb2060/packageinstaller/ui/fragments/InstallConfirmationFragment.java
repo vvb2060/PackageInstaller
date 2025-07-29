@@ -66,7 +66,9 @@ public class InstallConfirmationFragment extends DialogFragment {
             var flags = old.applicationInfo.flags;
             var system = (flags & ApplicationInfo.FLAG_SYSTEM) != 0;
             var installed = (flags & ApplicationInfo.FLAG_INSTALLED) != 0;
-            mCheckBox.setChecked(system);
+            if (system && savedInstanceState == null) {
+                mCheckBox.setChecked(true);
+            }
             if (installed) {
                 question = R.string.install_confirm_question_update;
             }
