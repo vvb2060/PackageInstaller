@@ -1,5 +1,11 @@
 package android.content.pm;
 
+import android.content.ComponentName;
+import android.content.IntentFilter;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 public class PackageManager_rename {
 
     public static int GET_ACTIVITIES = 0x00000001;
@@ -222,5 +228,9 @@ public class PackageManager_rename {
     public static int INSTALL_FAILED_INTERNAL_ERROR = -110;
 
     public native int installExistingPackage(String packageName, int installReason);
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    public native void addUniquePreferredActivity(IntentFilter filter, int match,
+                                                  ComponentName[] set, ComponentName activity);
 
 }

@@ -15,7 +15,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
-import io.github.vvb2060.packageinstaller.model.Hook;
 import io.github.vvb2060.packageinstaller.model.InstallAborted;
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 import rikka.shizuku.Shizuku;
@@ -93,8 +92,7 @@ public class InstallErrorFragment extends DialogFragment {
             case InstallAborted.ABORT_INFO -> {
                 return getString(R.string.error_info,
                     context.getString(R.string.license)) + "\n\n" +
-                    context.getString(R.string.copyright) + "\n" +
-                    Hook.INSTANCE.getPreferredActivity(context.getPackageManager());
+                    context.getString(R.string.copyright);
             }
         }
         var id = switch (code) {

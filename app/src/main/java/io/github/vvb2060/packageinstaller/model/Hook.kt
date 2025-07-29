@@ -3,26 +3,20 @@ package io.github.vvb2060.packageinstaller.model
 import android.app.ActivityThread
 import android.app.IActivityManager
 import android.content.AttributionSource
-import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageInstallerSession
 import android.content.pm.IPackageManager
 import android.content.pm.PackageInstaller
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import android.provider.Settings
 import android.system.Os
 import androidx.annotation.RequiresApi
-import io.github.vvb2060.packageinstaller.BuildConfig
-import io.github.vvb2060.packageinstaller.ui.InstallLaunch
 import org.lsposed.hiddenapibypass.LSPass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
@@ -30,8 +24,8 @@ import rikka.shizuku.SystemServiceHelper
 
 object Hook {
     private var hooked = false
-    private lateinit var rawPm: IPackageManager
     private lateinit var am: IActivityManager
+    lateinit var rawPm: IPackageManager
 
     init {
         LSPass.setHiddenApiExemptions("")
@@ -97,62 +91,15 @@ object Hook {
     }
 
     fun disableAdbVerify(context: Context) {
-        val verifierIncludeAdb = Settings.Global.getInt(
-            context.contentResolver,
-            "verifier_verify_adb_installs", 1
-        ) != 0
+        val name = "verifier_verify_adb_installs"
+        val verifierIncludeAdb = Settings.Global.getInt(context.contentResolver, name, 1) != 0
         if (verifierIncludeAdb) {
             wrapGlobalSettings {
                 val contextWrapper = ShizukuContext(context)
                 val cr = object : ContentResolver(contextWrapper) {}
-                Settings.Global.putInt(cr, "verifier_verify_adb_installs", 0)
+                Settings.Global.putInt(cr, name, 0)
             }
         }
-    }
-
-    fun getPreferredActivity(pm: PackageManager): String {
-        val type = "application/vnd.android.package-archive"
-        val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            addCategory(Intent.CATEGORY_DEFAULT)
-            setDataAndType(uri, type)
-        }
-        val info = pm.resolveActivity(installIntent, PackageManager.MATCH_DEFAULT_ONLY)
-        info?.run {
-            if (activityInfo.packageName != BuildConfig.APPLICATION_ID) {
-                return activityInfo.name
-            }
-        }
-        return ""
-    }
-
-    fun addPreferredActivity(pm: PackageManager) {
-        val type = "application/vnd.android.package-archive"
-        val uri = Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT).build()
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            addCategory(Intent.CATEGORY_DEFAULT)
-            setDataAndType(uri, type)
-        }
-        val info = pm.resolveActivity(installIntent, PackageManager.MATCH_DEFAULT_ONLY)
-        if (info?.activityInfo?.packageName == BuildConfig.APPLICATION_ID) {
-            return
-        }
-        rawPm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_VIEW)
-            addAction(Intent.ACTION_INSTALL_PACKAGE)
-            addCategory(Intent.CATEGORY_DEFAULT)
-            addDataType(type)
-        }
-        val set = pm.queryIntentActivities(
-            installIntent,
-            PackageManager.MATCH_DEFAULT_ONLY
-        ).map { info ->
-            ComponentName(info.activityInfo.packageName, info.activityInfo.name)
-        }.toTypedArray()
-        val activity = ComponentName(BuildConfig.APPLICATION_ID, InstallLaunch::class.java.name)
-        val match = IntentFilter.MATCH_CATEGORY_TYPE or IntentFilter.MATCH_ADJUSTMENT_MASK
-        pm.addPreferredActivity(filter, match, set, activity)
     }
 
     fun startActivity(intent: Intent) {

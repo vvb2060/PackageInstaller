@@ -62,7 +62,7 @@ class InstallRepository(private val context: Application) {
 
         Hook.init(context)
         Hook.disableAdbVerify(context)
-        Hook.addPreferredActivity(packageManager)
+        PreferredActivity.set(packageManager)
 
         installResult.value = InstallParse()
         return true
