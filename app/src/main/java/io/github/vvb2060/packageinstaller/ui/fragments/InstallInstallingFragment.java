@@ -11,19 +11,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.InstallInstalling;
+import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
 public class InstallInstallingFragment extends DialogFragment {
 
     private final InstallInstalling mDialogData;
-    private ProgressBar mProgressBar;
-    private TextView mTextView;
+    private InstallViewModel mViewModel;
     private AlertDialog mDialog;
 
     public InstallInstallingFragment(InstallInstalling dialogData) {
         mDialogData = dialogData;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(requireActivity())
+            .get(InstallViewModel.class);
     }
 
     @NonNull
@@ -31,8 +39,13 @@ public class InstallInstallingFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
         dialogView.requireViewById(R.id.installing).setVisibility(View.VISIBLE);
-        mTextView = dialogView.requireViewById(R.id.installing_message);
-        mProgressBar = dialogView.requireViewById(R.id.progress);
+        TextView textView = dialogView.requireViewById(R.id.installing_message);
+        ProgressBar progressBar = dialogView.requireViewById(R.id.progress);
+        mViewModel.getStagingProgress().observe(this, progress -> {
+            textView.setText(progress <= 100 ? R.string.copying : R.string.installing);
+            progressBar.setIndeterminate(progress < 0 || progress > 100);
+            progressBar.setProgress(progress);
+        });
         setCancelable(false);
         mDialog = new AlertDialog.Builder(requireContext())
             .setTitle(mDialogData.getApkLite().getLabel())
@@ -47,15 +60,5 @@ public class InstallInstallingFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
         mDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
-    }
-
-    public void setProgress(int progress) {
-        if (mTextView != null) {
-            mTextView.setText(progress <= 100 ? R.string.copying : R.string.installing);
-        }
-        if (mProgressBar != null) {
-            mProgressBar.setIndeterminate(progress < 0 || progress > 100);
-            mProgressBar.setProgress(progress);
-        }
     }
 }

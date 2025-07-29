@@ -65,9 +65,6 @@ class InstallLaunch : FragmentActivity() {
                 val installing = installStage as InstallInstalling
                 val installingDialog = InstallInstallingFragment(installing)
                 showDialogInner(installingDialog)
-                installViewModel.stagingProgress.observe(this) { progress: Int ->
-                    installingDialog.setProgress(progress)
-                }
             }
 
             InstallStage.Companion.STAGE_SUCCESS -> {
