@@ -88,9 +88,27 @@ object PackageUtil {
 
     }
 
-    private fun getAppLiteFromXmlBytes(xmlBytes: ByteArray): ApkLite? {
+    private fun getAppLiteFromXmlBytesLink(xmlBytes: ByteArray): ApkLite? {
         XmlBlock(xmlBytes).use {
             it.newParser().use { parser ->
+                val res = Resources.getSystem()
+                return parsingAndroidManifest(parser, res)
+            }
+        }
+    }
+
+    private fun getAppLiteFromXmlBytes(xmlBytes: ByteArray): ApkLite? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return getAppLiteFromXmlBytesLink(xmlBytes)
+        }
+        val clazz = Class.forName("android.content.res.XmlBlock")
+        clazz.getConstructor(ByteArray::class.java).run {
+            setAccessible(true)
+            newInstance(xmlBytes) as AutoCloseable
+        }.use {
+            clazz.getDeclaredMethod("newParser").run {
+                invoke(it) as XmlResourceParser
+            }.use { parser ->
                 val res = Resources.getSystem()
                 return parsingAndroidManifest(parser, res)
             }
