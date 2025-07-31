@@ -194,6 +194,8 @@ class InstallRepository(private val context: Application) {
             if (apk.icon == null) {
                 apk.icon = old.applicationInfo!!.loadIcon(packageManager)
             }
+            // use this field to store the installer package name
+            old.sharedUserId = packageManager.getInstallerPackageName(apk.packageName)
         }
         if (apk.label == null) {
             context.contentResolver.query(uri, null, null, null, null).use { cursor ->

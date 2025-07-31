@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import io.github.vvb2060.packageinstaller.BuildConfig;
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.InstallUserAction;
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
@@ -64,9 +65,9 @@ public class InstallConfirmationFragment extends DialogFragment {
         int question = R.string.install_confirm_question;
         if (old != null) {
             var flags = old.applicationInfo.flags;
-            var system = (flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            var installer = BuildConfig.APPLICATION_ID.equals(old.sharedUserId);
             var installed = (flags & ApplicationInfo.FLAG_INSTALLED) != 0;
-            if (system && savedInstanceState == null) {
+            if (!installer && savedInstanceState == null) {
                 mCheckBox.setChecked(true);
             }
             if (installed) {
