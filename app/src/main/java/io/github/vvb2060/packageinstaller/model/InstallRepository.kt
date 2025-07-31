@@ -89,13 +89,19 @@ class InstallRepository(private val context: Application) {
             installResult.postValue(processContentUri(uri))
             return
         }
+        if (uri == null) {
+            intent.getStringExtra(Intent.EXTRA_PACKAGE_NAME)?.let {
+                installResult.postValue(processPackageUri(it))
+                return
+            }
+        }
         installResult.postValue(InstallAborted(ABORT_INFO))
     }
 
     fun install(setInstaller: Boolean, commit: Boolean, full: Boolean) {
-        val uri = intent.data!!
+        val uri = intent.data
         installResult.postValue(InstallInstalling(apkLite!!))
-        if (ContentResolver.SCHEME_CONTENT != uri.scheme) {
+        if (ContentResolver.SCHEME_CONTENT != uri?.scheme) {
             installPackageUri()
             return
         }
