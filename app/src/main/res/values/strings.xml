@@ -24,6 +24,7 @@
     <string name="install_confirm_question">Do you want to install this app?</string>
     <string name="install_confirm_question_update">Do you want to update this app?</string>
     <string name="install_confirm_question_split">Do you want to add split package to this app?</string>
+    <string name="install_confirm_question_split_remove">Do you want to remove this split package?</string>
 
     <string name="install_done">App installed.</string>
 

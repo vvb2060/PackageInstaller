@@ -23,7 +23,8 @@
 
     <string name="install_confirm_question">"要安装此应用吗？"</string>
     <string name="install_confirm_question_update">"要更新此应用吗？"</string>
-    <string name="install_confirm_question_split">要添加拆分包吗？</string>
+    <string name="install_confirm_question_split">要添加此拆分包吗？</string>
+    <string name="install_confirm_question_split_remove">要移除此拆分包吗？</string>
 
     <string name="install_done">"已安装应用。"</string>
 

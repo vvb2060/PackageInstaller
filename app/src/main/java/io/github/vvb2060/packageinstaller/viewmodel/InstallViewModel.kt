@@ -30,9 +30,14 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
         repository.cleanupInstall()
     }
 
-    fun initiateInstall(setInstaller: Boolean, commit: Boolean, full: Boolean) {
+    fun initiateInstall(
+        setInstaller: Boolean,
+        commit: Boolean,
+        full: Boolean,
+        removeSplit: Boolean
+    ) {
         executor.executeOnDiskIO {
-            repository.install(setInstaller, commit, full)
+            repository.install(setInstaller, commit, full, removeSplit)
         }
     }
 }

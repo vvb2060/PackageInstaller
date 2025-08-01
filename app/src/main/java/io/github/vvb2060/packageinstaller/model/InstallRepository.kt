@@ -98,7 +98,7 @@ class InstallRepository(private val context: Application) {
         installResult.postValue(InstallAborted(ABORT_INFO))
     }
 
-    fun install(setInstaller: Boolean, commit: Boolean, full: Boolean) {
+    fun install(setInstaller: Boolean, commit: Boolean, full: Boolean, removeSplit: Boolean) {
         val uri = intent.data
         installResult.postValue(InstallInstalling(apkLite!!))
         if (ContentResolver.SCHEME_CONTENT != uri?.scheme) {
@@ -120,14 +120,18 @@ class InstallRepository(private val context: Application) {
         try {
             val session = packageInstaller.openSession(stagedSessionId)
             session.wrap()
-            context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { afd ->
-                if (apkLite!!.zip) {
-                    PackageUtil.stageZip(session, afd) {
-                        stagingProgress.postValue(it)
-                    }
-                } else {
-                    PackageUtil.stageApk(session, afd) {
-                        stagingProgress.postValue(it)
+            if (removeSplit) {
+                session.removeSplit(apkLite!!.splitName!!)
+            } else {
+                context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { afd ->
+                    if (apkLite!!.zip) {
+                        PackageUtil.stageZip(session, afd) {
+                            stagingProgress.postValue(it)
+                        }
+                    } else {
+                        PackageUtil.stageApk(session, afd) {
+                            stagingProgress.postValue(it)
+                        }
                     }
                 }
             }

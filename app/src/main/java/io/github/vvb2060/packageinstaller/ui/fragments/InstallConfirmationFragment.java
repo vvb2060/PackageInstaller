@@ -75,9 +75,18 @@ public class InstallConfirmationFragment extends DialogFragment {
             }
         }
         var full = mDialogData.getFullInstall();
+        var removeSplit = false;
         if (!full) {
             question = R.string.install_confirm_question_split;
+            for (String splitName : old.splitNames) {
+                if (splitName.equals(mDialogData.getApkLite().getSplitName())) {
+                    question = R.string.install_confirm_question_split_remove;
+                    removeSplit = true;
+                    break;
+                }
+            }
         }
+        var remove = removeSplit;
         sb.append(context.getString(question), new StyleSpan(Typeface.ITALIC),
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
         mTextView.setText(sb, TextView.BufferType.SPANNABLE);
@@ -88,12 +97,12 @@ public class InstallConfirmationFragment extends DialogFragment {
             .setView(dialogView)
             .setPositiveButton(old != null ? R.string.update : R.string.install,
                 (dialogInt, which) ->
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), true, full))
+                    mViewModel.initiateInstall(mCheckBox.isChecked(), true, full, remove))
             .setNegativeButton(android.R.string.cancel,
                 (dialogInt, which) -> cleanAndFinish())
             .setNeutralButton(R.string.add_more,
                 (dialogInt, which) ->
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), false, full))
+                    mViewModel.initiateInstall(mCheckBox.isChecked(), false, full, remove))
             .create();
         return mDialog;
     }
