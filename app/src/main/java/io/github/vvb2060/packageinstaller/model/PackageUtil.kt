@@ -20,6 +20,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.io.IOUtils
 import org.xmlpull.v1.XmlPullParser
 import java.io.FileDescriptor
+import java.io.IOException
 import java.util.Locale
 import java.util.function.Consumer
 
@@ -48,10 +49,17 @@ object PackageUtil {
             .get().use { zipFile ->
                 val xml = zipFile.getEntry("AndroidManifest.xml")
                 if (xml != null) {
-                    return getAppLiteFromApkFd(
-                        afd.getFileDescriptor(),
-                        afd.toString(), afd.getLength()
-                    )
+                    try {
+                        return getAppLiteFromApkFd(
+                            afd.getFileDescriptor(),
+                            afd.toString(), afd.getLength()
+                        )
+                    } catch (_: IOException) {
+                        zipFile.getInputStream(xml).use { input ->
+                            val bytes = IOUtils.toByteArray(input)
+                            return getAppLiteFromXmlBytes(bytes)
+                        }
+                    }
                 }
 
                 var base = zipFile.getEntry("base.apk")
