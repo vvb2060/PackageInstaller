@@ -2,33 +2,22 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageInstaller;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.InstallFailed;
-import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
-public class InstallFailedFragment extends DialogFragment {
+public class InstallFailedFragment extends BaseDialogFragment {
 
     private final InstallFailed mDialogData;
-    private InstallViewModel mViewModel;
 
     public InstallFailedFragment(InstallFailed dialogData) {
+        super(dialogData);
         mDialogData = dialogData;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity())
-            .get(InstallViewModel.class);
     }
 
     @NonNull
@@ -40,17 +29,6 @@ public class InstallFailedFragment extends DialogFragment {
             .setMessage(getExplanation())
             .setPositiveButton(R.string.done, (dialogInt, which) -> cleanAndFinish())
             .create();
-    }
-
-    @Override
-    public void onCancel(@NonNull DialogInterface dialog) {
-        super.onCancel(dialog);
-        cleanAndFinish();
-    }
-
-    private void cleanAndFinish() {
-        mViewModel.cleanupInstall();
-        requireActivity().finish();
     }
 
     private String getExplanation() {

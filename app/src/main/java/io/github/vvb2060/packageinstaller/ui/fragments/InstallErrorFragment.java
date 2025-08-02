@@ -3,7 +3,6 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,28 +10,18 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.InstallAborted;
-import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 import rikka.shizuku.Shizuku;
 
-public class InstallErrorFragment extends DialogFragment {
+public class InstallErrorFragment extends BaseDialogFragment {
 
     private final InstallAborted mAborted;
-    private InstallViewModel mViewModel;
 
     public InstallErrorFragment(InstallAborted aborted) {
+        super(aborted);
         mAborted = aborted;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity())
-            .get(InstallViewModel.class);
     }
 
     @NonNull
@@ -52,12 +41,6 @@ public class InstallErrorFragment extends DialogFragment {
                     }
                 })
             .create();
-    }
-
-    @Override
-    public void onCancel(@NonNull DialogInterface dialog) {
-        super.onCancel(dialog);
-        cleanAndFinish();
     }
 
     private void checkShizuku(Context context) {
@@ -104,10 +87,5 @@ public class InstallErrorFragment extends DialogFragment {
             default -> R.string.error_title;
         };
         return context.getString(id);
-    }
-
-    private void cleanAndFinish() {
-        mViewModel.cleanupInstall();
-        requireActivity().finish();
     }
 }

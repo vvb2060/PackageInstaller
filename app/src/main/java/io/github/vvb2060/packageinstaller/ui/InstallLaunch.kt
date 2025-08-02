@@ -16,6 +16,7 @@ import io.github.vvb2060.packageinstaller.model.InstallSuccess
 import io.github.vvb2060.packageinstaller.model.InstallUserAction
 import io.github.vvb2060.packageinstaller.model.PackageUserAction
 import io.github.vvb2060.packageinstaller.ui.fragments.ArchiveConfirmationFragment
+import io.github.vvb2060.packageinstaller.ui.fragments.BaseDialogFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallConfirmationFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallErrorFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallFailedFragment
@@ -107,7 +108,11 @@ class InstallLaunch : FragmentActivity() {
 
     private fun showDialogInner(newDialog: DialogFragment?) {
         val currentDialog = fragmentManager.findFragmentByTag("dialog") as DialogFragment?
-        if (currentDialog?.javaClass == newDialog?.javaClass) return
+        if (currentDialog is BaseDialogFragment && newDialog is BaseDialogFragment
+            && currentDialog.mDialogData.stageCode == newDialog.mDialogData.stageCode
+        ) {
+            return
+        }
         currentDialog?.dismissAllowingStateLoss()
         newDialog?.show(fragmentManager, "dialog")
     }

@@ -10,28 +10,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.InstallInstalling;
-import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
-public class InstallInstallingFragment extends DialogFragment {
+public class InstallInstallingFragment extends BaseDialogFragment {
 
     private final InstallInstalling mDialogData;
-    private InstallViewModel mViewModel;
     private AlertDialog mDialog;
 
     public InstallInstallingFragment(InstallInstalling dialogData) {
+        super(dialogData);
         mDialogData = dialogData;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity())
-            .get(InstallViewModel.class);
     }
 
     @NonNull

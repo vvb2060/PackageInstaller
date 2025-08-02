@@ -9,29 +9,19 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.Hook;
 import io.github.vvb2060.packageinstaller.model.InstallSuccess;
-import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
-public class InstallSuccessFragment extends DialogFragment {
+public class InstallSuccessFragment extends BaseDialogFragment {
 
     private final InstallSuccess mDialogData;
-    private InstallViewModel mViewModel;
     private AlertDialog mDialog;
 
     public InstallSuccessFragment(InstallSuccess dialogData) {
+        super(dialogData);
         mDialogData = dialogData;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity())
-            .get(InstallViewModel.class);
     }
 
     @NonNull
@@ -62,16 +52,5 @@ public class InstallSuccessFragment extends DialogFragment {
         if (mDialogData.getStartIntent() == null) {
             launchButton.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void onCancel(@NonNull DialogInterface dialog) {
-        super.onCancel(dialog);
-        cleanAndFinish();
-    }
-
-    private void cleanAndFinish() {
-        mViewModel.cleanupInstall();
-        requireActivity().finish();
     }
 }

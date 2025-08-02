@@ -20,31 +20,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import io.github.vvb2060.packageinstaller.BuildConfig;
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.model.InstallUserAction;
-import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
-public class InstallConfirmationFragment extends DialogFragment {
+public class InstallConfirmationFragment extends BaseDialogFragment {
 
     private final InstallUserAction mDialogData;
-    private InstallViewModel mViewModel;
     private AlertDialog mDialog;
     private CheckBox mCheckBox;
     private TextView mTextView;
 
     public InstallConfirmationFragment(InstallUserAction dialogData) {
+        super(dialogData);
         mDialogData = dialogData;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity())
-            .get(InstallViewModel.class);
     }
 
     @NonNull
@@ -108,12 +98,6 @@ public class InstallConfirmationFragment extends DialogFragment {
     }
 
     @Override
-    public void onCancel(@NonNull DialogInterface dialog) {
-        super.onCancel(dialog);
-        cleanAndFinish();
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setFilterTouchesWhenObscured(true);
@@ -132,11 +116,6 @@ public class InstallConfirmationFragment extends DialogFragment {
     public void onResume() {
         super.onResume();
         mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
-    }
-
-    private void cleanAndFinish() {
-        mViewModel.cleanupInstall();
-        requireActivity().finish();
     }
 
     private void getInfo(Context context, SpannableStringBuilder sb) {
