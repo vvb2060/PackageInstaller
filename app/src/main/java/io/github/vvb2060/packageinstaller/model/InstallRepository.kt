@@ -183,6 +183,18 @@ class InstallRepository(private val context: Application) {
         if (apk.isSplit()) {
             for (item in packageInstaller.allSessions) {
                 if (item.isActive && item.appPackageName == apk.packageName) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        // noinspection NewApi
+                        if (item.installerUid != Shizuku.getUid()) {
+                            continue
+                        }
+                    } else {
+                        if (item.installReason != PackageManager.INSTALL_REASON_USER) continue
+                        item as PackageInstaller_rename.SessionInfo
+                        if (item.installFlags and PackageManager_rename.INSTALL_FROM_ADB == 0) {
+                            continue
+                        }
+                    }
                     val info = packageInstaller.getSessionInfo(item.sessionId)!!
                     stagedSessionId = info.sessionId
                     full = info.mode == SessionParams.MODE_FULL_INSTALL
