@@ -3,6 +3,7 @@
 
     <string name="install">Installer</string>
     <string name="update">Mettre à jour</string>
+    <string name="archive">Archiver</string>
     <string name="add_more">Ajouter plus</string>
     <string name="done">Terminé</string>
     <string name="launch">Ouvrir</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">Voulez-vous installer cette application ?</string>
     <string name="install_confirm_question_update">Voulez-vous mettre à jour cette application ?</string>
     <string name="install_confirm_question_split">Voulez-vous ajouter un paquet divisé à cette application ?</string>
+    <string name="install_confirm_question_split_remove">Voulez-vous supprimer ce paquet divisé ?</string>
+
+    <string name="archive_confirm_question">Voulez-vous archiver le paquet de cette application ?</string>
 
     <string name="install_done">Application installée.</string>
+    <string name="archive_done">"Archivé dans : "</string>
 
     <string name="install_failed">Application non installée.</string>
     <string name="install_failed_blocked">L\'installation du paquet a été bloquée.</string>

@@ -3,6 +3,7 @@
 
     <string name="install">"安裝"</string>
     <string name="update">"更新"</string>
+    <string name="archive">封存</string>
     <string name="add_more">繼續新增</string>
     <string name="done">"完成"</string>
     <string name="launch">"開啟"</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">"要安裝此應用程式嗎？"</string>
     <string name="install_confirm_question_update">"要更新此應用程式嗎？"</string>
     <string name="install_confirm_question_split">"要將分割套件新增至此應用程式嗎？"</string>
+    <string name="install_confirm_question_split_remove">"要移除此分割套件嗎？"</string>
+
+    <string name="archive_confirm_question">要封存此應用程式的套件嗎？</string>
 
     <string name="install_done">"已安裝應用程式。"</string>
+    <string name="archive_done">"已封存至："</string>
 
     <string name="install_failed">"未安裝應用程式。"</string>
     <string name="install_failed_blocked">"系統已禁止安裝此套件。"</string>

@@ -3,6 +3,7 @@
 
     <string name="install">Cài đặt</string>
     <string name="update">Cập nhật</string>
+    <string name="archive">Lưu trữ</string>
     <string name="add_more">Thêm</string>
     <string name="done">Xong</string>
     <string name="launch">Mở</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">Bạn có muốn cài đặt ứng dụng này không?</string>
     <string name="install_confirm_question_update">Bạn có muốn cập nhật ứng dụng này không?</string>
     <string name="install_confirm_question_split">Bạn có muốn thêm gói tách vào ứng dụng này không?</string>
+    <string name="install_confirm_question_split_remove">Bạn có muốn xóa gói tách này không?</string>
+
+    <string name="archive_confirm_question">Bạn có muốn lưu trữ gói của ứng dụng này không?</string>
 
     <string name="install_done">Đã cài đặt ứng dụng.</string>
+    <string name="archive_done">"Đã lưu trữ tại: "</string>
 
     <string name="install_failed">Chưa cài đặt ứng dụng.</string>
     <string name="install_failed_blocked">Gói đã bị chặn cài đặt.</string>

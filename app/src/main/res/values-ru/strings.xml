@@ -3,6 +3,7 @@
 
     <string name="install">Установить</string>
     <string name="update">Обновить</string>
+    <string name="archive">Архивировать</string>
     <string name="add_more">Добавить еще</string>
     <string name="done">Готово</string>
     <string name="launch">Открыть</string>
@@ -24,12 +25,16 @@
     <string name="install_confirm_question">Установить это приложение?</string>
     <string name="install_confirm_question_update">Обновить это приложение?</string>
     <string name="install_confirm_question_split">Добавить разделенный пакет в это приложение?</string>
+    <string name="install_confirm_question_split_remove">Удалить этот разделенный пакет?</string>
+
+    <string name="archive_confirm_question">Архивировать пакет этого приложения?</string>
 
     <string name="install_done">Приложение установлено.</string>
+    <string name="archive_done">"Архивировано в: "</string>
 
     <string name="install_failed">Приложение не установлено.</string>
     <string name="install_failed_blocked">Установка пакета была заблокирована.</string>
-    <string name="install_failed_conflict">Приложение не установлено, так как пакет конф��иктует с существующим пакетом.</string>
+    <string name="install_failed_conflict">Приложение не установлено, так как пакет конфликтует с существующим пакетом.</string>
     <string name="install_failed_incompatible">Приложение не установлено, так как оно несовместимо с вашим устройством.</string>
     <string name="install_failed_invalid_apk">Приложение не установлено, так как пакет поврежден.</string>
     <string name="install_failed_storage">Недостаточно места</string>

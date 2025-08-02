@@ -3,6 +3,7 @@
 
     <string name="install">Installa</string>
     <string name="update">Aggiorna</string>
+    <string name="archive">Archivia</string>
     <string name="add_more">Aggiungi altro</string>
     <string name="done">Fatto</string>
     <string name="launch">Apri</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">Vuoi installare questa app?</string>
     <string name="install_confirm_question_update">Vuoi aggiornare questa app?</string>
     <string name="install_confirm_question_split">Vuoi aggiungere un pacchetto diviso a questa app?</string>
+    <string name="install_confirm_question_split_remove">Vuoi rimuovere questo pacchetto diviso?</string>
+
+    <string name="archive_confirm_question">Vuoi archiviare il pacchetto di questa app?</string>
 
     <string name="install_done">App installata.</string>
+    <string name="archive_done">"Archiviato in: "</string>
 
     <string name="install_failed">App non installata.</string>
     <string name="install_failed_blocked">L\'installazione del pacchetto è stata bloccata.</string>

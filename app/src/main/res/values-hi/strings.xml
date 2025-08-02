@@ -3,6 +3,7 @@
 
     <string name="install">इंस्टॉल करें</string>
     <string name="update">अपडेट करें</string>
+    <string name="archive">संग्रह करें</string>
     <string name="add_more">और जोड़ें</string>
     <string name="done">हो गया</string>
     <string name="launch">खोलें</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">क्या आप इस ऐप को इंस्टॉल करना चाहते हैं?</string>
     <string name="install_confirm_question_update">क्या आप इस ऐप को अपडेट करना चाहते हैं?</string>
     <string name="install_confirm_question_split">क्या आप इस ऐप में स्प्लिट पैकेज जोड़ना चाहते हैं?</string>
+    <string name="install_confirm_question_split_remove">क्या आप इस स्प्लिट पैकेज को हटाना चाहते हैं?</string>
+
+    <string name="archive_confirm_question">क्या आप इस ऐप के पैकेज को संग्रह करना चाहते हैं?</string>
 
     <string name="install_done">ऐप इंस्टॉल हो गया।</string>
+    <string name="archive_done">"संग्रह किया गया: "</string>
 
     <string name="install_failed">ऐप इंस्टॉल नहीं हुआ।</string>
     <string name="install_failed_blocked">पैकेज को इंस्टॉल होने से रोक दिया गया था।</string>

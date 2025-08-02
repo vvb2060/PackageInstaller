@@ -3,6 +3,7 @@
 
     <string name="install">설치</string>
     <string name="update">업데이트</string>
+    <string name="archive">아카이브</string>
     <string name="add_more">더 추가</string>
     <string name="done">완료</string>
     <string name="launch">열기</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">이 앱을 설치하시겠습니까?</string>
     <string name="install_confirm_question_update">이 앱을 업데이트하시겠습니까?</string>
     <string name="install_confirm_question_split">이 앱에 분할 패키지를 추가하시겠습니까?</string>
+    <string name="install_confirm_question_split_remove">이 분할 패키지를 제거하시겠습니까?</string>
+
+    <string name="archive_confirm_question">이 앱의 패키지를 아카이브하시겠습니까?</string>
 
     <string name="install_done">앱이 설치되었습니다.</string>
+    <string name="archive_done">"아카이브 위치: "</string>
 
     <string name="install_failed">앱이 설치되지 않았습니다.</string>
     <string name="install_failed_blocked">패키지 설치가 차단되었습니다.</string>

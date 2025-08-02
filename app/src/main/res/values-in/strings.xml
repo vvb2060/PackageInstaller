@@ -3,6 +3,7 @@
 
     <string name="install">Pasang</string>
     <string name="update">Perbarui</string>
+    <string name="archive">Arsipkan</string>
     <string name="add_more">Tambah lagi</string>
     <string name="done">Selesai</string>
     <string name="launch">Buka</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">Anda ingin memasang aplikasi ini?</string>
     <string name="install_confirm_question_update">Anda ingin memperbarui aplikasi ini?</string>
     <string name="install_confirm_question_split">Anda ingin menambahkan paket terpisah ke aplikasi ini?</string>
+    <string name="install_confirm_question_split_remove">Anda ingin menghapus paket terpisah ini?</string>
+
+    <string name="archive_confirm_question">Anda ingin mengarsipkan paket aplikasi ini?</string>
 
     <string name="install_done">Aplikasi terpasang.</string>
+    <string name="archive_done">"Diarsipkan ke: "</string>
 
     <string name="install_failed">Aplikasi tidak terpasang.</string>
     <string name="install_failed_blocked">Paket diblokir agar tidak dipasang.</string>

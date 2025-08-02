@@ -3,6 +3,7 @@
 
     <string name="install">"インストール"</string>
     <string name="update">"更新"</string>
+    <string name="archive">アーカイブ</string>
     <string name="add_more">"追加"</string>
     <string name="done">"完了"</string>
     <string name="launch">"開く"</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">"このアプリをインストールしますか？"</string>
     <string name="install_confirm_question_update">"このアプリを更新しますか？"</string>
     <string name="install_confirm_question_split">"このアプリに分割パッケージを追加しますか？"</string>
+    <string name="install_confirm_question_split_remove">"この分割パッケージを削除しますか？"</string>
+
+    <string name="archive_confirm_question">このアプリのパッケージをアーカイブしますか？</string>
 
     <string name="install_done">"アプリはインストールされました。"</string>
+    <string name="archive_done">"アーカイブ先: "</string>
 
     <string name="install_failed">"アプリはインストールされませんでした。"</string>
     <string name="install_failed_blocked">"パッケージのインストールはブロックされました。"</string>

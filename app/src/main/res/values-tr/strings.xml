@@ -3,6 +3,7 @@
 
     <string name="install">Yükle</string>
     <string name="update">Güncelle</string>
+    <string name="archive">Arşivle</string>
     <string name="add_more">Daha fazla ekle</string>
     <string name="done">Bitti</string>
     <string name="launch">Aç</string>
@@ -24,8 +25,12 @@
     <string name="install_confirm_question">Bu uygulamayı yüklemek istiyor musunuz?</string>
     <string name="install_confirm_question_update">Bu uygulamayı güncellemek istiyor musunuz?</string>
     <string name="install_confirm_question_split">Bu uygulamaya bölünmüş paket eklemek istiyor musunuz?</string>
+    <string name="install_confirm_question_split_remove">Bu bölünmüş paketi kaldırmak istiyor musunuz?</string>
+
+    <string name="archive_confirm_question">Bu uygulamanın paketini arşivlemek istiyor musunuz?</string>
 
     <string name="install_done">Uygulama yüklendi.</string>
+    <string name="archive_done">"Arşivlendi: "</string>
 
     <string name="install_failed">Uygulama yüklenmedi.</string>
     <string name="install_failed_blocked">Paketin yüklenmesi engellendi.</string>
