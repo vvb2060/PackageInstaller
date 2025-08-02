@@ -3,6 +3,7 @@ package io.github.vvb2060.packageinstaller.viewmodel
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Intent
+import android.content.pm.PackageInfo
 import androidx.arch.core.executor.ArchTaskExecutor
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -38,6 +39,12 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
     ) {
         executor.executeOnDiskIO {
             repository.install(setInstaller, commit, full, removeSplit)
+        }
+    }
+
+    fun archivePackage(info: PackageInfo) {
+        executor.executeOnDiskIO {
+            repository.archivePackage(info)
         }
     }
 }

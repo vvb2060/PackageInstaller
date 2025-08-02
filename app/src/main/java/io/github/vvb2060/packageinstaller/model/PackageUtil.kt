@@ -16,10 +16,15 @@ import android.os.Build
 import android.util.DisplayMetrics
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.compress.archivers.zip.ZipFile
+import org.apache.commons.compress.archivers.zip.ZipMethod
+import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream
 import org.apache.commons.io.IOUtils
 import org.xmlpull.v1.XmlPullParser
+import java.io.File
 import java.io.FileDescriptor
+import java.io.FileInputStream
 import java.io.IOException
 import java.util.Locale
 import java.util.function.Consumer
@@ -328,12 +333,12 @@ object PackageUtil {
                 val apks = filterZipEntries(zipFile)
                 val total = apks.sumOf { it.getSize() }
                 var totalRead = 0L
+                val buffer = ByteArray(16 * 1024)
                 callback.accept(0)
                 apks.forEach { entry ->
                     val fileName = entry.getName().substringAfterLast('/')
                     session.openWrite(fileName, 0, entry.getSize()).use { out ->
                         zipFile.getInputStream(entry).use { instream ->
-                            val buffer = ByteArray(16 * 1024)
                             var numRead: Int
                             while (instream.read(buffer).also { numRead = it } != -1) {
                                 out.write(buffer, 0, numRead)
@@ -370,4 +375,39 @@ object PackageUtil {
             session.fsync(out)
         }
     }
+
+    fun archivePackage(
+        apks: List<File>,
+        afd: AssetFileDescriptor,
+        callback: Consumer<Int>,
+    ) {
+        val total = apks.sumOf { it.length() }
+        var totalRead = 0L
+        callback.accept(0)
+        ZipArchiveOutputStream(afd.createOutputStream().getChannel()).use { out ->
+            val buffer = ByteArray(16 * 1024)
+            for (apk in apks) {
+                val entry = ZipArchiveEntry(apk, apk.name)
+                entry.setMethod(ZipMethod.XZ.getCode())
+                entry.setSize(apk.length())
+                out.putArchiveEntry(entry)
+                FileInputStream(apk).use { instream ->
+                    var numRead: Int
+                    val xz = XZCompressorOutputStream(out, 3)
+                    val crc = java.util.zip.CRC32()
+                    while (instream.read(buffer).also { numRead = it } != -1) {
+                        crc.update(buffer, 0, numRead)
+                        xz.write(buffer, 0, numRead)
+                        totalRead += numRead
+                        val fraction = totalRead.toFloat() / total.toFloat()
+                        callback.accept((fraction * 100.0).toInt())
+                    }
+                    xz.finish()
+                    entry.setCrc(crc.getValue())
+                }
+                out.closeArchiveEntry()
+            }
+        }
+    }
+
 }

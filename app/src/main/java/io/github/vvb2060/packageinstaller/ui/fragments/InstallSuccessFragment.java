@@ -37,10 +37,14 @@ public class InstallSuccessFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        mDialog = new AlertDialog.Builder(requireContext())
+        var context = requireContext();
+        var message = mDialogData.getPath() != null ?
+            context.getString(R.string.archive_done) + mDialogData.getPath() :
+            context.getString(R.string.install_done);
+        mDialog = new AlertDialog.Builder(context)
             .setTitle(mDialogData.getApkLite().getLabel())
             .setIcon(mDialogData.getApkLite().getIcon())
-            .setMessage(R.string.install_done)
+            .setMessage(message)
             .setNegativeButton(R.string.done,
                 (dialog, which) -> cleanAndFinish())
             .setPositiveButton(R.string.launch, (dialog, which) -> {

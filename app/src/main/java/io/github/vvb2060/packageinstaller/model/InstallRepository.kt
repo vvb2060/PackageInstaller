@@ -3,9 +3,12 @@ package io.github.vvb2060.packageinstaller.model
 import android.Manifest
 import android.app.Application
 import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Intent
 import android.content.IntentSender
 import android.content.Intent_rename
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageInstaller.SessionInfo
 import android.content.pm.PackageInstaller.SessionParams
@@ -14,12 +17,16 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager_rename
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Process
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
+import io.github.vvb2060.packageinstaller.R
 import io.github.vvb2060.packageinstaller.model.Hook.wrap
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_CLOSE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_CREATE
@@ -31,6 +38,7 @@ import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_S
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_WRITE
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
+import java.io.File
 import java.io.IOException
 
 class InstallRepository(private val context: Application) {
@@ -226,7 +234,11 @@ class InstallRepository(private val context: Application) {
 
         val apk = PackageUtil.getApkLite(packageManager, info!!)
         apkLite = apk
-        return InstallUserAction(apk, info, fullInstall = true, skipCreate = true)
+        return if (info.applicationInfo!!.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
+            PackageUserAction(apk, info)
+        } else {
+            InstallUserAction(apk, info)
+        }
     }
 
     private fun installPackageUri() {
@@ -333,6 +345,79 @@ class InstallRepository(private val context: Application) {
             }
             stagedSessionId = 0
         }
+    }
+
+    fun archivePackage(info: PackageInfo) {
+        installResult.postValue(InstallInstalling(apkLite!!))
+
+        val name = "${info.packageName}-${info.longVersionCode}.zip"
+        val dir = Environment.DIRECTORY_DOCUMENTS + File.separator +
+            context.getString(R.string.app_name)
+        var path = ""
+        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val cr = context.contentResolver
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.RELATIVE_PATH, dir)
+                put(MediaStore.MediaColumns.IS_PENDING, true)
+                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            }
+            val tableUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            cr.insert(tableUri, values)
+        } else {
+            val file = File(context.getExternalFilesDir(dir), name)
+            path = file.absolutePath
+            file.toUri()
+        }
+        if (uri == null) {
+            installResult.postValue(InstallAborted(ABORT_WRITE))
+            return
+        }
+
+        val list = ArrayList<File>()
+        list.add(File(info.applicationInfo!!.sourceDir))
+        info.applicationInfo!!.splitSourceDirs?.let {
+            for (split in it) {
+                list.add(File(split))
+            }
+        }
+
+        try {
+            context.contentResolver.openAssetFileDescriptor(uri, "wt")?.use { afd ->
+                PackageUtil.archivePackage(list, afd) {
+                    stagingProgress.postValue(it)
+                }
+            }
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to archive package", e)
+            if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+                context.contentResolver.delete(uri, null, null)
+            } else {
+                File(uri.path!!).delete()
+            }
+            installResult.postValue(InstallAborted(ABORT_WRITE))
+            return
+        }
+
+        if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+            val cr = context.contentResolver
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.IS_PENDING, false)
+            }
+            cr.update(uri, values, null, null)
+            cr.query(uri, null, null, null, null).use { cursor ->
+                if (cursor != null && cursor.moveToFirst()) {
+                    val index = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+                    if (index != -1) {
+                        path = cursor.getString(index)
+                    }
+                }
+            }
+        }
+
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, "application/zip")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        installResult.postValue(InstallSuccess(apkLite!!, intent, path))
     }
 
 }

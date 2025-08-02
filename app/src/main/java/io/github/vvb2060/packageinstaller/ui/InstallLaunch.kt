@@ -14,6 +14,8 @@ import io.github.vvb2060.packageinstaller.model.InstallInstalling
 import io.github.vvb2060.packageinstaller.model.InstallStage
 import io.github.vvb2060.packageinstaller.model.InstallSuccess
 import io.github.vvb2060.packageinstaller.model.InstallUserAction
+import io.github.vvb2060.packageinstaller.model.PackageUserAction
+import io.github.vvb2060.packageinstaller.ui.fragments.ArchiveConfirmationFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallConfirmationFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallErrorFragment
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallFailedFragment
@@ -75,6 +77,12 @@ class InstallLaunch : FragmentActivity() {
                 val uar = installStage as InstallUserAction
                 val actionDialog = InstallConfirmationFragment(uar)
                 showDialogInner(actionDialog)
+            }
+
+            InstallStage.Companion.STAGE_ARCHIVE -> {
+                val archive = installStage as PackageUserAction
+                val archiveDialog = ArchiveConfirmationFragment(archive)
+                showDialogInner(archiveDialog)
             }
 
             InstallStage.Companion.STAGE_INSTALLING -> {

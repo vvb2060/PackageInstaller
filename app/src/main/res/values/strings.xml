@@ -3,6 +3,7 @@
 
     <string name="install">Install</string>
     <string name="update">Update</string>
+    <string name="archive">Archive</string>
     <string name="add_more">Add more</string>
     <string name="done">Done</string>
     <string name="launch">Open</string>
@@ -26,7 +27,10 @@
     <string name="install_confirm_question_split">Do you want to add split package to this app?</string>
     <string name="install_confirm_question_split_remove">Do you want to remove this split package?</string>
 
+    <string name="archive_confirm_question">Do you want to archive the package of this app?</string>
+
     <string name="install_done">App installed.</string>
+    <string name="archive_done">"Archived to: "</string>
 
     <string name="install_failed">App not installed.</string>
     <string name="install_failed_blocked">The package was blocked from being installed.</string>

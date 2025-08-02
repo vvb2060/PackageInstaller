@@ -3,6 +3,7 @@
 
     <string name="install">"安装"</string>
     <string name="update">"更新"</string>
+    <string name="archive">存档</string>
     <string name="add_more">继续添加</string>
     <string name="done">"完成"</string>
     <string name="launch">"打开"</string>
@@ -26,7 +27,10 @@
     <string name="install_confirm_question_split">要添加此拆分包吗？</string>
     <string name="install_confirm_question_split_remove">要移除此拆分包吗？</string>
 
+    <string name="archive_confirm_question">要存档此应用的软件包吗？</string>
+
     <string name="install_done">"已安装应用。"</string>
+    <string name="archive_done">"已存档至："</string>
 
     <string name="install_failed">"未安装应用。"</string>
     <string name="install_failed_blocked">"系统已禁止安装该应用。"</string>
