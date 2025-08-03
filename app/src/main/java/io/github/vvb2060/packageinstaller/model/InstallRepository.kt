@@ -118,7 +118,7 @@ class InstallRepository(private val context: Application) {
             try {
                 val params: SessionParams = createSessionParams(setInstaller, full)
                 stagedSessionId = packageInstaller.createSession(params)
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Log.e(TAG, "Failed to create a staging session", e)
                 installResult.postValue(InstallAborted(ABORT_CREATE))
                 return
@@ -167,7 +167,7 @@ class InstallRepository(private val context: Application) {
             context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { afd ->
                 PackageUtil.parseZipFromFd(afd)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Log.e(TAG, "Failed to parse APK from content URI: $uri", e)
             null
         }
