@@ -5,6 +5,8 @@
     <string name="update">"更新"</string>
     <string name="archive">封存</string>
     <string name="add_more">繼續新增</string>
+    <string name="enable">啟用</string>
+    <string name="disable">停用</string>
     <string name="done">"完成"</string>
     <string name="launch">"開啟"</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">"正在解析…"</string>
 
     <string name="set_installer">設定安裝來源</string>
+    <string name="uninstall_keep_data">同時解除安裝此應用程式但保留資料</string>
 
     <string name="package_name">"套件名稱："</string>
     <string name="split_name">"分割："</string>

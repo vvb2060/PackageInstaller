@@ -5,6 +5,8 @@
     <string name="update">अपडेट करें</string>
     <string name="archive">संग्रह करें</string>
     <string name="add_more">और जोड़ें</string>
+    <string name="enable">सक्षम करें</string>
+    <string name="disable">अक्षम करें</string>
     <string name="done">हो गया</string>
     <string name="launch">खोलें</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">पार्स हो रहा है…</string>
 
     <string name="set_installer">इंस्टॉलर सेट करें</string>
+    <string name="uninstall_keep_data">इस ऐप को भी अनइंस्टॉल करें लेकिन डेट��� रखें</string>
 
     <string name="package_name">"पैकेज: "</string>
     <string name="split_name">"स्प्लिट: "</string>

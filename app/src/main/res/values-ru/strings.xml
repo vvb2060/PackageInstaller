@@ -5,6 +5,8 @@
     <string name="update">Обновить</string>
     <string name="archive">Архивировать</string>
     <string name="add_more">Добавить еще</string>
+    <string name="enable">Включить</string>
+    <string name="disable">Отключить</string>
     <string name="done">Готово</string>
     <string name="launch">Открыть</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">Анализ…</string>
 
     <string name="set_installer">Задать установщик</string>
+    <string name="uninstall_keep_data">Также удалить это приложение, но сохранить данные</string>
 
     <string name="package_name">"Пакет: "</string>
     <string name="split_name">"Разделение: "</string>

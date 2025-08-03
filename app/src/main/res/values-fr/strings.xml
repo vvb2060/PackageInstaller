@@ -5,6 +5,8 @@
     <string name="update">Mettre à jour</string>
     <string name="archive">Archiver</string>
     <string name="add_more">Ajouter plus</string>
+    <string name="enable">Activer</string>
+    <string name="disable">Désactiver</string>
     <string name="done">Terminé</string>
     <string name="launch">Ouvrir</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">Analyse en cours…</string>
 
     <string name="set_installer">Définir l\'installateur</string>
+    <string name="uninstall_keep_data">Désinstaller également cette application mais conserver les données</string>
 
     <string name="package_name">"Paquet : "</string>
     <string name="split_name">"Split : "</string>

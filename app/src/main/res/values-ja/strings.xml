@@ -5,6 +5,8 @@
     <string name="update">"更新"</string>
     <string name="archive">アーカイブ</string>
     <string name="add_more">"追加"</string>
+    <string name="enable">有効にする</string>
+    <string name="disable">無効にする</string>
     <string name="done">"完了"</string>
     <string name="launch">"開く"</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">"解析中…"</string>
 
     <string name="set_installer">"インストーラーを設定"</string>
+    <string name="uninstall_keep_data">このアプリをアンインストールしますが、データは保持します</string>
 
     <string name="package_name">"パッケージ: "</string>
     <string name="split_name">"Split: "</string>

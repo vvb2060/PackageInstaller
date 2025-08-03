@@ -5,6 +5,8 @@
     <string name="update">업데이트</string>
     <string name="archive">아카이브</string>
     <string name="add_more">더 추가</string>
+    <string name="enable">활성화</string>
+    <string name="disable">비활성화</string>
     <string name="done">완료</string>
     <string name="launch">열기</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">파싱 중…</string>
 
     <string name="set_installer">설치 프로그램 설정</string>
+    <string name="uninstall_keep_data">이 앱도 제거하지만 데이터는 유지</string>
 
     <string name="package_name">"패키지: "</string>
     <string name="split_name">"분할: "</string>

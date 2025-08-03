@@ -5,6 +5,8 @@
     <string name="update">Cập nhật</string>
     <string name="archive">Lưu trữ</string>
     <string name="add_more">Thêm</string>
+    <string name="enable">Bật</string>
+    <string name="disable">Tắt</string>
     <string name="done">Xong</string>
     <string name="launch">Mở</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">Đang phân tích…</string>
 
     <string name="set_installer">Đặt trình cài đặt</string>
+    <string name="uninstall_keep_data">Cũng gỡ cài đặt ứng dụng này nhưng giữ lại dữ liệu</string>
 
     <string name="package_name">"Gói: "</string>
     <string name="split_name">"Tách: "</string>

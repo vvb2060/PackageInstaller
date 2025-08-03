@@ -5,6 +5,8 @@
     <string name="update">Güncelle</string>
     <string name="archive">Arşivle</string>
     <string name="add_more">Daha fazla ekle</string>
+    <string name="enable">Etkinleştir</string>
+    <string name="disable">Devre dışı bırak</string>
     <string name="done">Bitti</string>
     <string name="launch">Aç</string>
 
@@ -13,6 +15,7 @@
     <string name="parsing">Ayrıştırılıyor…</string>
 
     <string name="set_installer">Yükleyiciyi ayarla</string>
+    <string name="uninstall_keep_data">Bu uygulamayı da kaldır ancak verileri sakla</string>
 
     <string name="package_name">"Paket: "</string>
     <string name="split_name">"Bölünmüş: "</string>
