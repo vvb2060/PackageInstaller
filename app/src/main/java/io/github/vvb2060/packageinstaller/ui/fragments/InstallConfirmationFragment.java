@@ -42,11 +42,11 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         var context = requireContext();
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
-        dialogView.requireViewById(R.id.install_confirm).setVisibility(View.VISIBLE);
         mTextView = dialogView.requireViewById(R.id.message);
-        mCheckBox = dialogView.requireViewById(R.id.set_installer);
-        if (mDialogData.getSkipCreate()) {
-            mCheckBox.setVisibility(View.GONE);
+        mCheckBox = dialogView.requireViewById(R.id.checkbox);
+        if (!mDialogData.getSkipCreate()) {
+            mCheckBox.setText(R.string.set_installer);
+            mCheckBox.setVisibility(View.VISIBLE);
         }
 
         var sb = new SpannableStringBuilder();

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,8 +22,9 @@ public class InstallParseFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
-        dialogView.requireViewById(R.id.installing).setVisibility(View.VISIBLE);
-        TextView textView = dialogView.requireViewById(R.id.installing_message);
+        ProgressBar progressBar = dialogView.requireViewById(R.id.progress);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView textView = dialogView.requireViewById(R.id.message);
         textView.setText(R.string.parsing);
         setCancelable(false);
         mDialog = new AlertDialog.Builder(requireContext())

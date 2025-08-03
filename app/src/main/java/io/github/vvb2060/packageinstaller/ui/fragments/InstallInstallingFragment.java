@@ -28,9 +28,9 @@ public class InstallInstallingFragment extends BaseDialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
-        dialogView.requireViewById(R.id.installing).setVisibility(View.VISIBLE);
-        TextView textView = dialogView.requireViewById(R.id.installing_message);
+        TextView textView = dialogView.requireViewById(R.id.message);
         ProgressBar progressBar = dialogView.requireViewById(R.id.progress);
+        progressBar.setVisibility(View.VISIBLE);
         mViewModel.getStagingProgress().observe(this, progress -> {
             textView.setText(progress <= 100 ? R.string.copying : R.string.installing);
             progressBar.setIndeterminate(progress < 0 || progress > 100);

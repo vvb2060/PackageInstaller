@@ -1,53 +1,30 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="?android:attr/dialogPreferredPadding"
+    android:paddingStart="?android:attr/dialogPreferredPadding"
     android:paddingTop="8dp"
-    android:paddingRight="?android:attr/dialogPreferredPadding"
+    android:paddingEnd="?android:attr/dialogPreferredPadding"
     android:theme="?android:attr/alertDialogTheme">
 
-    <ScrollView
-        android:id="@+id/install_confirm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/message"
-                style="@android:style/TextAppearance.Material.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <CheckBox
-                android:id="@+id/set_installer"
-                style="@android:style/TextAppearance.Material.Subhead"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="-4dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/set_installer" />
-
-        </LinearLayout>
-    </ScrollView>
-
     <LinearLayout
-        android:id="@+id/installing"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="invisible">
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/installing_message"
+            android:id="@+id/message"
+            style="@android:style/TextAppearance.Material.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox"
             style="@android:style/TextAppearance.Material.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/installing" />
+            android:layout_marginStart="-4dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/progress"
@@ -55,8 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:indeterminate="true"
-            android:paddingTop="8dp" />
+            android:paddingTop="8dp"
+            android:visibility="gone" />
 
     </LinearLayout>
-
-</FrameLayout>
+</ScrollView>
