@@ -80,6 +80,7 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
         sb.append(context.getString(question), new StyleSpan(Typeface.ITALIC),
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
         mTextView.setText(sb, TextView.BufferType.SPANNABLE);
+        mTextView.setTextIsSelectable(true);
 
         mDialog = new AlertDialog.Builder(context)
             .setIcon(mDialogData.getApkLite().getIcon())
