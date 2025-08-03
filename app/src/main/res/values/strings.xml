@@ -5,6 +5,8 @@
     <string name="update">Update</string>
     <string name="archive">Archive</string>
     <string name="add_more">Add more</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
     <string name="done">Done</string>
     <string name="launch">Open</string>
 

@@ -47,4 +47,10 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
             repository.archivePackage(info, uninstall)
         }
     }
+
+    fun setPackageEnabled(packageName: String, enabled: Boolean) {
+        executor.executeOnDiskIO {
+            repository.setPackageEnabled(packageName, enabled)
+        }
+    }
 }

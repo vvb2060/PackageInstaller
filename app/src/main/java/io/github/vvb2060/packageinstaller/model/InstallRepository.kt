@@ -451,4 +451,13 @@ class InstallRepository(private val context: Application) {
         }
     }
 
+    fun setPackageEnabled(packageName: String, enabled: Boolean) {
+        val newState = if (enabled) {
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+        } else {
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
+        }
+        packageManager.setApplicationEnabledSetting(packageName, newState, 0)
+    }
+
 }

@@ -31,6 +31,9 @@ public class ArchiveConfirmationFragment extends BaseDialogFragment {
         CheckBox checkBox = dialogView.requireViewById(R.id.checkbox);
         checkBox.setVisibility(View.VISIBLE);
         checkBox.setText(R.string.uninstall_keep_data);
+        var info = mDialogData.getOldApk().applicationInfo;
+        assert info != null;
+        int text = info.enabled ? R.string.disable : R.string.enable;
         return new AlertDialog.Builder(requireContext())
             .setTitle(mDialogData.getApkLite().getLabel())
             .setIcon(mDialogData.getApkLite().getIcon())
@@ -39,6 +42,10 @@ public class ArchiveConfirmationFragment extends BaseDialogFragment {
                 requireActivity().finish())
             .setPositiveButton(R.string.archive, (dialog, which) ->
                 mViewModel.archivePackage(mDialogData.getOldApk(), checkBox.isChecked()))
+            .setNeutralButton(text, (dialog, which) -> {
+                requireActivity().finish();
+                mViewModel.setPackageEnabled(info.packageName, !info.enabled);
+            })
             .create();
     }
 
