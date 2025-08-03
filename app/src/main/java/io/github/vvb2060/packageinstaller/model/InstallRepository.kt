@@ -249,13 +249,15 @@ class InstallRepository(private val context: Application) {
 
         val apk = PackageUtil.getApkLite(packageManager, info!!)
         apkLite = apk
-        if (info.applicationInfo!!.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
-            return PackageUserAction(apk, info)
-        } else if (info.applicationInfo!!.sourceDir == null) {
+
+        val path = info.applicationInfo!!.sourceDir
+        if (path == null || !File(path).exists()) {
             queryZipUri(info)?.let {
                 intent.setData(it)
                 return processContentUri(it)
             }
+        } else if (info.applicationInfo!!.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
+            return PackageUserAction(apk, info)
         }
         return InstallUserAction(apk, info)
     }
