@@ -19,13 +19,13 @@
 
             <TextView
                 android:id="@+id/message"
-                style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+                style="@android:style/TextAppearance.Material.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <CheckBox
                 android:id="@+id/set_installer"
-                style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+                style="@android:style/TextAppearance.Material.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="-4dp"
@@ -44,7 +44,7 @@
 
         <TextView
             android:id="@+id/installing_message"
-            style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+            style="@android:style/TextAppearance.Material.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/installing" />
