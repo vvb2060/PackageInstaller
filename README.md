@@ -10,6 +10,7 @@ Features
 - **Add Splits**: Add new split APKs to an existing application.
 - **Remove Splits**: Remove split APKs from existing application.
 - **Interactive Split Installation**: When installing an app that requires splits, user can progressively add more APK files without needing to package them into a single zip file beforehand.
+- **Archive Apps**: Archive installed applications to a zip file, which can be used for backup or sharing.
 
 User Experience
 -------
