@@ -41,12 +41,12 @@ public class InstallFailedFragment extends BaseDialogFragment {
                 R.string.install_failed_incompatible;
             default -> R.string.install_failed;
         };
-        var message = requireContext().getString(res);
-        message += "[" + mDialogData.getLegacyCode() + "]";
+        var sb = new StringBuilder(requireContext().getString(res));
+        sb.append(" (").append(mDialogData.getLegacyCode()).append(")");
         if (mDialogData.getMessage() != null) {
-            message += "\n\n" + mDialogData.getMessage();
+            sb.append("\n\n").append(mDialogData.getMessage());
         }
-        return message;
+        return sb.toString();
 
     }
 }

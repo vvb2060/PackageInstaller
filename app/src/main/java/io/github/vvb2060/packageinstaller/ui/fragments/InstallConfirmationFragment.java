@@ -227,45 +227,46 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
     }
 
     private static String getAndroidName(int apiLevel) {
-        return switch (apiLevel) {
-            case Build.VERSION_CODES.CUR_DEVELOPMENT -> "Developer Preview";
-            case Build.VERSION_CODES.BASE -> "Android 1.0";
-            case Build.VERSION_CODES.BASE_1_1 -> "Android 1.1";
-            case Build.VERSION_CODES.CUPCAKE -> "Android 1.5";
-            case Build.VERSION_CODES.DONUT -> "Android 1.6";
-            case Build.VERSION_CODES.ECLAIR -> "Android 2.0";
-            case Build.VERSION_CODES.ECLAIR_0_1 -> "Android 2.0.1";
-            case Build.VERSION_CODES.ECLAIR_MR1 -> "Android 2.1";
-            case Build.VERSION_CODES.FROYO -> "Android 2.2";
-            case Build.VERSION_CODES.GINGERBREAD -> "Android 2.3";
-            case Build.VERSION_CODES.GINGERBREAD_MR1 -> "Android 2.3.3";
-            case Build.VERSION_CODES.HONEYCOMB -> "Android 3.0";
-            case Build.VERSION_CODES.HONEYCOMB_MR1 -> "Android 3.1";
-            case Build.VERSION_CODES.HONEYCOMB_MR2 -> "Android 3.2";
-            case Build.VERSION_CODES.ICE_CREAM_SANDWICH -> "Android 4.0";
-            case Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 -> "Android 4.0.3";
-            case Build.VERSION_CODES.JELLY_BEAN -> "Android 4.1";
-            case Build.VERSION_CODES.JELLY_BEAN_MR1 -> "Android 4.2";
-            case Build.VERSION_CODES.JELLY_BEAN_MR2 -> "Android 4.3";
-            case Build.VERSION_CODES.KITKAT -> "Android 4.4";
-            case Build.VERSION_CODES.KITKAT_WATCH -> "Android 4.4W";
-            case Build.VERSION_CODES.LOLLIPOP -> "Android 5.0";
-            case Build.VERSION_CODES.LOLLIPOP_MR1 -> "Android 5.1";
-            case Build.VERSION_CODES.M -> "Android 6.0";
-            case Build.VERSION_CODES.N -> "Android 7.0";
-            case Build.VERSION_CODES.N_MR1 -> "Android 7.1";
-            case Build.VERSION_CODES.O -> "Android 8.0";
-            case Build.VERSION_CODES.O_MR1 -> "Android 8.1";
-            case Build.VERSION_CODES.P -> "Android 9";
-            case Build.VERSION_CODES.Q -> "Android 10";
-            case Build.VERSION_CODES.R -> "Android 11";
-            case Build.VERSION_CODES.S -> "Android 12";
-            case Build.VERSION_CODES.S_V2 -> "Android 12L";
-            case Build.VERSION_CODES.TIRAMISU -> "Android 13";
-            case Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> "Android 14";
-            case Build.VERSION_CODES.VANILLA_ICE_CREAM -> "Android 15";
-            case Build.VERSION_CODES.BAKLAVA -> "Android 16";
-            default -> "Unknown (" + apiLevel + ")";
+        var name = switch (apiLevel) {
+            case Build.VERSION_CODES.CUR_DEVELOPMENT -> "Dev";
+            case Build.VERSION_CODES.BASE -> "1.0";
+            case Build.VERSION_CODES.BASE_1_1 -> "1.1";
+            case Build.VERSION_CODES.CUPCAKE -> "1.5";
+            case Build.VERSION_CODES.DONUT -> "1.6";
+            case Build.VERSION_CODES.ECLAIR -> "2.0";
+            case Build.VERSION_CODES.ECLAIR_0_1 -> "2.0.1";
+            case Build.VERSION_CODES.ECLAIR_MR1 -> "2.1";
+            case Build.VERSION_CODES.FROYO -> "2.2";
+            case Build.VERSION_CODES.GINGERBREAD -> "2.3";
+            case Build.VERSION_CODES.GINGERBREAD_MR1 -> "2.3.3";
+            case Build.VERSION_CODES.HONEYCOMB -> "3.0";
+            case Build.VERSION_CODES.HONEYCOMB_MR1 -> "3.1";
+            case Build.VERSION_CODES.HONEYCOMB_MR2 -> "3.2";
+            case Build.VERSION_CODES.ICE_CREAM_SANDWICH -> "4.0";
+            case Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 -> "4.0.3";
+            case Build.VERSION_CODES.JELLY_BEAN -> "4.1";
+            case Build.VERSION_CODES.JELLY_BEAN_MR1 -> "4.2";
+            case Build.VERSION_CODES.JELLY_BEAN_MR2 -> "4.3";
+            case Build.VERSION_CODES.KITKAT -> "4.4";
+            case Build.VERSION_CODES.KITKAT_WATCH -> "4.4W";
+            case Build.VERSION_CODES.LOLLIPOP -> "5.0";
+            case Build.VERSION_CODES.LOLLIPOP_MR1 -> "5.1";
+            case Build.VERSION_CODES.M -> "6.0";
+            case Build.VERSION_CODES.N -> "7.0";
+            case Build.VERSION_CODES.N_MR1 -> "7.1";
+            case Build.VERSION_CODES.O -> "8.0";
+            case Build.VERSION_CODES.O_MR1 -> "8.1";
+            case Build.VERSION_CODES.P -> "9";
+            case Build.VERSION_CODES.Q -> "10";
+            case Build.VERSION_CODES.R -> "11";
+            case Build.VERSION_CODES.S -> "12";
+            case Build.VERSION_CODES.S_V2 -> "12L";
+            case Build.VERSION_CODES.TIRAMISU -> "13";
+            case Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> "14";
+            case Build.VERSION_CODES.VANILLA_ICE_CREAM -> "15";
+            case Build.VERSION_CODES.BAKLAVA -> "16";
+            default -> "???";
         };
+        return "Android " + name + " (" + apiLevel + ")";
     }
 }
