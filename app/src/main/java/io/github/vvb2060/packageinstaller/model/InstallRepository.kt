@@ -15,6 +15,7 @@ import android.content.pm.PackageInstaller.SessionParams
 import android.content.pm.PackageInstaller_rename
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager_rename
+import android.content.pm.VersionedPackage
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -359,7 +360,7 @@ class InstallRepository(private val context: Application) {
         }
     }
 
-    fun archivePackage(info: PackageInfo) {
+    fun archivePackage(info: PackageInfo, uninstall: Boolean) {
         installResult.postValue(InstallInstalling(apkLite!!))
 
         val name = "${info.packageName}-${info.longVersionCode}.zip"
@@ -429,7 +430,25 @@ class InstallRepository(private val context: Application) {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, "application/zip")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        installResult.postValue(InstallSuccess(apkLite!!, intent, path))
+
+        if (uninstall) {
+            val versionedPackage = VersionedPackage(info.packageName, info.longVersionCode)
+            val receiver = LocalIntentReceiver { statusCode, legacyCode, msg ->
+                if (statusCode == PackageInstaller.STATUS_SUCCESS) {
+                    installResult.postValue(InstallSuccess(apkLite!!, intent, path))
+                } else {
+                    installResult.postValue(InstallSuccess(apkLite!!, intent, "$path\n\n$msg"))
+                }
+            }
+            // noinspection MissingPermission NewApi
+            packageInstaller.uninstall(
+                versionedPackage,
+                PackageManager_rename.DELETE_KEEP_DATA,
+                receiver.intentSender as IntentSender
+            )
+        } else {
+            installResult.postValue(InstallSuccess(apkLite!!, intent, path))
+        }
     }
 
 }

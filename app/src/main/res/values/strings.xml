@@ -13,6 +13,7 @@
     <string name="parsing">Parsing…</string>
 
     <string name="set_installer">Set installer</string>
+    <string name="uninstall_keep_data">Also uninstall this app but keep data</string>
 
     <string name="package_name">"Package: "</string>
     <string name="split_name">"Split: "</string>

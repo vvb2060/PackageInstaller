@@ -227,6 +227,30 @@ public class PackageManager_rename {
 
     public static int INSTALL_FAILED_INTERNAL_ERROR = -110;
 
+    public static int DELETE_KEEP_DATA = 0x00000001;
+
+    public static int DELETE_ALL_USERS = 0x00000002;
+
+    public static int DELETE_SYSTEM_APP = 0x00000004;
+
+    public static int DELETE_DONT_KILL_APP = 0x00000008;
+
+    public static int DELETE_ARCHIVE = 0x00000010;
+
+    public static int DELETE_CHATTY = 0x80000000;
+
+    public static int DELETE_SUCCEEDED = 1;
+
+    public static int DELETE_FAILED_INTERNAL_ERROR = -1;
+
+    public static int DELETE_FAILED_DEVICE_POLICY_MANAGER = -2;
+
+    public static int DELETE_FAILED_USER_RESTRICTED = -3;
+
+    public static int DELETE_FAILED_OWNER_BLOCKED = -4;
+
+    public static int DELETE_FAILED_ABORTED = -5;
+
     public native int installExistingPackage(String packageName, int installReason);
 
     @RequiresApi(Build.VERSION_CODES.S)

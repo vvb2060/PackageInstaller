@@ -42,9 +42,9 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun archivePackage(info: PackageInfo) {
+    fun archivePackage(info: PackageInfo, uninstall: Boolean) {
         executor.executeOnDiskIO {
-            repository.archivePackage(info)
+            repository.archivePackage(info, uninstall)
         }
     }
 }

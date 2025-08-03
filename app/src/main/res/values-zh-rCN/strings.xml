@@ -13,6 +13,7 @@
     <string name="parsing">"正在解析…"</string>
 
     <string name="set_installer">伪造安装者</string>
+    <string name="uninstall_keep_data">同时卸载此应用但保留数据</string>
 
     <string name="package_name">"包名："</string>
     <string name="split_name">"拆分: "</string>

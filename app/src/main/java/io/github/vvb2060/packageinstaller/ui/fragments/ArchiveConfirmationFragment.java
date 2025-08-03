@@ -3,6 +3,9 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,14 +25,20 @@ public class ArchiveConfirmationFragment extends BaseDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
+        TextView textView = dialogView.requireViewById(R.id.message);
+        textView.setText(R.string.archive_confirm_question);
+        CheckBox checkBox = dialogView.requireViewById(R.id.checkbox);
+        checkBox.setVisibility(View.VISIBLE);
+        checkBox.setText(R.string.uninstall_keep_data);
         return new AlertDialog.Builder(requireContext())
             .setTitle(mDialogData.getApkLite().getLabel())
             .setIcon(mDialogData.getApkLite().getIcon())
-            .setMessage(R.string.archive_confirm_question)
+            .setView(dialogView)
             .setNegativeButton(android.R.string.cancel, (dialog, which) ->
                 requireActivity().finish())
             .setPositiveButton(R.string.archive, (dialog, which) ->
-                mViewModel.archivePackage(mDialogData.getOldApk()))
+                mViewModel.archivePackage(mDialogData.getOldApk(), checkBox.isChecked()))
             .create();
     }
 
