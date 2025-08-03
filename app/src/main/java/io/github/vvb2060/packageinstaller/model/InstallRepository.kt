@@ -110,7 +110,9 @@ class InstallRepository(private val context: Application) {
     fun install(setInstaller: Boolean, commit: Boolean, full: Boolean, removeSplit: Boolean) {
         val uri = intent.data
         installResult.postValue(InstallInstalling(apkLite!!))
-        if (ContentResolver.SCHEME_CONTENT != uri?.scheme) {
+        if (ContentResolver.SCHEME_CONTENT != uri?.scheme &&
+            ContentResolver.SCHEME_FILE != uri?.scheme
+        ) {
             installPackageUri()
             return
         }
@@ -247,11 +249,41 @@ class InstallRepository(private val context: Application) {
 
         val apk = PackageUtil.getApkLite(packageManager, info!!)
         apkLite = apk
-        return if (info.applicationInfo!!.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
-            PackageUserAction(apk, info)
-        } else {
-            InstallUserAction(apk, info)
+        if (info.applicationInfo!!.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
+            return PackageUserAction(apk, info)
+        } else if (info.applicationInfo!!.sourceDir == null) {
+            queryZipUri(info)?.let {
+                intent.setData(it)
+                return processContentUri(it)
+            }
         }
+        return InstallUserAction(apk, info)
+    }
+
+    private fun queryZipUri(info: PackageInfo): Uri? {
+        val name = "${info.packageName}-${info.longVersionCode}.zip"
+        val dir = Environment.DIRECTORY_DOCUMENTS + File.separator +
+            context.getString(R.string.app_name)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val cr = context.contentResolver
+            val tableUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            val selection = "${MediaStore.MediaColumns.DISPLAY_NAME}=?"
+            cr.query(tableUri, null, selection, arrayOf(name), null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val index = cursor.getColumnIndex(MediaStore.MediaColumns._ID)
+                    if (index != -1) {
+                        val id = cursor.getLong(index)
+                        return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL, id)
+                    }
+                }
+            }
+        } else {
+            val file = File(context.getExternalFilesDir(dir), name)
+            if (file.exists()) {
+                return file.toUri()
+            }
+        }
+        return null
     }
 
     private fun installPackageUri() {
