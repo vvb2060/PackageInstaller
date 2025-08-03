@@ -8,6 +8,7 @@ Features
 - **APK Dumps**: Install apps from zipped APK dumps (a zip file containing all base and split APKs from `pm path`).
 - **Zipped APKs**: Install a single APK from within a ZIP archive.
 - **Add Splits**: Add new split APKs to an existing application.
+- **Remove Splits**: Remove split APKs from existing application.
 - **Interactive Split Installation**: When installing an app that requires splits, user can progressively add more APK files without needing to package them into a single zip file beforehand.
 
 User Experience
