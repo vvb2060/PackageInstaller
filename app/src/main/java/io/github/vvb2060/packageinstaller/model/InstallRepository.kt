@@ -22,6 +22,7 @@ import android.os.Environment
 import android.os.Process
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.system.Os
 import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
@@ -480,6 +481,9 @@ class InstallRepository(private val context: Application) {
                 PackageManager_rename.DELETE_KEEP_DATA,
                 receiver.intentSender as IntentSender
             )
+            val userId = Os.getuid() / 100000
+            packageManager as PackageManager_rename
+            packageManager.deleteApplicationCacheFilesAsUser(info.packageName, userId, null)
         } else {
             installResult.postValue(InstallSuccess(apkLite!!, intent, path))
         }

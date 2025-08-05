@@ -257,4 +257,7 @@ public class PackageManager_rename {
     public native void addUniquePreferredActivity(IntentFilter filter, int match,
                                                   ComponentName[] set, ComponentName activity);
 
+    public native void deleteApplicationCacheFilesAsUser(String packageName,
+                                                         int userId, IPackageDataObserver observer);
+
 }
