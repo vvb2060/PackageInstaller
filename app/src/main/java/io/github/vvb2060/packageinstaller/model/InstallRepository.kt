@@ -265,19 +265,21 @@ class InstallRepository(private val context: Application) {
 
     private fun queryZipUri(info: PackageInfo): Uri? {
         val name = "${info.packageName}-${info.longVersionCode}.zip"
+        val name2 = "${info.packageName}-${info.longVersionCode} (%).zip"
         val dir = Environment.DIRECTORY_DOCUMENTS + File.separator +
             context.getString(R.string.app_name)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val cr = context.contentResolver
             val tableUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            val selection = "${MediaStore.MediaColumns.DISPLAY_NAME}=?"
-            cr.query(tableUri, null, selection, arrayOf(name), null)?.use { cursor ->
+            val selection = "${MediaStore.MediaColumns.DISPLAY_NAME}=? OR " +
+                "${MediaStore.MediaColumns.DISPLAY_NAME} LIKE ?"
+            val selectionArgs = arrayOf(name, name2)
+            val projection = arrayOf(MediaStore.MediaColumns._ID)
+            cr.query(tableUri, projection, selection, selectionArgs, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    val index = cursor.getColumnIndex(MediaStore.MediaColumns._ID)
-                    if (index != -1) {
-                        val id = cursor.getLong(index)
-                        return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL, id)
-                    }
+                    val index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
+                    val id = cursor.getLong(index)
+                    return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL, id)
                 }
             }
         } else {
