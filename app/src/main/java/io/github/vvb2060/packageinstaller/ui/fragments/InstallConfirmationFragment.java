@@ -95,6 +95,7 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
                 (dialogInt, which) ->
                     mViewModel.initiateInstall(mCheckBox.isChecked(), false, full, remove))
             .create();
+        mDialog.setCanceledOnTouchOutside(false);
         return mDialog;
     }
 
