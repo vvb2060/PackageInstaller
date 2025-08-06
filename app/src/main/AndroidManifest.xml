@@ -35,6 +35,7 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/zip" />
@@ -42,6 +43,7 @@
             </intent-filter>
             <intent-filter android:priority="10">
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:scheme="package" />
@@ -49,13 +51,16 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="details"
                     android:scheme="market" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
@@ -64,13 +69,24 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.INFO" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
-                <action android:name="android.intent.action.SHOW_APP_INFO"/>
+                <action android:name="android.intent.action.SHOW_APP_INFO" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".receiver.UnarchiveReceiver"
+            android:enabled="@bool/supported_archive"
+            android:exported="false"
+            tools:targetApi="35">
+            <intent-filter>
+                <action android:name="android.intent.action.UNARCHIVE_PACKAGE" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name=".provider.ShizukuProvider"
@@ -78,7 +94,6 @@
             android:exported="true"
             android:multiprocess="false"
             android:permission="android.permission.NETWORK_SETTINGS" />
-
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
