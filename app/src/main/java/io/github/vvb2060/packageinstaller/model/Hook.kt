@@ -11,6 +11,7 @@ import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageInstallerSession
 import android.content.pm.IPackageManager
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.os.Process
@@ -25,7 +26,8 @@ import rikka.shizuku.SystemServiceHelper
 object Hook {
     private var hooked = false
     private lateinit var am: IActivityManager
-    lateinit var rawPm: IPackageManager
+    lateinit var pm: PackageManager
+    lateinit var installer: PackageInstaller
 
     init {
         LSPass.setHiddenApiExemptions("")
@@ -37,13 +39,25 @@ object Hook {
         val ibinder = SystemServiceHelper.getSystemService(Context.ACTIVITY_SERVICE)
         am = IActivityManager.Stub.asInterface(ShizukuBinderWrapper(ibinder))
 
-        val pm = context.packageManager
-        val pi = pm.packageInstaller
+        pm = context.packageManager
+        var contextImpl = context
+        while (contextImpl is ContextWrapper) {
+            contextImpl = contextImpl.baseContext
+        }
+        contextImpl::class.java.getDeclaredField("mPackageManager").apply {
+            isAccessible = true
+            set(contextImpl, null)
+        }
+
+        installer = pm.packageInstaller
+        pm::class.java.getDeclaredField("mInstaller").apply {
+            isAccessible = true
+            set(pm, null)
+        }
 
         ActivityThread::class.java.getDeclaredField("sPackageManager").apply {
             isAccessible = true
             val sPackageManager = get(null) as IPackageManager
-            rawPm = sPackageManager
             val wrapper = ShizukuBinderWrapper(sPackageManager.asBinder())
             set(null, IPackageManager.Stub.asInterface(wrapper))
         }
@@ -53,11 +67,11 @@ object Hook {
             val wrapper = ShizukuBinderWrapper(mPM.asBinder())
             set(pm, IPackageManager.Stub.asInterface(wrapper))
         }
-        pi::class.java.getDeclaredField("mInstaller").apply {
+        installer::class.java.getDeclaredField("mInstaller").apply {
             isAccessible = true
-            val mInstaller = get(pi) as IPackageInstaller
+            val mInstaller = get(installer) as IPackageInstaller
             val wrapper = ShizukuBinderWrapper(mInstaller.asBinder())
-            set(pi, IPackageInstaller.Stub.asInterface(wrapper))
+            set(installer, IPackageInstaller.Stub.asInterface(wrapper))
         }
         hooked = true
     }

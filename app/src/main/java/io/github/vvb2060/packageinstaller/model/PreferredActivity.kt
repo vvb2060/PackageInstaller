@@ -84,12 +84,13 @@ object PreferredActivity {
         }
     }
 
-    fun set(pm: PackageManager) {
+    fun set(rawPm: PackageManager) {
+        val pm = Hook.pm
         if (check(pm, Intent.ACTION_VIEW) && check(pm, Intent.ACTION_INSTALL_PACKAGE)) {
             return
         }
 
-        Hook.rawPm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
+        rawPm.clearPackagePreferredActivities(BuildConfig.APPLICATION_ID)
         add(pm, Intent.ACTION_VIEW)
         add(pm, Intent.ACTION_INSTALL_PACKAGE)
         Log.v(TAG, "Preferred activities set for ${BuildConfig.APPLICATION_ID}")

@@ -47,8 +47,8 @@ class InstallRepository(private val context: Application) {
     private val TAG = InstallRepository::class.java.simpleName
     val installResult = MutableLiveData<InstallStage>()
     val stagingProgress = MutableLiveData<Int>()
-    private val packageManager: PackageManager = context.packageManager
-    private val packageInstaller: PackageInstaller = packageManager.packageInstaller
+    private lateinit var packageManager: PackageManager
+    private lateinit var packageInstaller: PackageInstaller
     private var stagedSessionId = SessionInfo.INVALID_ID
     private var callingUid = Process.INVALID_UID
     private lateinit var intent: Intent
@@ -62,7 +62,9 @@ class InstallRepository(private val context: Application) {
         ) {
             installResult.value = InstallAborted(
                 ABORT_SHIZUKU,
-                packageManager.getLaunchIntentForPackage(ShizukuProvider.MANAGER_APPLICATION_ID)
+                context.packageManager.getLaunchIntentForPackage(
+                    ShizukuProvider.MANAGER_APPLICATION_ID
+                )
             )
             return false
         }
@@ -71,8 +73,10 @@ class InstallRepository(private val context: Application) {
         Log.v(TAG, "Intent: $intent")
 
         Hook.init(context)
+        packageManager = Hook.pm
+        packageInstaller = Hook.installer
         Hook.disableAdbVerify(context)
-        PreferredActivity.set(packageManager)
+        PreferredActivity.set(context.packageManager)
 
         installResult.value = InstallParse()
         return true
@@ -491,8 +495,8 @@ class InstallRepository(private val context: Application) {
                 receiver.intentSender as IntentSender
             )
             val userId = Os.getuid() / 100000
-            packageManager as PackageManager_rename
-            packageManager.deleteApplicationCacheFilesAsUser(info.packageName, userId, null)
+            val pm = packageManager as PackageManager_rename
+            pm.deleteApplicationCacheFilesAsUser(info.packageName, userId, null)
         } else {
             installResult.postValue(InstallSuccess(apkLite!!, intent, path))
         }
