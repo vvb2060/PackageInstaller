@@ -385,6 +385,10 @@ class InstallRepository(private val context: Application) {
     private fun setStageBasedOnResult(statusCode: Int, legacyStatus: Int, message: String?) {
         if (statusCode == PackageInstaller.STATUS_SUCCESS) {
             val intent = packageManager.getLaunchIntentForPackage(apkLite!!.packageName)
+            packageManager.getPackageInfo(apkLite!!.packageName, 0)?.let { info ->
+                apkLite!!.icon = info.applicationInfo!!.loadIcon(packageManager)
+                apkLite!!.label = info.applicationInfo!!.loadLabel(packageManager).toString()
+            }
             installResult.postValue(InstallSuccess(apkLite!!, intent))
         } else {
             installResult.postValue(InstallFailed(apkLite!!, legacyStatus, statusCode, message))
