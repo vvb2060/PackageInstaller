@@ -469,7 +469,6 @@ class InstallRepository(private val context: Application) {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
         if (uninstall) {
-            val versionedPackage = VersionedPackage(info.packageName, info.longVersionCode)
             val receiver = LocalIntentReceiver { statusCode, legacyCode, msg ->
                 if (statusCode == PackageInstaller.STATUS_SUCCESS) {
                     installResult.postValue(InstallSuccess(apkLite!!, intent, path))
@@ -477,9 +476,17 @@ class InstallRepository(private val context: Application) {
                     installResult.postValue(InstallSuccess(apkLite!!, intent, "$path\n\n$msg"))
                 }
             }
+            // noinspection MissingPermission
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                packageInstaller.requestArchive(
+                    info.packageName,
+                    receiver.intentSender as IntentSender
+                )
+                return
+            }
             // noinspection MissingPermission NewApi
             packageInstaller.uninstall(
-                versionedPackage,
+                VersionedPackage(info.packageName, info.longVersionCode),
                 PackageManager_rename.DELETE_KEEP_DATA,
                 receiver.intentSender as IntentSender
             )
