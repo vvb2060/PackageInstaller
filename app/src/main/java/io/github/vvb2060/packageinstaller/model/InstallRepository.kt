@@ -484,13 +484,17 @@ class InstallRepository(private val context: Application) {
                     installResult.postValue(InstallSuccess(apkLite!!, intent, "$path\n\n$msg"))
                 }
             }
-            // noinspection MissingPermission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                packageInstaller.requestArchive(
-                    info.packageName,
-                    receiver.intentSender as IntentSender
-                )
-                return
+                try {
+                    // noinspection MissingPermission
+                    packageInstaller.requestArchive(
+                        info.packageName,
+                        receiver.intentSender as IntentSender
+                    )
+                    return
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Log.w(TAG, "Failed to archive for package ${info.packageName}", e)
+                }
             }
             // noinspection MissingPermission NewApi
             packageInstaller.uninstall(
