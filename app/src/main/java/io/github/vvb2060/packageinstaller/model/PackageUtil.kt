@@ -50,6 +50,7 @@ object PackageUtil {
 
     fun parseZipFromFd(afd: AssetFileDescriptor): ApkLite? {
         ZipFile.builder()
+            .setIgnoreLocalFileHeader(true)
             .setSeekableByteChannel(afd.createInputStream().getChannel())
             .get().use { zipFile ->
                 val xml = zipFile.getEntry("AndroidManifest.xml")
@@ -328,6 +329,7 @@ object PackageUtil {
         callback: Consumer<Int>,
     ) {
         ZipFile.builder()
+            .setIgnoreLocalFileHeader(true)
             .setSeekableByteChannel(afd.createInputStream().getChannel())
             .get().use { zipFile ->
                 val apks = filterZipEntries(zipFile)
