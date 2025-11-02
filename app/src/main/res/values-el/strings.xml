@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">Shizuku installer</string>
+
+    <string name="install">Εγκατάσταση</string>
+    <string name="update">Ενημέρωση</string>
+    <string name="archive">Αρχειοθέτηση</string>
+    <string name="add_more">Προσθήκη περισσότερων</string>
+    <string name="enable">Ενεργοποίηση</string>
+    <string name="disable">Απενεργοποίηση</string>
+    <string name="done">Τέλος</string>
+    <string name="launch">Άνοιγμα</string>
+
+    <string name="copying">Αντιγραφή…</string>
+    <string name="installing">Εγκατάσταση…</string>
+    <string name="parsing">Ανάλυση…</string>
+
+    <string name="set_installer">Ορισμός προγράμματος εγκατάστασης</string>
+    <string name="uninstall_keep_data">Επίσης, απεγκατάσταση αυτής της εφαρμογής, αλλά διατήρηση δεδομένων</string>
+
+    <string name="package_name">"Πακέτο: "</string>
+    <string name="split_name">"Διαχωρισμένο: "</string>
+    <string name="split_types">"Τύποι: "</string>
+    <string name="required_split_types">"Απαιτείται: "</string>
+    <string name="version">"Έκδοση: "</string>
+    <string name="min_sdk">"Ελάχιστη: "</string>
+    <string name="target_sdk">"Στόχος: "</string>
+
+    <string name="install_confirm_question">Θέλετε να εγκαταστήσετε αυτήν την εφαρμογή;</string>
+    <string name="install_confirm_question_update">Θέλετε να ενημερώσετε αυτήν την εφαρμογή;</string>
+    <string name="install_confirm_question_split">Θέλετε να προσθέσετε διαχωρισμένο πακέτο σε αυτήν την εφαρμογή;</string>
+    <string name="install_confirm_question_split_remove">Θέλετε να αφαιρέσετε αυτό το διαχωρισμένο πακέτο;</string>
+
+    <string name="archive_confirm_question">Θέλετε να αρχειοθετήσετε το πακέτο αυτής της εφαρμογής;</string>
+
+    <string name="install_done">Η εφαρμογή εγκαταστάθηκε.</string>
+    <string name="archive_done">"Αρχειοθετήθηκε σε: "</string>
+
+    <string name="install_failed">Η εφαρμογή δεν εγκαταστάθηκε.</string>
+    <string name="install_failed_blocked">Η εγκατάσταση του πακέτου αποκλείστηκε.</string>
+    <string name="install_failed_conflict">Η εφαρμογή δεν εγκαταστάθηκε επειδή το πακέτο έρχεται σε διένεξη με ένα υπάρχον πακέτο.</string>
+    <string name="install_failed_incompatible">Η εφαρμογή δεν έχει εγκατασταθεί, καθώς δεν είναι συμβατή με τη συσκευή σας.</string>
+    <string name="install_failed_invalid_apk">Η εφαρμογή δεν έχει εγκατασταθεί, καθώς το πακέτο φαίνεται να μην είναι έγκυρο.</string>
+    <string name="install_failed_storage">Δεν υπάρχει χώρος</string>
+
+    <string name="error_title">Σφάλμα</string>
+    <string name="error_parse">Παρουσιάστηκε πρόβλημα κατά την ανάλυση του πακέτου.</string>
+    <string name="error_split">Λείπει το αντίστοιχο βασικό πακέτο.</string>
+    <string name="error_notfound">Η εφαρμογή δεν βρέθηκε στη λίστα με τις εγκατεστημένες εφαρμογές.</string>
+    <string name="error_shizuku_notfound">Το Shizuku δεν είναι εγκατεστημένο.</string>
+    <string name="error_shizuku_notrunning">Το Shizuku δεν εκτελείται.</string>
+    <string name="error_shizuku_notpermitted">Το Shizuku δεν επιτρέπεται.</string>
+    <string name="error_shizuku_unavailable">Το Shizuku δεν είναι διαθέσιμο.</string>
+    <string name="error_create">Αποτυχία δημιουργίας περιόδου λειτουργίας εγκατάστασης.</string>
+    <string name="error_write">Αποτυχία αντιγραφής apk.</string>
+    <string name="error_info">Αυτό το λογισμικό είναι ανοιχτού κώδικα με %s.</string>
+</resources>
