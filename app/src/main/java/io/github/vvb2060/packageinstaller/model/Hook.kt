@@ -1,5 +1,6 @@
 package io.github.vvb2060.packageinstaller.model
 
+import android.annotation.SuppressLint
 import android.app.ActivityThread
 import android.app.IActivityManager
 import android.content.AttributionSource
@@ -76,22 +77,31 @@ object Hook {
         hooked = true
     }
 
+    @SuppressLint("SoonBlockedPrivateApi", "DiscouragedPrivateApi")
     private fun wrapGlobalSettings(callback: Runnable) {
-        val holder = Settings.Global::class.java.getDeclaredField("sProviderHolder").run {
-            isAccessible = true
-            get(null)
-        }
-        val provider = holder::class.java.getDeclaredField("mContentProvider").run {
-            isAccessible = true
-            get(holder)
-        }
-        provider::class.java.getDeclaredField("mRemote").run {
-            isAccessible = true
-            val binder = get(provider) as IBinder
-            val wrapper = ShizukuBinderWrapper(binder)
-            set(provider, wrapper)
+        runCatching {
+            val holder = Settings.Global::class.java.getDeclaredField("sProviderHolder").run {
+                isAccessible = true
+                get(null)
+            }
+            val provider = holder::class.java.getDeclaredField("mContentProvider").run {
+                isAccessible = true
+                get(holder)
+            }
+            provider::class.java.getDeclaredField("mRemote").run {
+                isAccessible = true
+                val binder = get(provider) as IBinder
+                val wrapper = ShizukuBinderWrapper(binder)
+                set(provider, wrapper)
+                try {
+                    callback.run()
+                } finally {
+                    set(provider, binder)
+                }
+            }
+        }.onFailure {
+            // Fallback without reflection to avoid hard crash on future Android releases.
             callback.run()
-            set(provider, binder)
         }
     }
 

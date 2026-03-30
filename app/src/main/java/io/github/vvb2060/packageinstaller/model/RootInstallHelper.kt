@@ -1,15 +1,32 @@
 package io.github.vvb2060.packageinstaller.model
 
 import android.content.Context
+import android.content.ContentResolver
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.system.Os
 import java.io.File
+import java.io.InputStream
 import java.io.IOException
 
 object RootInstallHelper {
+    sealed class InstallStream(open val name: String, open val length: Long) {
+        data class RootPath(
+            override val name: String,
+            override val length: Long,
+            val sourcePath: String,
+        ) : InstallStream(name, length)
+
+        data class Reader(
+            override val name: String,
+            override val length: Long,
+            val openStream: () -> InputStream,
+        ) : InstallStream(name, length)
+    }
+
     private data class PackageDetails(
         val versionCode: Long?,
         val versionName: String?,
@@ -56,14 +73,48 @@ object RootInstallHelper {
         return parseSessionId(result.output)
     }
 
-    fun writeSession(sessionId: Int, files: List<File>) {
-        for (file in files) {
-            val result = execute(
-                "cat ${shellQuote(file.absolutePath)} | pm install-write -S ${file.length()} $sessionId ${shellQuote(file.name.substringBeforeLast(".apk"))} -"
-            )
-            if (result.exitCode != 0 || result.output.contains("Exception") || result.output.contains("Error")) {
-                throw IOException("Failed to write ${file.name}: ${result.output}")
+    fun writeSession(sessionId: Int, streams: List<InstallStream>) {
+        for (stream in streams) {
+            if (stream.length <= 0L) {
+                throw IOException("Invalid stream length for ${stream.name}: ${stream.length}")
             }
+            when (stream) {
+                is InstallStream.RootPath -> writeSessionFromRootPath(sessionId, stream)
+                is InstallStream.Reader -> writeSessionFromReader(sessionId, stream)
+            }
+        }
+    }
+
+    private fun writeSessionFromRootPath(sessionId: Int, stream: InstallStream.RootPath) {
+        val result = execute(
+            "cat ${shellQuote(stream.sourcePath)} | pm install-write -S ${stream.length} $sessionId ${shellQuote(stream.name)} -"
+        )
+        if (result.exitCode != 0 || result.output.contains("Exception") || result.output.contains("Error")) {
+            throw IOException("Failed to write ${stream.name}: ${result.output}")
+        }
+    }
+
+    private fun writeSessionFromReader(sessionId: Int, stream: InstallStream.Reader) {
+        val command = "pm install-write -S ${stream.length} $sessionId ${shellQuote(stream.name)} -"
+        val process = ProcessBuilder("su", "-c", command)
+            .redirectErrorStream(true)
+            .start()
+
+        try {
+            stream.openStream().use { input ->
+                process.outputStream.use { output ->
+                    input.copyTo(output, 8 * 1024)
+                }
+            }
+        } catch (e: Exception) {
+            process.destroy()
+            throw IOException("Failed to stream ${stream.name}", e)
+        }
+
+        val result = process.inputStream.bufferedReader().use { it.readText().trim() }
+        val exitCode = process.waitFor()
+        if (exitCode != 0 || result.contains("Exception") || result.contains("Error")) {
+            throw IOException("Failed to write ${stream.name}: $result")
         }
     }
 
@@ -158,8 +209,7 @@ object RootInstallHelper {
         val splitPaths = paths.filter { it != basePath }
         val splitNames = splitPaths.map { File(it).name.removeSuffix(".apk") }
 
-        // Attempt to parse the APK using Android's native parser
-        val pi = pm.getPackageArchiveInfo(basePath, 0)
+        val pi = runCatching { pm.getPackageArchiveInfo(basePath, 0) }.getOrNull()
         
         val appInfo = (pi?.applicationInfo ?: ApplicationInfo()).apply {
             this.packageName = packageName
@@ -184,24 +234,50 @@ object RootInstallHelper {
         }
     }
 
-    fun prepareSourceFiles(
+    fun prepareSourceStreams(
         context: Context,
         uri: Uri,
         apk: ApkLite,
-        targetDir: File,
-    ): List<File> {
-        targetDir.mkdirs()
-        return try {
-            PackageUtil.extractInstallFiles(context, uri, apk, targetDir)
-        } catch (e: Exception) {
-            val sourceFile = uniqueFile(targetDir, "source.apk")
-            if (!copyContentUriToFile(uri, sourceFile)) {
-                throw IOException("Failed to read URI via root: $uri", e)
+    ): List<InstallStream> {
+        if (!apk.zip) {
+            val filePath = uri.path
+            if (uri.scheme == ContentResolver.SCHEME_FILE && !filePath.isNullOrEmpty()) {
+                val source = File(filePath)
+                val length = queryFileLength(filePath)
+                val name = source.name.substringBeforeLast(".apk", source.name)
+                return listOf(InstallStream.RootPath(name, length, filePath))
             }
-            try {
-                PackageUtil.extractInstallFilesFromFile(sourceFile, apk, targetDir)
-            } finally {
-                runCatching { sourceFile.delete() }
+
+            val length = queryContentLength(context, uri)
+            val name = "${apk.packageName}-${System.nanoTime()}"
+            return listOf(
+                InstallStream.Reader(name, length) {
+                    context.contentResolver.openInputStream(uri)
+                        ?: throw IOException("Failed to open source: $uri")
+                }
+            )
+        }
+
+        if (uri.scheme == ContentResolver.SCHEME_FILE && !uri.path.isNullOrEmpty()) {
+            val sourceFile = File(uri.path!!)
+            val entries = PackageUtil.listInstallArchiveEntries(sourceFile)
+            if (entries.isEmpty()) {
+                throw IOException("No install entries in archive: ${sourceFile.absolutePath}")
+            }
+            return entries.map { entry ->
+                InstallStream.Reader(entry.installName, entry.length) {
+                    PackageUtil.openArchiveEntryStream(sourceFile, entry.archivePath)
+                }
+            }
+        }
+
+        val entries = PackageUtil.listInstallArchiveEntries(context, uri)
+        if (entries.isEmpty()) {
+            throw IOException("No install entries in archive: $uri")
+        }
+        return entries.map { entry ->
+            InstallStream.Reader(entry.installName, entry.length) {
+                PackageUtil.openArchiveEntryStream(context, uri, entry.archivePath)
             }
         }
     }
@@ -239,45 +315,129 @@ object RootInstallHelper {
         execute("chmod 644 ${shellQuote(targetFile.absolutePath)}")
     }
 
-    fun prepareInstalledPackageFiles(
+    fun prepareInstalledPackageStreams(
         info: PackageInfo,
-        targetDir: File,
         excludeSplitName: String? = null,
-    ): List<File> {
-        targetDir.mkdirs()
-        val files = ArrayList<File>()
-        val source = info.applicationInfo?.sourceDir?.let { File(it) }
-        if (source != null && source.exists()) {
-            files.add(copyToTemp(source, targetDir, source.name))
+    ): List<InstallStream> {
+        val streams = ArrayList<InstallStream>()
+        val sourcePath = info.applicationInfo?.sourceDir
+        if (!sourcePath.isNullOrEmpty()) {
+            val sourceName = File(sourcePath).name
+            val installName = sourceName.substringBeforeLast(".apk", sourceName)
+            streams.add(InstallStream.RootPath(installName, queryFileLength(sourcePath), sourcePath))
         }
+
         val splitSourceDirs = info.applicationInfo?.splitSourceDirs
         val splitNames = info.splitNames
         if (splitSourceDirs != null) {
             for (index in splitSourceDirs.indices) {
-                val splitFile = File(splitSourceDirs[index])
-                if (!splitFile.exists()) continue
+                val splitPath = splitSourceDirs[index]
                 val splitName = splitNames?.getOrNull(index)
                 if (excludeSplitName != null && splitName == excludeSplitName) continue
-                files.add(copyToTemp(splitFile, targetDir, splitFile.name))
+                val splitFileName = File(splitPath).name
+                val installName = splitFileName.substringBeforeLast(".apk", splitFileName)
+                streams.add(InstallStream.RootPath(installName, queryFileLength(splitPath), splitPath))
             }
         }
-        return files
+        return streams
     }
 
-    fun copyToTemp(source: File, targetDir: File, name: String = source.name): File {
-        targetDir.mkdirs()
-        val target = uniqueFile(targetDir, name)
-        source.inputStream().use { input ->
-            target.outputStream().use { output ->
-                input.copyTo(output)
-            }
+    fun resolvePresentationFromSourcePath(
+        context: Context,
+        pm: PackageManager,
+        sourcePath: String,
+    ): PackageUtil.ArchivePresentation? {
+        val sourceFile = File(sourcePath)
+        if (sourceFile.exists()) {
+            return resolvePresentationFromFile(pm, sourceFile)
         }
-        return target
+
+        val tempDir = File(context.cacheDir, "root-meta-${System.nanoTime()}")
+        val tempFile = File(tempDir, "source.apk")
+        return try {
+            if (!copyFileToFile(sourcePath, tempFile)) {
+                null
+            } else {
+                resolvePresentationFromFile(pm, tempFile)
+            }
+        } finally {
+            deleteRecursively(tempDir)
+        }
     }
 
-    fun deleteFiles(files: List<File>) {
-        files.forEach { file ->
-            runCatching { file.delete() }
+    fun parseContentUriWithMetadata(
+        context: Context,
+        pm: PackageManager,
+        uri: Uri,
+    ): ApkLite? {
+        val tempDir = File(context.cacheDir, "root-parse-${System.nanoTime()}")
+        val sourceFile = File(tempDir, "source.apk")
+        return try {
+            val parsed = runCatching {
+                context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { afd ->
+                    PackageUtil.parseZipFromFd(afd)
+                }
+            }.getOrNull()
+            val apk = parsed ?: run {
+                val copied = copyContentUriToFileWithApp(context, uri, sourceFile)
+                    || copyContentUriToFile(uri, sourceFile)
+                if (!copied) {
+                    return null
+                }
+                PackageUtil.parseZipFromFile(sourceFile)
+            } ?: return null
+
+            if (apk.label == null || apk.icon == null) {
+                val fromUri = runCatching {
+                    PackageUtil.resolveUriArchivePresentation(context, pm, uri, apk.zip)
+                }.getOrNull()
+                if (apk.label == null) {
+                    apk.label = fromUri?.label
+                }
+                if (apk.icon == null) {
+                    apk.icon = fromUri?.icon
+                }
+            }
+
+            if ((apk.label == null || apk.icon == null) && sourceFile.exists()) {
+                val fromFile = resolvePresentationFromFile(pm, sourceFile)
+                if (apk.label == null) {
+                    apk.label = fromFile?.label
+                }
+                if (apk.icon == null) {
+                    apk.icon = fromFile?.icon
+                }
+            }
+            apk
+        } finally {
+            deleteRecursively(tempDir)
+        }
+    }
+
+    private fun copyContentUriToFileWithApp(
+        context: Context,
+        uri: Uri,
+        targetFile: File,
+    ): Boolean {
+        return try {
+            targetFile.parentFile?.mkdirs()
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                targetFile.outputStream().use { output ->
+                    input.copyTo(output, 8 * 1024)
+                }
+            } ?: return false
+            targetFile.exists() && targetFile.length() > 0L
+        } catch (_: Exception) {
+            runCatching { targetFile.delete() }
+            false
+        }
+    }
+
+    fun deleteRecursively(target: File) {
+        runCatching {
+            if (target.exists()) {
+                target.deleteRecursively()
+            }
         }
     }
 
@@ -344,10 +504,75 @@ object RootInstallHelper {
             ?.groupValues?.getOrNull(1)?.toIntOrNull()
         val targetSdk = Regex("targetSdk=(\\d+)").find(text)
             ?.groupValues?.getOrNull(1)?.toIntOrNull()
-        val enabledState = Regex("enabled=(\\d+)").find(text)
-            ?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 0
-        val isEnabled = enabledState <= 1
+        val isEnabled = queryPackageEnabled(packageName)
         return PackageDetails(versionCode, versionName, minSdk, targetSdk, isEnabled)
+    }
+
+    private fun queryPackageEnabled(packageName: String): Boolean {
+        val result = execute("pm list packages -d ${shellQuote(packageName)}")
+        if (result.exitCode != 0) {
+            return true
+        }
+        return result.output.lineSequence().none { it.trim() == "package:$packageName" }
+    }
+
+    private fun queryFileLength(path: String): Long {
+        val result = execute("stat -c %s ${shellQuote(path)}")
+        if (result.exitCode == 0) {
+            val size = result.output.lineSequence().firstOrNull()?.trim()?.toLongOrNull()
+            if (size != null && size > 0L) {
+                return size
+            }
+        }
+        val fallback = File(path).length()
+        if (fallback > 0L) {
+            return fallback
+        }
+        throw IOException("Failed to resolve file length: $path")
+    }
+
+    private fun queryContentLength(context: Context, uri: Uri): Long {
+        val afdLength = context.contentResolver.openAssetFileDescriptor(uri, "r")?.use {
+            it.length
+        } ?: -1L
+        if (afdLength > 0L) {
+            return afdLength
+        }
+
+        val pfdLength = context.contentResolver.openFileDescriptor(uri, "r")?.use {
+            it.statSize
+        } ?: -1L
+        if (pfdLength > 0L) {
+            return pfdLength
+        }
+
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            var count = 0L
+            val buffer = ByteArray(8 * 1024)
+            while (true) {
+                val read = input.read(buffer)
+                if (read <= 0) {
+                    break
+                }
+                count += read
+            }
+            if (count > 0L) {
+                return count
+            }
+        }
+
+        throw IOException("Failed to resolve content length: $uri")
+    }
+
+    private fun resolvePresentationFromFile(
+        pm: PackageManager,
+        sourceFile: File,
+    ): PackageUtil.ArchivePresentation? {
+        val parsed = runCatching { PackageUtil.parseZipFromFile(sourceFile) }.getOrNull()
+        if (parsed != null && (parsed.label != null || parsed.icon != null)) {
+            return PackageUtil.ArchivePresentation(parsed.label, parsed.icon)
+        }
+        return PackageUtil.resolveArchivePresentation(pm, sourceFile, parsed?.zip == true)
     }
 
     private fun parseSessionId(output: String): Int {
@@ -364,20 +589,4 @@ object RootInstallHelper {
         return "'" + value.replace("'", "'\\''") + "'"
     }
 
-    private fun uniqueFile(dir: File, name: String): File {
-        val baseName = name.ifEmpty { "package.apk" }
-        var candidate = File(dir, baseName)
-        var index = 1
-        while (candidate.exists()) {
-            val dot = baseName.lastIndexOf('.')
-            val fileName = if (dot > 0) {
-                baseName.substring(0, dot) + "-$index" + baseName.substring(dot)
-            } else {
-                baseName + "-$index"
-            }
-            candidate = File(dir, fileName)
-            index += 1
-        }
-        return candidate
-    }
 }

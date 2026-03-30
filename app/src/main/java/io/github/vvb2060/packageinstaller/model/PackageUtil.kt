@@ -28,11 +28,23 @@ import org.xmlpull.v1.XmlPullParser
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
+import java.io.InputStream
 import java.io.IOException
 import java.util.Locale
 import java.util.function.Consumer
 
 object PackageUtil {
+    data class ArchivePresentation(
+        val label: String?,
+        val icon: Drawable?,
+    )
+
+    data class InstallArchiveEntry(
+        val archivePath: String,
+        val installName: String,
+        val length: Long,
+    )
+
     fun getApkLite(pm: PackageManager, pkgInfo: PackageInfo): ApkLite {
         val info = pkgInfo.applicationInfo ?: ApplicationInfo().apply {
             packageName = pkgInfo.packageName
@@ -489,6 +501,225 @@ object PackageUtil {
             }
         }
         return target
+    }
+
+    fun resolveArchivePresentation(
+        pm: PackageManager,
+        sourceFile: File,
+        isArchive: Boolean,
+    ): ArchivePresentation? {
+        if (!sourceFile.exists()) {
+            return null
+        }
+
+        var tempDir: File? = null
+        val archiveFile = if (isArchive) {
+            tempDir = File(sourceFile.parentFile, "meta-${System.nanoTime()}")
+            extractBaseApkFile(sourceFile, tempDir!!)
+        } else {
+            sourceFile
+        } ?: return null
+
+        return try {
+            val pi = readArchivePackageInfo(pm, archiveFile) ?: return null
+            val appInfo = pi.applicationInfo ?: return null
+            val label = runCatching { appInfo.loadLabel(pm).toString() }.getOrNull()
+            val icon = runCatching { appInfo.loadIcon(pm) }.getOrNull()
+            if (label == null && icon == null) {
+                null
+            } else {
+                ArchivePresentation(label, icon)
+            }
+        } finally {
+            tempDir?.deleteRecursively()
+        }
+    }
+
+    private fun readArchivePackageInfo(pm: PackageManager, archiveFile: File): PackageInfo? {
+        val pi = pm.getPackageArchiveInfo(archiveFile.absolutePath, 0) ?: return null
+        val appInfo = pi.applicationInfo ?: return null
+        appInfo.sourceDir = archiveFile.absolutePath
+        appInfo.publicSourceDir = archiveFile.absolutePath
+        return pi
+    }
+
+    private fun extractBaseApkFile(sourceFile: File, targetDir: File): File? {
+        targetDir.mkdirs()
+        FileInputStream(sourceFile).use { input ->
+            ZipFile.builder()
+                .setIgnoreLocalFileHeader(true)
+                .setSeekableByteChannel(input.getChannel())
+                .get().use { zipFile ->
+                    val entry = findBaseApkEntry(zipFile) ?: return null
+                    val simpleName = entry.getName().substringAfterLast('/').ifEmpty { "base.apk" }
+                    val outFile = File(targetDir, simpleName)
+                    zipFile.getInputStream(entry).use { entryInput ->
+                        outFile.outputStream().use { output ->
+                            entryInput.copyTo(output)
+                        }
+                    }
+                    return outFile
+                }
+        }
+    }
+
+    private fun findBaseApkEntry(zipFile: ZipFile): ZipArchiveEntry? {
+        var singleApk: ZipArchiveEntry? = null
+        var apkCount = 0
+        var fallback: ZipArchiveEntry? = null
+
+        for (entry in zipFile.getEntries()) {
+            if (!entry.getName().endsWith(".apk")) {
+                continue
+            }
+            apkCount += 1
+            if (singleApk == null) {
+                singleApk = entry
+            }
+
+            val name = entry.getName().substringAfterLast('/')
+            if (name == "base.apk") {
+                return entry
+            }
+            if (fallback == null && (name.startsWith("base-") || name.startsWith("base_"))) {
+                fallback = entry
+            }
+        }
+
+        return fallback ?: if (apkCount == 1) singleApk else null
+    }
+
+    fun listInstallArchiveEntries(context: Context, uri: Uri): List<InstallArchiveEntry> {
+        val afd = context.contentResolver.openAssetFileDescriptor(uri, "r") ?: return emptyList()
+        afd.use {
+            ZipFile.builder()
+                .setIgnoreLocalFileHeader(true)
+                .setSeekableByteChannel(it.createInputStream().getChannel())
+                .get().use { zipFile ->
+                    return buildInstallArchiveEntries(zipFile)
+                }
+        }
+    }
+
+    fun listInstallArchiveEntries(sourceFile: File): List<InstallArchiveEntry> {
+        FileInputStream(sourceFile).use { input ->
+            ZipFile.builder()
+                .setIgnoreLocalFileHeader(true)
+                .setSeekableByteChannel(input.getChannel())
+                .get().use { zipFile ->
+                    return buildInstallArchiveEntries(zipFile)
+                }
+        }
+    }
+
+    fun openArchiveEntryStream(context: Context, uri: Uri, archivePath: String): InputStream {
+        val afd = context.contentResolver.openAssetFileDescriptor(uri, "r")
+            ?: throw IOException("Failed to open source: $uri")
+        val zipFile = ZipFile.builder()
+            .setIgnoreLocalFileHeader(true)
+            .setSeekableByteChannel(afd.createInputStream().getChannel())
+            .get()
+        return openArchiveEntryStream(zipFile, archivePath, afd)
+    }
+
+    fun openArchiveEntryStream(sourceFile: File, archivePath: String): InputStream {
+        val input = FileInputStream(sourceFile)
+        val zipFile = ZipFile.builder()
+            .setIgnoreLocalFileHeader(true)
+            .setSeekableByteChannel(input.getChannel())
+            .get()
+        return openArchiveEntryStream(zipFile, archivePath, input)
+    }
+
+    fun resolveUriArchivePresentation(
+        context: Context,
+        pm: PackageManager,
+        uri: Uri,
+        isArchive: Boolean,
+    ): ArchivePresentation? {
+        if (!isArchive) {
+            val afd = context.contentResolver.openAssetFileDescriptor(uri, "r") ?: return null
+            afd.use {
+                val apk = parseZipFromFd(it) ?: return null
+                if (apk.label == null && apk.icon == null) {
+                    return null
+                }
+                return ArchivePresentation(apk.label, apk.icon)
+            }
+        }
+
+        val entries = listInstallArchiveEntries(context, uri)
+        val base = entries.firstOrNull { it.installName == "base" } ?: entries.firstOrNull() ?: return null
+        val tempFile = File(context.cacheDir, "meta-${System.nanoTime()}.apk")
+        return try {
+            openArchiveEntryStream(context, uri, base.archivePath).use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            resolveArchivePresentation(pm, tempFile, false)
+        } finally {
+            tempFile.delete()
+        }
+    }
+
+    private fun buildInstallArchiveEntries(zipFile: ZipFile): List<InstallArchiveEntry> {
+        val selected = filterZipEntries(zipFile)
+        val entries = ArrayList<InstallArchiveEntry>(selected.size)
+        for (entry in selected) {
+            val fileName = entry.getName().substringAfterLast('/').ifEmpty { "base.apk" }
+            val installName = fileName.substringBeforeLast(".apk", fileName)
+            val length = if (entry.getSize() > 0L) {
+                entry.getSize()
+            } else {
+                zipFile.getInputStream(entry).use { stream ->
+                    var count = 0L
+                    val buffer = ByteArray(8 * 1024)
+                    while (true) {
+                        val read = stream.read(buffer)
+                        if (read <= 0) {
+                            break
+                        }
+                        count += read
+                    }
+                    count
+                }
+            }
+            if (length <= 0L) {
+                continue
+            }
+            entries.add(InstallArchiveEntry(entry.getName(), installName, length))
+        }
+        return entries
+    }
+
+    private fun openArchiveEntryStream(
+        zipFile: ZipFile,
+        archivePath: String,
+        owner: AutoCloseable,
+    ): InputStream {
+        val entry = zipFile.getEntry(archivePath)
+            ?: run {
+                runCatching { zipFile.close() }
+                runCatching { owner.close() }
+                throw IOException("Entry not found: $archivePath")
+            }
+        val inner = zipFile.getInputStream(entry)
+        return object : InputStream() {
+            override fun read(): Int {
+                return inner.read()
+            }
+
+            override fun read(b: ByteArray, off: Int, len: Int): Int {
+                return inner.read(b, off, len)
+            }
+
+            override fun close() {
+                runCatching { inner.close() }
+                runCatching { zipFile.close() }
+                runCatching { owner.close() }
+            }
+        }
     }
 
     fun archivePackage(
