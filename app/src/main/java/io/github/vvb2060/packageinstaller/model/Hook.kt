@@ -116,7 +116,18 @@ object Hook {
         }
     }
 
-    fun startActivity(intent: Intent) {
+    fun startActivity(context: Context, intent: Intent) {
+        if (intent.action == "io.github.vvb2060.packageinstaller.ROOT_LAUNCH") {
+            intent.`package`?.let {
+                RootInstallHelper.launchPackage(it)
+            }
+            return
+        }
+        if (!::am.isInitialized) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+            return
+        }
         val userId = Os.getuid() / 100000
         am.startActivityAsUser(
             null, "com.android.shell", intent, intent.type,

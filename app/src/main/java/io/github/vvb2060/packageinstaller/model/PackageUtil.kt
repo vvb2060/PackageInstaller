@@ -1,5 +1,7 @@
 package io.github.vvb2060.packageinstaller.model
 
+import android.content.ContentResolver
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageInstaller
@@ -12,6 +14,7 @@ import android.content.res.Resources
 import android.content.res.XmlBlock
 import android.content.res.XmlResourceParser
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.util.DisplayMetrics
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
@@ -53,53 +56,82 @@ object PackageUtil {
             .setIgnoreLocalFileHeader(true)
             .setSeekableByteChannel(afd.createInputStream().getChannel())
             .get().use { zipFile ->
-                val xml = zipFile.getEntry("AndroidManifest.xml")
-                if (xml != null) {
-                    try {
-                        return getAppLiteFromApkFd(
-                            afd.getFileDescriptor(),
-                            afd.toString(), afd.getLength()
-                        )
-                    } catch (_: IOException) {
-                        zipFile.getInputStream(xml).use { input ->
-                            val bytes = IOUtils.toByteArray(input)
-                            return getAppLiteFromXmlBytes(bytes)
-                        }
-                    }
-                }
-
-                var base = zipFile.getEntry("base.apk")
-                    ?: zipFile.getEntry("splits/base-master_2.apk")
-                if (base == null) {
-                    for (entry in zipFile.getEntries()) {
-                        if (entry.getName().endsWith(".apk")) {
-                            if (base == null) {
-                                base = entry
-                            } else {
-                                return null
-                            }
-                        }
-                    }
-                    if (base == null) {
-                        return null
-                    }
-                }
-
-                ZipArchiveInputStream(zipFile.getInputStream(base)).use { input ->
-                    var innerEntry = input.getNextEntry()
-                    while (innerEntry != null) {
-                        if (innerEntry.getName() == "AndroidManifest.xml") {
-                            val bytes = IOUtils.toByteArray(input)
-                            return getAppLiteFromXmlBytes(bytes)?.apply {
-                                zip = true
-                            }
-                        }
-                        innerEntry = input.getNextEntry()
-                    }
-                    return null
+                return parseZip(zipFile) {
+                    getAppLiteFromApkFd(
+                        afd.getFileDescriptor(),
+                        afd.toString(),
+                        afd.getLength(),
+                    )
                 }
             }
 
+    }
+
+    fun parseZipFromFile(file: File): ApkLite? {
+        FileInputStream(file).use { input ->
+            ZipFile.builder()
+                .setIgnoreLocalFileHeader(true)
+                .setSeekableByteChannel(input.getChannel())
+                .get().use { zipFile ->
+                    return parseZip(zipFile) {
+                        getAppLiteFromApkFd(
+                            input.getFD(),
+                            file.absolutePath,
+                            file.length(),
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun parseZip(
+        zipFile: ZipFile,
+        parseSelfApk: () -> ApkLite?,
+    ): ApkLite? {
+        val xml = zipFile.getEntry("AndroidManifest.xml")
+        if (xml != null) {
+            try {
+                parseSelfApk()?.let {
+                    return it
+                }
+            } catch (_: Throwable) {
+            }
+            zipFile.getInputStream(xml).use { input ->
+                val bytes = IOUtils.toByteArray(input)
+                return getAppLiteFromXmlBytes(bytes)
+            }
+        }
+
+        var base = zipFile.getEntry("base.apk")
+            ?: zipFile.getEntry("splits/base-master_2.apk")
+        if (base == null) {
+            for (entry in zipFile.getEntries()) {
+                if (entry.getName().endsWith(".apk")) {
+                    if (base == null) {
+                        base = entry
+                    } else {
+                        return null
+                    }
+                }
+            }
+            if (base == null) {
+                return null
+            }
+        }
+
+        ZipArchiveInputStream(zipFile.getInputStream(base)).use { input ->
+            var innerEntry = input.getNextEntry()
+            while (innerEntry != null) {
+                if (innerEntry.getName() == "AndroidManifest.xml") {
+                    val bytes = IOUtils.toByteArray(input)
+                    return getAppLiteFromXmlBytes(bytes)?.apply {
+                        zip = true
+                    }
+                }
+                innerEntry = input.getNextEntry()
+            }
+            return null
+        }
     }
 
     private fun getAppLiteFromXmlBytesLink(xmlBytes: ByteArray): ApkLite? {
@@ -130,10 +162,17 @@ object PackageUtil {
     }
 
     private fun getAppLiteFromApkFd(fd: FileDescriptor, name: String, length: Long): ApkLite? {
-        val assets = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ApkAssets.loadFromFd(fd, name, 0, length, 0, null)
-        } else {
-            ApkAssets.loadFromFd(fd, name, false, false)
+        val assets = try {
+            try {
+                android.system.Os.lseek(fd, 0, android.system.OsConstants.SEEK_SET)
+            } catch (_: Throwable) {}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                ApkAssets.loadFromFd(fd, name, 0, length, 0, null)
+            } else {
+                ApkAssets.loadFromFd(fd, name, false, false)
+            }
+        } catch (_: Throwable) {
+            return null
         }
         val am = `AssetManager$Builder`()
             .addApkAssets(assets)
@@ -376,6 +415,80 @@ object PackageUtil {
             }
             session.fsync(out)
         }
+    }
+
+    fun extractInstallFiles(
+        context: Context,
+        uri: Uri,
+        apk: ApkLite,
+        targetDir: File,
+    ): List<File> {
+        targetDir.mkdirs()
+        if (!apk.zip) {
+            return listOf(copyUriToFile(context, uri, File(targetDir, apk.packageName + ".apk")))
+        }
+
+        val afd = context.contentResolver.openAssetFileDescriptor(uri, "r") ?: return emptyList()
+        afd.use {
+            ZipFile.builder()
+                .setIgnoreLocalFileHeader(true)
+                .setSeekableByteChannel(it.createInputStream().getChannel())
+                .get().use { zipFile ->
+                    return extractZipFiles(zipFile, targetDir)
+                }
+        }
+    }
+
+    fun extractInstallFilesFromFile(
+        sourceFile: File,
+        apk: ApkLite,
+        targetDir: File,
+    ): List<File> {
+        targetDir.mkdirs()
+        if (!apk.zip) {
+            return listOf(copyFile(sourceFile, File(targetDir, apk.packageName + ".apk")))
+        }
+        FileInputStream(sourceFile).use { input ->
+            ZipFile.builder()
+                .setIgnoreLocalFileHeader(true)
+                .setSeekableByteChannel(input.getChannel())
+                .get().use { zipFile ->
+                    return extractZipFiles(zipFile, targetDir)
+                }
+        }
+    }
+
+    private fun extractZipFiles(zipFile: ZipFile, targetDir: File): List<File> {
+        val apks = filterZipEntries(zipFile)
+        val files = ArrayList<File>(apks.size)
+        for (entry in apks) {
+            val file = File(targetDir, entry.getName().substringAfterLast('/'))
+            zipFile.getInputStream(entry).use { input ->
+                file.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            files.add(file)
+        }
+        return files
+    }
+
+    private fun copyUriToFile(context: Context, uri: Uri, file: File): File {
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        } ?: throw IOException("Failed to open source: $uri")
+        return file
+    }
+
+    private fun copyFile(source: File, target: File): File {
+        source.inputStream().use { input ->
+            target.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        return target
     }
 
     fun archivePackage(

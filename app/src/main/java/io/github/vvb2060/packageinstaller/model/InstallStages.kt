@@ -60,5 +60,6 @@ class InstallAborted(
         const val ABORT_CREATE = 5
         const val ABORT_WRITE = 6
         const val ABORT_INFO = 7
+        const val ABORT_PRIVILEGED = 8
     }
 }

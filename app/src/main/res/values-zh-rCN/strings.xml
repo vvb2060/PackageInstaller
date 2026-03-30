@@ -50,6 +50,7 @@
     <string name="error_shizuku_notrunning">Shizuku 未运行。</string>
     <string name="error_shizuku_notpermitted">Shizuku 未授权。</string>
     <string name="error_shizuku_unavailable">Shizuku 不可用。</string>
+    <string name="error_privileged_unavailable">Shizuku 和 Root 权限都不可用。</string>
     <string name="error_create">无法开始安装。</string>
     <string name="error_write">无法写入文件。</string>
     <string name="error_info">此软件是 %s 下的开源软件。</string>
