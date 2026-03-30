@@ -37,6 +37,7 @@ import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_N
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_PARSE
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SHIZUKU
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_SPLIT
+import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_PRIVILEGED
 import io.github.vvb2060.packageinstaller.model.InstallAborted.Companion.ABORT_WRITE
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
@@ -53,33 +54,80 @@ class InstallRepository(private val context: Application) {
     private var callingUid = Process.INVALID_UID
     private lateinit var intent: Intent
     private var apkLite: ApkLite? = null
+    private var oldApkInfo: PackageInfo? = null
+    private var privilegedMode = PrivilegedMode.SHIZUKU
+
+    private enum class PrivilegedMode {
+        SHIZUKU,
+        ROOT,
+    }
+
+    private fun getPackageInfoSafely(packageName: String): PackageInfo? {
+        val flags = if (privilegedMode == PrivilegedMode.ROOT) {
+            0
+        } else {
+            PackageManager_rename.MATCH_KNOWN_PACKAGES
+        }
+        val info = try {
+            packageManager.getPackageInfo(packageName, flags)
+        } catch (_: SecurityException) {
+            null
+        } catch (_: PackageManager.NameNotFoundException) {
+            null
+        }
+        if (info != null) {
+            return info
+        }
+        if (privilegedMode == PrivilegedMode.ROOT) {
+            return RootInstallHelper.getInstalledPackageInfo(packageName, packageManager)
+        }
+        return info
+    }
 
     fun preCheck(intent: Intent): Boolean {
-        if (!Shizuku.pingBinder()
-            || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
-            || Shizuku.checkRemotePermission(Manifest.permission.INSTALL_PACKAGES)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
+        val binderReady = Shizuku.pingBinder()
+        val shizukuReady = binderReady
+            && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+            && Shizuku.checkRemotePermission(Manifest.permission.INSTALL_PACKAGES) ==
+            PackageManager.PERMISSION_GRANTED
+        if (shizukuReady) {
+            privilegedMode = PrivilegedMode.SHIZUKU
+            this.intent = intent
+            Log.v(TAG, "Intent: $intent")
+
+            Hook.init(context)
+            packageManager = Hook.pm
+            packageInstaller = Hook.installer
+            Hook.disableAdbVerify(context)
+            PreferredActivity.set(context.packageManager)
+
+            installResult.value = InstallParse()
+            return true
+        }
+
+        if (RootInstallHelper.isAvailable()) {
+            privilegedMode = PrivilegedMode.ROOT
+            this.intent = intent
+            Log.v(TAG, "Intent: $intent")
+
+            packageManager = context.packageManager
+            installResult.value = InstallParse()
+            return true
+        }
+
+        if (shizukuReady || binderReady) {
             installResult.value = InstallAborted(
                 ABORT_SHIZUKU,
                 context.packageManager.getLaunchIntentForPackage(
                     ShizukuProvider.MANAGER_APPLICATION_ID
                 )
             )
-            return false
         }
 
-        this.intent = intent
-        Log.v(TAG, "Intent: $intent")
-
-        Hook.init(context)
-        packageManager = Hook.pm
-        packageInstaller = Hook.installer
-        Hook.disableAdbVerify(context)
-        PreferredActivity.set(context.packageManager)
-
-        installResult.value = InstallParse()
-        return true
+        if (!binderReady) {
+            installResult.value = InstallAborted(ABORT_PRIVILEGED)
+        }
+        return false
     }
 
     fun parseUri() {
@@ -113,6 +161,10 @@ class InstallRepository(private val context: Application) {
     }
 
     fun install(setInstaller: Boolean, commit: Boolean, full: Boolean, removeSplit: Boolean) {
+        if (privilegedMode == PrivilegedMode.ROOT) {
+            installWithRoot(setInstaller, commit, full, removeSplit)
+            return
+        }
         val uri = intent.data
         installResult.postValue(InstallInstalling(apkLite!!))
         if (ContentResolver.SCHEME_CONTENT != uri?.scheme &&
@@ -166,12 +218,219 @@ class InstallRepository(private val context: Application) {
         }
     }
 
+    private fun installWithRoot(
+        setInstaller: Boolean,
+        commit: Boolean,
+        full: Boolean,
+        removeSplit: Boolean,
+    ) {
+        val uri = intent.data
+        installResult.postValue(InstallInstalling(apkLite!!))
+        if (ContentResolver.SCHEME_CONTENT != uri?.scheme &&
+            ContentResolver.SCHEME_FILE != uri?.scheme
+        ) {
+            installPackageUriWithRoot()
+            return
+        }
+
+        val streams = try {
+            when {
+                removeSplit -> {
+                    val old = oldApkInfo ?: throw IOException("Missing installed package info")
+                    RootInstallHelper.prepareInstalledPackageStreams(old, apkLite!!.splitName)
+                }
+                stagedSessionId == SessionInfo.INVALID_ID && !full && oldApkInfo != null -> {
+                    val installed = RootInstallHelper.prepareInstalledPackageStreams(oldApkInfo!!, null)
+                    val source = RootInstallHelper.prepareSourceStreams(context, uri!!, apkLite!!)
+                    installed + source
+                }
+                else -> RootInstallHelper.prepareSourceStreams(context, uri!!, apkLite!!)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to prepare root install streams", e)
+            installResult.postValue(InstallAborted(ABORT_WRITE))
+            return
+        }
+
+        if (streams.isEmpty()) {
+            installResult.postValue(InstallAborted(ABORT_WRITE))
+            return
+        }
+
+        if (stagedSessionId == SessionInfo.INVALID_ID) {
+            try {
+                stagedSessionId = RootInstallHelper.createSession(
+                    streams.sumOf { it.length },
+                    resolveInstallerPackageName(setInstaller),
+                    apkLite!!.packageName,
+                    full
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to create a root staging session", e)
+                installResult.postValue(InstallAborted(ABORT_CREATE))
+                return
+            }
+        }
+
+        try {
+            RootInstallHelper.writeSession(stagedSessionId, streams)
+        } catch (e: Exception) {
+            cleanupInstall()
+            Log.e(TAG, "Could not stage APK with root.", e)
+            installResult.postValue(InstallAborted(ABORT_WRITE))
+            return
+        }
+
+        if (commit) {
+            stagingProgress.postValue(101)
+            commitRoot()
+        } else {
+            installResult.postValue(InstallAborted(ABORT_CLOSE))
+        }
+    }
+
+    private fun installPackageUriWithRoot() {
+        stagingProgress.postValue(101)
+        try {
+            RootInstallHelper.installExistingPackage(apkLite!!.packageName)
+            setStageBasedOnResult(
+                PackageInstaller.STATUS_SUCCESS,
+                PackageManager_rename.INSTALL_SUCCEEDED,
+                null
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to install existing package with root", e)
+            setStageBasedOnResult(
+                PackageInstaller.STATUS_FAILURE,
+                PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR,
+                e.localizedMessage
+            )
+        }
+    }
+
+    private fun hasApkPresentation(apk: ApkLite): Boolean {
+        return apk.label != null && apk.icon != null
+    }
+
+    private fun mergeApkPresentation(apk: ApkLite, source: ApkLite?) {
+        if (source == null) {
+            return
+        }
+        if (apk.label == null) {
+            apk.label = source.label
+        }
+        if (apk.icon == null) {
+            apk.icon = source.icon
+        }
+    }
+
+    private fun mergeArchivePresentation(
+        apk: ApkLite,
+        source: PackageUtil.ArchivePresentation?,
+    ) {
+        if (source == null) {
+            return
+        }
+        if (apk.label == null) {
+            apk.label = source.label
+        }
+        if (apk.icon == null) {
+            apk.icon = source.icon
+        }
+    }
+
+    private fun snapshotApkIcon(apk: ApkLite) {
+        val icon = apk.icon ?: return
+        apk.icon = try {
+            icon.toBitmap().toDrawable(context.resources)
+        } catch (_: OutOfMemoryError) {
+            icon
+        } catch (_: Exception) {
+            icon
+        }
+    }
+
+    private fun fillPresentationFromInstalledInfo(apk: ApkLite, info: PackageInfo?) {
+        val appInfo = info?.applicationInfo ?: return
+        if (apk.label == null) {
+            apk.label = runCatching {
+                appInfo.loadLabel(packageManager).toString()
+            }.getOrNull()
+        }
+        if (apk.icon == null) {
+            apk.icon = runCatching {
+                appInfo.loadIcon(packageManager)
+            }.getOrNull()
+        }
+    }
+
+    private fun fillPresentationFromSourcePath(apk: ApkLite, sourcePath: String?) {
+        if (sourcePath.isNullOrEmpty() || hasApkPresentation(apk)) {
+            return
+        }
+
+        if (privilegedMode != PrivilegedMode.ROOT) {
+            return
+        }
+
+        val presentation = runCatching {
+            RootInstallHelper.resolvePresentationFromSourcePath(context, packageManager, sourcePath)
+        }.getOrNull()
+        mergeArchivePresentation(apk, presentation)
+    }
+
+    private fun fillLabelFromDisplayName(apk: ApkLite, uri: Uri) {
+        if (apk.label != null) {
+            return
+        }
+        context.contentResolver.query(uri, null, null, null, null).use { cursor ->
+            if (cursor != null && cursor.moveToFirst()) {
+                val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (displayNameIndex != -1) {
+                    apk.label = cursor.getString(displayNameIndex)
+                }
+            }
+        }
+    }
+
+    private fun parseContentUriWithAppCopy(uri: Uri): ApkLite? {
+        val tempDir = File(context.cacheDir, "content-parse-${System.nanoTime()}")
+        val sourceFile = File(tempDir, "source.apk")
+        return try {
+            sourceFile.parentFile?.mkdirs()
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                sourceFile.outputStream().use { output ->
+                    input.copyTo(output, 8 * 1024)
+                }
+            } ?: return null
+
+            val apk = PackageUtil.parseZipFromFile(sourceFile) ?: return null
+            if (!hasApkPresentation(apk)) {
+                mergeArchivePresentation(
+                    apk,
+                    PackageUtil.resolveArchivePresentation(
+                        packageManager,
+                        sourceFile,
+                        apk.zip,
+                    )
+                )
+            }
+            snapshotApkIcon(apk)
+            apk
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to parse content uri via app copy", e)
+            null
+        } finally {
+            RootInstallHelper.deleteRecursively(tempDir)
+        }
+    }
+
     private fun processContentUri(uri: Uri): InstallStage {
         Log.v(TAG, "content URI: $uri")
         packageManager.resolveContentProvider(uri.authority!!, 0)?.also { info ->
             callingUid = info.applicationInfo.uid
         }
-        val apk = try {
+        var apk = try {
             context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { afd ->
                 PackageUtil.parseZipFromFd(afd)
             }
@@ -179,36 +438,57 @@ class InstallRepository(private val context: Application) {
             Log.e(TAG, "Failed to parse APK from content URI: $uri", e)
             null
         }
+        if (apk == null || !hasApkPresentation(apk)) {
+            val appParsed = parseContentUriWithAppCopy(uri)
+            if (apk == null) {
+                apk = appParsed
+            } else {
+                mergeApkPresentation(apk, appParsed)
+            }
+        }
+        if (privilegedMode == PrivilegedMode.ROOT && (apk?.let { hasApkPresentation(it) } != true)) {
+            val rootParsed = parseContentUriWithRoot(uri)
+            if (apk == null) {
+                apk = rootParsed
+            } else {
+                mergeApkPresentation(apk, rootParsed)
+            }
+        }
         if (apk == null) {
             return InstallAborted(ABORT_PARSE)
         }
-        val old = try {
-            packageManager.getPackageInfo(apk.packageName, PackageManager_rename.MATCH_KNOWN_PACKAGES)
-        } catch (_: PackageManager.NameNotFoundException) {
-            null
-        }
+        val old = getPackageInfoSafely(apk.packageName)
+        oldApkInfo = old
         var full = true
         if (apk.isSplit()) {
-            for (item in packageInstaller.allSessions) {
-                if (item.isActive && item.appPackageName == apk.packageName) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        // noinspection NewApi
-                        if (item.installerUid != Shizuku.getUid()) {
-                            continue
+            if (privilegedMode == PrivilegedMode.SHIZUKU) {
+                for (item in packageInstaller.allSessions) {
+                    if (item.isActive && item.appPackageName == apk.packageName) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            // noinspection NewApi
+                            if (item.installerUid != Shizuku.getUid()) {
+                                continue
+                            }
+                        } else {
+                            if (item.installReason != PackageManager.INSTALL_REASON_USER) continue
+                            item as PackageInstaller_rename.SessionInfo
+                            if (item.installFlags and PackageManager_rename.INSTALL_FROM_ADB == 0) {
+                                continue
+                            }
                         }
-                    } else {
-                        if (item.installReason != PackageManager.INSTALL_REASON_USER) continue
-                        item as PackageInstaller_rename.SessionInfo
-                        if (item.installFlags and PackageManager_rename.INSTALL_FROM_ADB == 0) {
-                            continue
-                        }
+                        val info = packageInstaller.getSessionInfo(item.sessionId)!!
+                        stagedSessionId = info.sessionId
+                        full = info.mode == SessionParams.MODE_FULL_INSTALL
+                        apk.label = info.appLabel as String?
+                        apk.icon = info.appIcon?.toDrawable(context.resources)
+                        break
                     }
-                    val info = packageInstaller.getSessionInfo(item.sessionId)!!
-                    stagedSessionId = info.sessionId
-                    full = info.mode == SessionParams.MODE_FULL_INSTALL
-                    apk.label = info.appLabel as String?
-                    apk.icon = info.appIcon?.toDrawable(context.resources)
-                    break
+                }
+            } else if (privilegedMode == PrivilegedMode.ROOT) {
+                val rootSession = RootInstallHelper.getActiveSession(apk.packageName)
+                if (rootSession != null) {
+                    stagedSessionId = rootSession.first
+                    full = rootSession.second
                 }
             }
             if (stagedSessionId == SessionInfo.INVALID_ID) {
@@ -220,40 +500,54 @@ class InstallRepository(private val context: Application) {
             }
         }
         if (old != null) {
-            if (apk.label == null) {
-                apk.label = old.applicationInfo!!.loadLabel(packageManager).toString()
-            }
-            if (apk.icon == null) {
-                apk.icon = old.applicationInfo!!.loadIcon(packageManager)
-            }
+            fillPresentationFromInstalledInfo(apk, old)
             // use this field to store the installer package name
-            old.sharedUserId = packageManager.getInstallerPackageName(apk.packageName)
-        }
-        if (apk.label == null) {
-            context.contentResolver.query(uri, null, null, null, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
-                    val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (displayNameIndex != -1) {
-                        apk.label = cursor.getString(displayNameIndex)
-                    }
-                }
+            old.sharedUserId = try {
+                packageManager.getInstallerPackageName(apk.packageName)
+            } catch (e: Exception) {
+                null
             }
         }
+        if (!hasApkPresentation(apk) && privilegedMode == PrivilegedMode.ROOT) {
+            fillPresentationFromSourcePath(apk, old?.applicationInfo?.sourceDir)
+        }
+        fillLabelFromDisplayName(apk, uri)
+        snapshotApkIcon(apk)
         apkLite = apk
         val skipCreate = stagedSessionId != SessionInfo.INVALID_ID
         return InstallUserAction(apk, old, full, skipCreate)
     }
 
+    private fun parseContentUriWithRoot(uri: Uri): ApkLite? {
+        return runCatching {
+            val apk = RootInstallHelper.parseContentUriWithMetadata(context, packageManager, uri)
+                ?: parseContentUriWithAppCopy(uri)
+            if (apk != null) {
+                snapshotApkIcon(apk)
+            }
+            apk
+        }.getOrElse {
+            Log.e(TAG, "Failed to parse content uri with root", it)
+            null
+        }
+    }
+
     private fun processPackageUri(packageName: String): InstallStage {
-        val info = try {
-            packageManager.getPackageInfo(packageName, PackageManager_rename.MATCH_KNOWN_PACKAGES)
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(TAG, "Requested package not available.", e)
+        val info = getPackageInfoSafely(packageName)
+        if (info == null) {
+            Log.e(TAG, "Requested package not available.")
             return InstallAborted(ABORT_NOTFOUND)
         }
 
-        val apk = PackageUtil.getApkLite(packageManager, info!!)
+        val apk = PackageUtil.getApkLite(packageManager, info)
+        fillPresentationFromInstalledInfo(apk, info)
+        if (privilegedMode == PrivilegedMode.ROOT && !hasApkPresentation(apk)) {
+            fillPresentationFromSourcePath(apk, info.applicationInfo?.sourceDir)
+        }
+        snapshotApkIcon(apk)
+
         apkLite = apk
+        oldApkInfo = info
 
         val path = info.applicationInfo!!.sourceDir
         if (path == null || !File(path).exists()) {
@@ -314,6 +608,46 @@ class InstallRepository(private val context: Application) {
         }
     }
 
+    private fun commitRoot() {
+        try {
+            RootInstallHelper.commitSession(stagedSessionId)
+            setStageBasedOnResult(
+                PackageInstaller.STATUS_SUCCESS,
+                PackageManager_rename.INSTALL_SUCCEEDED,
+                null
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to commit root staging session", e)
+            cleanupInstall()
+            setStageBasedOnResult(
+                PackageInstaller.STATUS_FAILURE,
+                PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR,
+                e.localizedMessage
+            )
+        }
+    }
+
+    private fun resolveInstallerPackageName(setInstaller: Boolean): String {
+        var installer = context.packageName
+        if (setInstaller) {
+            installer = if (privilegedMode == PrivilegedMode.ROOT) {
+                if (RootInstallHelper.isPackageInstalled("com.android.vending")) {
+                    "com.android.vending"
+                } else {
+                    "com.android.shell"
+                }
+            } else {
+                try {
+                    packageManager.getPackageInfo("com.android.vending", PackageManager.MATCH_SYSTEM_ONLY)
+                    "com.android.vending"
+                } catch (_: PackageManager.NameNotFoundException) {
+                    "com.android.shell"
+                }
+            }
+        }
+        return installer
+    }
+
     private fun createSessionParams(setInstaller: Boolean, full: Boolean): SessionParams {
         val mode = if (full) {
             SessionParams.MODE_FULL_INSTALL
@@ -321,14 +655,8 @@ class InstallRepository(private val context: Application) {
             SessionParams.MODE_INHERIT_EXISTING
         }
         val params = SessionParams(mode)
-        var installer = context.packageName
+        val installer = resolveInstallerPackageName(setInstaller)
         if (setInstaller) {
-            try {
-                packageManager.getPackageInfo("com.android.vending", PackageManager.MATCH_SYSTEM_ONLY)
-                installer = "com.android.vending"
-            } catch (_: PackageManager.NameNotFoundException) {
-                installer = "com.android.shell"
-            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 params.setPackageSource(PackageInstaller.PACKAGE_SOURCE_STORE)
             }
@@ -384,10 +712,22 @@ class InstallRepository(private val context: Application) {
 
     private fun setStageBasedOnResult(statusCode: Int, legacyStatus: Int, message: String?) {
         if (statusCode == PackageInstaller.STATUS_SUCCESS) {
-            val intent = packageManager.getLaunchIntentForPackage(apkLite!!.packageName)
-            packageManager.getPackageInfo(apkLite!!.packageName, 0)?.let { info ->
-                apkLite!!.icon = info.applicationInfo!!.loadIcon(packageManager)
-                apkLite!!.label = info.applicationInfo!!.loadLabel(packageManager).toString()
+            var intent = try {
+                packageManager.getLaunchIntentForPackage(apkLite!!.packageName)
+            } catch (e: Exception) {
+                null
+            }
+            if (intent == null && privilegedMode == PrivilegedMode.ROOT) {
+                if (RootInstallHelper.hasLauncherActivity(apkLite!!.packageName)) {
+                    intent = Intent("io.github.vvb2060.packageinstaller.ROOT_LAUNCH").setPackage(apkLite!!.packageName)
+                }
+            }
+            getPackageInfoSafely(apkLite!!.packageName)?.let { info ->
+                fillPresentationFromInstalledInfo(apkLite!!, info)
+                if (privilegedMode == PrivilegedMode.ROOT && !hasApkPresentation(apkLite!!)) {
+                    fillPresentationFromSourcePath(apkLite!!, info.applicationInfo?.sourceDir)
+                }
+                snapshotApkIcon(apkLite!!)
             }
             installResult.postValue(InstallSuccess(apkLite!!, intent))
         } else {
@@ -398,8 +738,12 @@ class InstallRepository(private val context: Application) {
     fun cleanupInstall() {
         if (stagedSessionId > 0) {
             try {
-                packageInstaller.abandonSession(stagedSessionId)
-            } catch (_: SecurityException) {
+                if (privilegedMode == PrivilegedMode.ROOT) {
+                    RootInstallHelper.abandonSession(stagedSessionId)
+                } else {
+                    packageInstaller.abandonSession(stagedSessionId)
+                }
+            } catch (_: Exception) {
             }
             stagedSessionId = 0
         }
@@ -477,6 +821,15 @@ class InstallRepository(private val context: Application) {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
         if (uninstall) {
+            if (privilegedMode == PrivilegedMode.ROOT) {
+                try {
+                    RootInstallHelper.uninstallPackage(info.packageName, true)
+                    installResult.postValue(InstallSuccess(apkLite!!, intent, path))
+                } catch (e: Exception) {
+                    installResult.postValue(InstallSuccess(apkLite!!, intent, "$path\n\n${e.message}"))
+                }
+                return
+            }
             val receiver = LocalIntentReceiver { statusCode, legacyCode, msg ->
                 if (statusCode == PackageInstaller.STATUS_SUCCESS) {
                     installResult.postValue(InstallSuccess(apkLite!!, intent, path))
@@ -511,6 +864,14 @@ class InstallRepository(private val context: Application) {
     }
 
     fun setPackageEnabled(packageName: String, enabled: Boolean) {
+        if (privilegedMode == PrivilegedMode.ROOT) {
+            runCatching {
+                RootInstallHelper.setPackageEnabled(packageName, enabled)
+            }.onFailure {
+                Log.e(TAG, "Failed to update package state for $packageName", it)
+            }
+            return
+        }
         val newState = if (enabled) {
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED
         } else {

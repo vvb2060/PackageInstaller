@@ -39,7 +39,7 @@ public class InstallSuccessFragment extends BaseDialogFragment {
                 (dialog, which) -> cleanAndFinish())
             .setPositiveButton(R.string.launch, (dialog, which) -> {
                 cleanAndFinish();
-                Hook.INSTANCE.startActivity(mDialogData.getStartIntent());
+                Hook.INSTANCE.startActivity(context, mDialogData.getStartIntent());
             })
             .create();
         return mDialog;

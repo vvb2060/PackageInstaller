@@ -2,6 +2,7 @@ package io.github.vvb2060.packageinstaller.ui
 
 import android.os.Bundle
 import android.view.Window
+import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -57,6 +58,7 @@ class InstallLaunch : FragmentActivity() {
     }
 
     private fun onInstallStageChange(installStage: InstallStage) {
+        updateScreenAwake(installStage)
         when (installStage.stageCode) {
             InstallStage.Companion.STAGE_ABORTED -> {
                 val aborted = installStage as InstallAborted
@@ -115,6 +117,20 @@ class InstallLaunch : FragmentActivity() {
         }
         currentDialog?.dismissAllowingStateLoss()
         newDialog?.show(fragmentManager, "dialog")
+    }
+
+    private fun updateScreenAwake(installStage: InstallStage) {
+        val keepOn = installStage.stageCode == InstallStage.STAGE_INSTALLING
+        if (keepOn) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    override fun onDestroy() {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        super.onDestroy()
     }
 
 }

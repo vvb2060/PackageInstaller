@@ -84,6 +84,7 @@ public class InstallErrorFragment extends BaseDialogFragment {
             case InstallAborted.ABORT_NOTFOUND -> R.string.error_notfound;
             case InstallAborted.ABORT_CREATE -> R.string.error_create;
             case InstallAborted.ABORT_WRITE -> R.string.error_write;
+            case InstallAborted.ABORT_PRIVILEGED -> R.string.error_privileged_unavailable;
             default -> R.string.error_title;
         };
         return context.getString(id);
