@@ -2,6 +2,7 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.github.vvb2060.packageinstaller.R;
-import io.github.vvb2060.packageinstaller.model.InstallAborted;
+import io.github.vvb2060.packageinstaller.installmodel.InstallAborted;
 import rikka.shizuku.Shizuku;
 
 public class InstallErrorFragment extends BaseDialogFragment {
@@ -27,7 +28,7 @@ public class InstallErrorFragment extends BaseDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        var code = mAborted.getAbortReason();
+        var code = mAborted.abortReason;
         var context = requireContext();
         return new AlertDialog.Builder(requireContext())
             .setTitle(code == InstallAborted.ABORT_INFO ? R.string.app_name : R.string.error_title)
@@ -48,19 +49,26 @@ public class InstallErrorFragment extends BaseDialogFragment {
             Shizuku.requestPermission(1);
             return;
         }
-        var intent = mAborted.getIntent();
+        var intent = mAborted.intent;
         if (intent == null) {
             Uri web = Uri.parse(context.getString(R.string.shizuku_url));
             intent = new Intent(Intent.ACTION_VIEW, web);
         }
-        requireActivity().startActivity(intent);
+        startActivitySafe(intent);
+    }
+
+    private void startActivitySafe(Intent intent) {
+        try {
+            requireActivity().startActivity(intent);
+        } catch (ActivityNotFoundException | SecurityException _) {
+        }
     }
 
     private String getErrorMessage(Context context, int code) {
         switch (code) {
             case InstallAborted.ABORT_SHIZUKU -> {
                 if (!Shizuku.pingBinder()) {
-                    if (mAborted.getIntent() == null) {
+                    if (mAborted.intent == null) {
                         return context.getString(R.string.error_shizuku_notfound);
                     } else {
                         return context.getString(R.string.error_shizuku_notrunning);
@@ -86,6 +94,8 @@ public class InstallErrorFragment extends BaseDialogFragment {
             case InstallAborted.ABORT_WRITE -> R.string.error_write;
             default -> R.string.error_title;
         };
-        return context.getString(id);
+        var string = context.getString(id);
+        var message = mAborted.message;
+        return message != null ? string + "\n\n" + message : string;
     }
 }

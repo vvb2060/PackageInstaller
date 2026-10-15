@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.github.vvb2060.packageinstaller.R;
-import io.github.vvb2060.packageinstaller.model.InstallInstalling;
+import io.github.vvb2060.packageinstaller.installmodel.InstallInstalling;
 
 public class InstallInstallingFragment extends BaseDialogFragment {
 
@@ -34,12 +34,12 @@ public class InstallInstallingFragment extends BaseDialogFragment {
         mViewModel.getStagingProgress().observe(this, progress -> {
             textView.setText(progress <= 100 ? R.string.copying : R.string.installing);
             progressBar.setIndeterminate(progress < 0 || progress > 100);
-            progressBar.setProgress(progress);
+            progressBar.setProgress(progress, true);
         });
         setCancelable(false);
         mDialog = new AlertDialog.Builder(requireContext())
-            .setTitle(mDialogData.getApkLite().getLabel())
-            .setIcon(mDialogData.getApkLite().getIcon())
+            .setTitle(mDialogData.apkLite.getLabel())
+            .setIcon(mDialogData.apkLite.getIcon())
             .setView(dialogView)
             .setNegativeButton(android.R.string.cancel, null)
             .create();

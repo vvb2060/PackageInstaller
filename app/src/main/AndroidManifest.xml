@@ -10,6 +10,9 @@
         android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         tools:node="remove" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <queries>
         <package android:name="moe.shizuku.privileged.api" />
     </queries>
@@ -23,9 +26,8 @@
         <activity
             android:name=".ui.InstallLaunch"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-            android:excludeFromRecents="true"
             android:exported="true">
-            <intent-filter android:priority="10">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
 
@@ -41,7 +43,7 @@
                 <data android:mimeType="application/zip" />
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
-            <intent-filter android:priority="10">
+            <intent-filter>
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -52,6 +54,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
@@ -66,6 +69,7 @@
                 <data android:mimeType="application/vnd.android.package-archive" />
                 <data android:mimeType="application/zip" />
                 <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -94,6 +98,7 @@
             android:exported="true"
             android:multiprocess="false"
             android:permission="android.permission.NETWORK_SETTINGS" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

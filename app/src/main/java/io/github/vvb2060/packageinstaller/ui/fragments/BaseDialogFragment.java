@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import io.github.vvb2060.packageinstaller.model.InstallStage;
+import io.github.vvb2060.packageinstaller.installmodel.InstallStage;
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
 public class BaseDialogFragment extends DialogFragment {
@@ -35,6 +35,6 @@ public class BaseDialogFragment extends DialogFragment {
 
     void cleanAndFinish() {
         mViewModel.cleanupInstall();
-        requireActivity().finish();
+        requireActivity().finishAndRemoveTask();
     }
 }

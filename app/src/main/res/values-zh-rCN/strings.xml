@@ -1,51 +1,64 @@
 <resources>
     <string name="app_name">"Shizuku 安装器"</string>
 
-    <string name="install">"安装"</string>
-    <string name="update">"更新"</string>
-    <string name="archive">存档</string>
+    <string name="install">安装</string>
+    <string name="update">更新</string>
+    <string name="uninstall">卸载</string>
+    <string name="clear">清除</string>
     <string name="add_more">继续添加</string>
+    <string name="remove_more">继续移除</string>
     <string name="enable">启用</string>
     <string name="disable">停用</string>
-    <string name="done">"完成"</string>
-    <string name="launch">"打开"</string>
+    <string name="done">完成</string>
+    <string name="launch">打开</string>
 
     <string name="copying">正在复制…</string>
-    <string name="installing">"正在安装…"</string>
-    <string name="parsing">"正在解析…"</string>
+    <string name="installing">正在安装…</string>
+    <string name="parsing">正在解析…</string>
 
-    <string name="set_installer">伪造安装者</string>
-    <string name="uninstall_keep_data">同时卸载此应用但保留数据</string>
+    <string name="set_installer">设置安装者</string>
+    <string name="only_clear_data">仅清除数据</string>
 
-    <string name="package_name">"包名："</string>
-    <string name="split_name">"拆分: "</string>
-    <string name="split_types">"类型: "</string>
-    <string name="required_split_types">"需求: "</string>
-    <string name="version">"版本："</string>
-    <string name="min_sdk">"兼容："</string>
-    <string name="target_sdk">"适配："</string>
+    <string name="package_name">包名：</string>
+    <string name="size">大小：</string>
+    <string name="split_name">拆分：</string>
+    <string name="split_types">类型：</string>
+    <string name="required_split_types">需求：</string>
+    <string name="config_for_split">配置：</string>
+    <string name="version">版本：</string>
+    <string name="min_sdk">兼容：</string>
+    <string name="target_sdk">适配：</string>
+    <string name="signing_block">签名：</string>
 
-    <string name="install_confirm_question">"要安装此应用吗？"</string>
-    <string name="install_confirm_question_update">"要更新此应用吗？"</string>
+    <string name="google_source">由 Google 于 %1$s 生成</string>
+    <string name="google_source_play">由 Google 于 %1$s 生成，通过 Play 商店分发</string>
+
+    <string name="install_confirm_warn_content">内容相同，</string>
+    <string name="install_confirm_warn_signer">签名不同，</string>
+    <string name="install_confirm_question_warn">真的要更新此应用吗？</string>
+    <string name="install_confirm_question">要安装此应用吗？</string>
+    <string name="install_confirm_question_update">要更新此应用吗？</string>
     <string name="install_confirm_question_split">要添加此拆分包吗？</string>
     <string name="install_confirm_question_split_remove">要移除此拆分包吗？</string>
 
-    <string name="archive_confirm_question">要存档此应用的软件包吗？</string>
+    <string name="uninstall_confirm_question">要卸载此应用吗？</string>
 
-    <string name="install_done">"已安装应用。"</string>
-    <string name="archive_done">"已存档至："</string>
+    <string name="install_done">已安装应用。</string>
 
-    <string name="install_failed">"未安装应用。"</string>
-    <string name="install_failed_blocked">"系统已禁止安装该应用。"</string>
-    <string name="install_failed_conflict">"与现有应用存在冲突。"</string>
-    <string name="install_failed_incompatible">"应用与您的设备不兼容。"</string>
-    <string name="install_failed_invalid_apk">"软件包似乎无效。"</string>
-    <string name="install_failed_storage">"空间不足"</string>
+    <string name="install_failed">未安装应用。</string>
+    <string name="install_failed_user_action">未安装应用，因为需要用户操作。</string>
+    <string name="install_failed_blocked">系统已禁止安装该应用。</string>
+    <string name="install_failed_aborted">未安装应用，因为安装被中止。</string>
+    <string name="install_failed_conflict">未安装应用，因为与现有应用存在冲突。</string>
+    <string name="install_failed_incompatible">未安装应用，因为应用与设备不兼容。</string>
+    <string name="install_failed_invalid_apk">未安装应用，因为软件包似乎无效。</string>
+    <string name="install_failed_storage">若要安装此应用，请先释放部分空间，然后重试。</string>
+    <string name="install_failed_timeout">未安装应用，因为安装超时。</string>
 
-    <string name="error_title">"错误"</string>
-    <string name="error_parse">"解析软件包时出现问题。"</string>
+    <string name="error_title">错误</string>
+    <string name="error_parse">解析软件包时出现问题。</string>
     <string name="error_split">缺失匹配的基础包。</string>
-    <string name="error_notfound">"在已安装应用列表中找不到该应用。"</string>
+    <string name="error_notfound">在已安装应用列表中找不到该应用。</string>
     <string name="error_shizuku_notfound">Shizuku 未安装。</string>
     <string name="error_shizuku_notrunning">Shizuku 未运行。</string>
     <string name="error_shizuku_notpermitted">Shizuku 未授权。</string>

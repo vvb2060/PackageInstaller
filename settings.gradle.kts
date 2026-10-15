@@ -1,17 +1,25 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
-        google()
+        google {
+            content {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
     }
     plugins {
-        id("com.android.application") version "8.12.0"
-        id("com.android.library") version "8.12.0"
-        id("org.jetbrains.kotlin.android") version "2.2.0"
+        val agp = "9.4.1"
+        id("com.android.application") version agp
+        id("com.android.library") version agp
+        id("com.android.settings") version agp
     }
 }
 
-@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -27,14 +35,22 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.android.settings") version "8.12.0"
+    id("com.android.settings")
 }
 
 android {
-    compileSdk = 36
-    minSdk = 28
-    targetSdk = 36
-    buildToolsVersion = "36.0.0"
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 2
+        }
+    }
+    minSdk {
+        version = release(30)
+    }
+    targetSdk {
+        version = release(37)
+    }
+    buildToolsVersion = "37.0.0"
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

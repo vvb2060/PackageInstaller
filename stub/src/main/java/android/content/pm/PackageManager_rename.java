@@ -251,13 +251,14 @@ public class PackageManager_rename {
 
     public static int DELETE_FAILED_ABORTED = -5;
 
-    public native int installExistingPackage(String packageName, int installReason);
+    public native int installExistingPackage(String packageName, int installReason)
+        throws PackageManager.NameNotFoundException;
 
     @RequiresApi(Build.VERSION_CODES.S)
     public native void addUniquePreferredActivity(IntentFilter filter, int match,
                                                   ComponentName[] set, ComponentName activity);
 
-    public native void deleteApplicationCacheFilesAsUser(String packageName,
-                                                         int userId, IPackageDataObserver observer);
+    public native void clearApplicationUserData(String packageName, IPackageDataObserver observer);
 
+    public native static String installStatusToString(int status);
 }

@@ -2,7 +2,6 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Canvas;
@@ -10,10 +9,14 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Layout;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.ReplacementSpan;
+import android.text.method.LinkMovementMethod;
+import android.text.style.LeadingMarginSpan;
 import android.text.style.StyleSpan;
-import android.text.style.TabStopSpan;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -21,9 +24,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import io.github.vvb2060.packageinstaller.BuildConfig;
+import java.util.Locale;
+
 import io.github.vvb2060.packageinstaller.R;
-import io.github.vvb2060.packageinstaller.model.InstallUserAction;
+import io.github.vvb2060.packageinstaller.apksig.Parser;
+import io.github.vvb2060.packageinstaller.apksig.Signer;
+import io.github.vvb2060.packageinstaller.apksig.Span;
+import io.github.vvb2060.packageinstaller.installmodel.InstallUserAction;
 
 public class InstallConfirmationFragment extends BaseDialogFragment {
 
@@ -44,54 +51,38 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
         mTextView = dialogView.requireViewById(R.id.message);
         mCheckBox = dialogView.requireViewById(R.id.checkbox);
-        if (!mDialogData.getSkipCreate()) {
+        if (!mDialogData.skipCreate) {
             mCheckBox.setText(R.string.set_installer);
             mCheckBox.setVisibility(View.VISIBLE);
         }
 
         var sb = new SpannableStringBuilder();
-        getInfo(context, sb);
-        var old = mDialogData.getOldApk();
-        int question = R.string.install_confirm_question;
-        if (old != null) {
-            var flags = old.applicationInfo.flags;
-            var installer = BuildConfig.APPLICATION_ID.equals(old.sharedUserId);
-            var installed = (flags & ApplicationInfo.FLAG_INSTALLED) != 0;
-            if (!installer && savedInstanceState == null) {
-                mCheckBox.setChecked(true);
-            }
-            if (installed) {
-                question = R.string.install_confirm_question_update;
-            }
-        }
-        var full = mDialogData.getFullInstall();
-        var removeSplit = false;
-        if (!full) {
-            question = R.string.install_confirm_question_split;
-            for (String splitName : old.splitNames) {
-                if (splitName.equals(mDialogData.getApkLite().getSplitName())) {
-                    question = R.string.install_confirm_question_split_remove;
-                    removeSplit = true;
-                    break;
-                }
-            }
-        }
-        var remove = removeSplit;
-        sb.append(context.getString(question), new StyleSpan(Typeface.ITALIC),
-            SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
+        appendBaseInfo(sb);
+        appendSignInfo(sb);
+        var remove = appendQuestion(sb, savedInstanceState == null);
         mTextView.setText(sb, TextView.BufferType.SPANNABLE);
         mTextView.setTextIsSelectable(true);
+        mTextView.setMovementMethod(new LinkMovementMethod() {
+            @Override
+            public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+                var ret = super.onTouchEvent(widget, buffer, event);
+                Selection.removeSelection(buffer);
+                return ret;
+            }
+        });
 
+        var old = mDialogData.oldApk;
+        var full = mDialogData.fullInstall;
         mDialog = new AlertDialog.Builder(context)
-            .setIcon(mDialogData.getApkLite().getIcon())
-            .setTitle(mDialogData.getApkLite().getLabel())
+            .setIcon(mDialogData.apkLite.getIcon())
+            .setTitle(mDialogData.apkLite.getLabel())
             .setView(dialogView)
             .setPositiveButton(old != null ? R.string.update : R.string.install,
                 (dialogInt, which) ->
                     mViewModel.initiateInstall(mCheckBox.isChecked(), true, full, remove))
             .setNegativeButton(android.R.string.cancel,
                 (dialogInt, which) -> cleanAndFinish())
-            .setNeutralButton(R.string.add_more,
+            .setNeutralButton(remove ? R.string.remove_more : R.string.add_more,
                 (dialogInt, which) ->
                     mViewModel.initiateInstall(mCheckBox.isChecked(), false, full, remove))
             .create();
@@ -103,7 +94,7 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
     public void onStart() {
         super.onStart();
         mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setFilterTouchesWhenObscured(true);
-        if (!mDialogData.getApkLite().needSplit()) {
+        if (!mDialogData.apkLite.needSplit()) {
             mDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setVisibility(View.GONE);
         }
     }
@@ -120,47 +111,48 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
         mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
     }
 
-    private void getInfo(Context context, SpannableStringBuilder sb) {
-        var apk = mDialogData.getApkLite();
-        var old = mDialogData.getOldApk();
-        append(context, sb, R.string.package_name, apk.getPackageName());
+    private void appendBaseInfo(SpannableStringBuilder sb) {
+        var apk = mDialogData.apkLite;
+        var old = mDialogData.oldApk;
+        append(sb, R.string.package_name, apk.packageName);
+        append(sb, R.string.size, formatBytes(apk.size));
         if (apk.needSplit()) {
-            append(context, sb, R.string.split_name, apk.getSplitName());
-            append(context, sb, R.string.split_types, apk.getSplitTypes());
-            append(context, sb, R.string.required_split_types, apk.getRequiredSplitTypes());
+            append(sb, R.string.split_name, apk.splitName);
+            append(sb, R.string.split_types, apk.splitTypes);
+            append(sb, R.string.required_split_types, apk.requiredSplitTypes);
+            append(sb, R.string.config_for_split, apk.configForSplit);
         }
         if (apk.isSplit()) return;
 
-        var ver = apk.getVersionName() + " (" + apk.getVersionCode() + ")";
-        var min = getAndroidName(apk.getMinSdkVersion());
-        var target = getAndroidName(apk.getTargetSdkVersion());
+        var ver = apk.versionName + " (" + apk.versionCode + ")";
+        var min = getAndroidName(apk.minSdkVersion);
+        var target = getAndroidName(apk.targetSdkVersion);
         if (old != null) {
             var oldVer = old.versionName + " (" + old.getLongVersionCode() + ")";
             var oldMin = getAndroidName(old.applicationInfo.minSdkVersion);
             var oldTarget = getAndroidName(old.applicationInfo.targetSdkVersion);
-            append(context, sb, oldVer, old.getLongVersionCode(), ver, apk.getVersionCode());
-            append(context, sb, R.string.min_sdk, oldMin, min);
-            append(context, sb, R.string.target_sdk, oldTarget, target);
+            append(sb, oldVer, old.getLongVersionCode(), ver, apk.versionCode);
+            append(sb, R.string.min_sdk, oldMin, min);
+            append(sb, R.string.target_sdk, oldTarget, target);
         } else {
-            append(context, sb, R.string.version, ver);
-            append(context, sb, R.string.min_sdk, min);
-            append(context, sb, R.string.target_sdk, target);
+            append(sb, R.string.version, ver);
+            append(sb, R.string.min_sdk, min);
+            append(sb, R.string.target_sdk, target);
         }
     }
 
-    private void append(Context context, SpannableStringBuilder sb, int label, String now) {
+    private void append(SpannableStringBuilder sb, int label, String now) {
         if (now != null && !now.isEmpty()) {
-            sb.append(context.getString(label));
+            sb.append(mTextView.getResources().getString(label));
             sb.append(now).append("\n");
         }
     }
 
-    private void append(Context context, SpannableStringBuilder sb,
-                        int label, String old, String now) {
+    private void append(SpannableStringBuilder sb, int label, String old, String now) {
         if (old.equals(now)) {
-            append(context, sb, label, now);
+            append(sb, label, now);
         } else {
-            sb.append(context.getString(label));
+            sb.append(mTextView.getResources().getString(label));
             sb.append(old);
             sb.append(" → ");
             sb.append(now, new StyleSpan(Typeface.BOLD),
@@ -169,27 +161,20 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
         }
     }
 
-    private void append(Context context, SpannableStringBuilder sb,
-                        String old, long oldVer,
+    private void append(SpannableStringBuilder sb, String old, long oldVer,
                         String now, long nowVer) {
         if (old.equals(now)) {
-            append(context, sb, R.string.version, now);
+            append(sb, R.string.version, now);
             return;
         }
-        var label = context.getString(R.string.version);
-        var start = sb.length();
-        sb.append(label).append("\t");
+        var label = mTextView.getResources().getString(R.string.version);
+        var oldStart = sb.length();
         sb.append(old).append("\n");
-        var indicatorStart = sb.length();
-        sb.append("\t");
+        var newStart = sb.length();
         sb.append(now, new StyleSpan(Typeface.BOLD),
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.append("\n");
         var end = sb.length();
-        var paint = mTextView.getPaint();
-        int offset = (int) paint.measureText(label) + 1;
-        sb.setSpan(new TabStopSpan.Standard(offset), start, end,
-            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE);
 
         String indicator;
         if (oldVer < nowVer) {
@@ -199,23 +184,110 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
         } else {
             indicator = "=";
         }
-        var indicatorWidth = paint.measureText(indicator);
-        var indicatorSpan = new ReplacementSpan() {
+
+        var leadingMarginSpan = new LeadingMarginSpan() {
+            float offset = 0;
+
             @Override
-            public int getSize(@NonNull Paint paint, CharSequence text, int start, int end,
-                               @Nullable Paint.FontMetricsInt fm) {
-                return offset;
+            public int getLeadingMargin(boolean first) {
+                return (int) offset;
             }
 
             @Override
-            public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
-                             float x, int top, int y, int bottom, @NonNull Paint paint) {
-                float textX = x + (offset - indicatorWidth) / 2;
-                canvas.drawText(indicator, textX, y, paint);
+            public void drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top,
+                                          int baseline, int bottom, CharSequence text,
+                                          int start, int end, boolean first, Layout layout) {
+                if (start == oldStart) {
+                    offset = p.measureText(label);
+                    c.drawText(label, x, baseline, p);
+                } else if (start == newStart) {
+                    offset = p.measureText(label);
+                    var textX = x + (offset - p.measureText(indicator)) / 2;
+                    c.drawText(indicator, textX, baseline, p);
+                } else offset = 0;
             }
         };
-        sb.setSpan(indicatorSpan, indicatorStart, indicatorStart + 1,
+        sb.setSpan(leadingMarginSpan, oldStart, end,
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    private void appendSignInfo(SpannableStringBuilder sb) {
+        var map = mDialogData.apkLite.signingBlock;
+        if (map == null || map.isEmpty()) return;
+        sb.append(mTextView.getResources().getString(R.string.signing_block));
+        Span.appendSignInfo(sb, mTextView, map);
+        sb.append("\n");
+
+        var stamp = map.get(Parser.V2_SOURCE_STAMP_BLOCK_ID);
+        if (stamp instanceof Signer signer && signer.certs.get(0).isGoogle() &&
+            signer.stampTime != null) {
+            var stampTime = Signer.FORMATTER.format(signer.stampTime);
+            var hasFrosting = map.get(Parser.GOOGLE_PLAY_FROSTING_BLOCK_ID) != null;
+            var id = hasFrosting ? R.string.google_source_play : R.string.google_source;
+            sb.append(mTextView.getResources().getString(id, stampTime));
+            sb.append("\n");
+        }
+    }
+
+    private boolean appendQuestion(SpannableStringBuilder sb, boolean needDefault) {
+        var old = mDialogData.oldApk;
+        var full = mDialogData.fullInstall;
+        int question = R.string.install_confirm_question;
+        var removeSplit = false;
+
+        if (!full) {
+            question = R.string.install_confirm_question_split;
+            for (String splitName : old.splitNames) {
+                if (splitName.equals(mDialogData.apkLite.splitName)) {
+                    question = R.string.install_confirm_question_split_remove;
+                    removeSplit = true;
+                    break;
+                }
+            }
+        }
+
+        if (full && old != null) {
+            var flags = old.applicationInfo.flags;
+            var system = (flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            var installed = (flags & ApplicationInfo.FLAG_INSTALLED) != 0;
+            if (system && needDefault) {
+                mCheckBox.setChecked(true);
+            }
+            if (installed) {
+                question = R.string.install_confirm_question_update;
+            }
+        }
+
+        var resources = mTextView.getResources();
+        var string = resources.getString(question);
+
+        var isSame = mDialogData.apkLite.isSame;
+        if (isSame != null) {
+            var builder = new StringBuilder();
+            if (isSame[0]) {
+                builder.append(resources.getString(R.string.install_confirm_warn_content));
+            }
+            if (!isSame[1]) {
+                builder.append(resources.getString(R.string.install_confirm_warn_signer));
+            }
+            if (builder.length() > 0) {
+                builder.append(resources.getString(R.string.install_confirm_question_warn));
+                string = builder.toString();
+            }
+        }
+
+        sb.append("\n");
+        sb.append(string, new StyleSpan(Typeface.ITALIC),
+            SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return removeSplit;
+    }
+
+    private static String formatBytes(long bytes) {
+        if (bytes <= 0) return "";
+        if (bytes < 1024) return bytes + " bytes";
+        int unit = (int) (Math.log(bytes) / Math.log(1024));
+        double value = bytes / Math.pow(1024, unit);
+        return String.format(Locale.ROOT, "%.2f %ciB", value, "KMGTPE".charAt(unit - 1));
     }
 
     private static String getAndroidName(String apiLevel) {
@@ -223,13 +295,17 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
             var api = Integer.parseInt(apiLevel);
             return getAndroidName(api);
         } catch (NumberFormatException ignored) {
-            return apiLevel;
+            return "Android " + apiLevel + " (" + Build.VERSION_CODES.CUR_DEVELOPMENT + ")";
         }
     }
 
     private static String getAndroidName(int apiLevel) {
         var name = switch (apiLevel) {
-            case Build.VERSION_CODES.CUR_DEVELOPMENT -> "Dev";
+            case Build.VERSION_CODES.CUR_DEVELOPMENT -> {
+                var codename = Build.VERSION.CODENAME;
+                if (codename.equals("REL")) codename = "DEV";
+                yield codename;
+            }
             case Build.VERSION_CODES.BASE -> "1.0";
             case Build.VERSION_CODES.BASE_1_1 -> "1.1";
             case Build.VERSION_CODES.CUPCAKE -> "1.5";
@@ -266,6 +342,7 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
             case Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> "14";
             case Build.VERSION_CODES.VANILLA_ICE_CREAM -> "15";
             case Build.VERSION_CODES.BAKLAVA -> "16";
+            case Build.VERSION_CODES.CINNAMON_BUN -> "17";
             default -> "???";
         };
         return "Android " + name + " (" + apiLevel + ")";

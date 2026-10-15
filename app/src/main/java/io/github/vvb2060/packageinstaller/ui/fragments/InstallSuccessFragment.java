@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.github.vvb2060.packageinstaller.R;
-import io.github.vvb2060.packageinstaller.model.Hook;
-import io.github.vvb2060.packageinstaller.model.InstallSuccess;
+import io.github.vvb2060.packageinstaller.core.BinderWrapper;
+import io.github.vvb2060.packageinstaller.installmodel.InstallSuccess;
 
 public class InstallSuccessFragment extends BaseDialogFragment {
 
@@ -28,18 +28,16 @@ public class InstallSuccessFragment extends BaseDialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         var context = requireContext();
-        var message = mDialogData.getPath() != null ?
-            context.getString(R.string.archive_done) + mDialogData.getPath() :
-            context.getString(R.string.install_done);
+        var message = context.getString(R.string.install_done);
         mDialog = new AlertDialog.Builder(context)
-            .setTitle(mDialogData.getApkLite().getLabel())
-            .setIcon(mDialogData.getApkLite().getIcon())
+            .setTitle(mDialogData.apkLite.getLabel())
+            .setIcon(mDialogData.apkLite.getIcon())
             .setMessage(message)
             .setNegativeButton(R.string.done,
                 (dialog, which) -> cleanAndFinish())
             .setPositiveButton(R.string.launch, (dialog, which) -> {
                 cleanAndFinish();
-                Hook.INSTANCE.startActivity(mDialogData.getStartIntent());
+                BinderWrapper.startActivity(mDialogData.startIntent);
             })
             .create();
         return mDialog;
@@ -49,7 +47,7 @@ public class InstallSuccessFragment extends BaseDialogFragment {
     public void onStart() {
         super.onStart();
         Button launchButton = mDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        if (mDialogData.getStartIntent() == null) {
+        if (mDialogData.startIntent == null) {
             launchButton.setVisibility(View.GONE);
         }
     }
