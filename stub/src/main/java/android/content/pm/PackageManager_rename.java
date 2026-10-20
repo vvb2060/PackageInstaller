@@ -100,9 +100,11 @@ public class PackageManager_rename {
 
     public static int MATCH_EXPLICITLY_VISIBLE_ONLY = 0x02000000;
 
+    // @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    public static final int MATCH_STATIC_SHARED_AND_SDK_LIBRARIES = 0x04000000;
 
-    public static int MATCH_STATIC_SHARED_AND_SDK_LIBRARIES = 0x04000000;
-
+    // renamed in Tiramisu
+    public static int MATCH_STATIC_SHARED_LIBRARIES = 0x04000000;
 
     public static int GET_SIGNING_CERTIFICATES = 0x08000000;
 
