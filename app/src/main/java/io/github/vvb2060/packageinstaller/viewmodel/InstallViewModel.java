@@ -33,9 +33,11 @@ public class InstallViewModel extends AndroidViewModel {
     }
 
     public void preprocessIntent(@NonNull Intent intent) {
-        if (repository.preCheck(intent)) {
-            executor.execute(repository::parseUri);
-        }
+        executor.execute(() -> {
+            if (repository.preCheck(intent)) {
+                repository.parseUri();
+            }
+        });
     }
 
     public void cleanupInstall() {

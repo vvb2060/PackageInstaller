@@ -29,7 +29,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.time.Duration;
 
 import javax.net.ssl.SSLContext;
 
@@ -49,8 +48,8 @@ import io.github.vvb2060.packageinstaller.installmodel.InstallStage;
 import io.github.vvb2060.packageinstaller.installmodel.InstallSuccess;
 import io.github.vvb2060.packageinstaller.installmodel.InstallUserAction;
 import io.github.vvb2060.packageinstaller.installmodel.PackageUserAction;
+import io.github.vvb2060.packageinstaller.provider.ShizukuProvider;
 import rikka.shizuku.Shizuku;
-import rikka.shizuku.ShizukuProvider;
 
 public class InstallRepository {
     private static final String TAG = InstallRepository.class.getSimpleName();
@@ -72,13 +71,14 @@ public class InstallRepository {
     }
 
     public boolean preCheck(Intent intent) {
+        ShizukuProvider.waitForBinder(context);
         if (!Shizuku.pingBinder()
             || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
             || Shizuku.checkRemotePermission(Manifest.permission.INSTALL_PACKAGES)
             != PackageManager.PERMISSION_GRANTED) {
-            installResult.setValue(new InstallAborted(InstallAborted.ABORT_SHIZUKU, null,
+            installResult.postValue(new InstallAborted(InstallAborted.ABORT_SHIZUKU, null,
                 context.getPackageManager().getLaunchIntentForPackage(
-                    ShizukuProvider.MANAGER_APPLICATION_ID)));
+                    rikka.shizuku.ShizukuProvider.MANAGER_APPLICATION_ID)));
             return false;
         }
 
@@ -91,7 +91,7 @@ public class InstallRepository {
         BinderWrapper.disableAdbVerify(context);
         PreferredActivity.set(packageManager);
 
-        installResult.setValue(new InstallParse());
+        installResult.postValue(new InstallParse());
         return true;
     }
 
