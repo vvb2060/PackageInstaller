@@ -1,8 +1,10 @@
 package io.github.vvb2060.packageinstaller.ui;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -37,7 +39,12 @@ public class InstallLaunch extends FragmentActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        var window = getWindow();
+        window.requestFeature(Window.FEATURE_NO_TITLE);
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            window.setHideOverlayWindows(true);
+        }
         fragmentManager = getSupportFragmentManager();
         installViewModel = new ViewModelProvider(this).get(InstallViewModel.class);
         fragmentManager.setFragmentFactory(new FragmentFactory() {
