@@ -4,6 +4,7 @@
 -assumenosideeffects class android.util.Log {
     public static int v(...);
     public static int d(...);
+    public static boolean isLoggable(...) return false;
 }
 -keepclassmembers class * implements android.os.Parcelable {
     public static final ** CREATOR;
@@ -14,6 +15,12 @@
 }
 -assumenosideeffects class java.util.Objects {
     ** requireNonNull(...);
+}
+-assumenosideeffects class androidx.core.app.ComponentActivity {
+    protected final boolean shouldDumpInternalState(...) return false;
+}
+-assumenosideeffects class androidx.fragment.app.FragmentManager {
+    public void dump(...);
 }
 -dontwarn dalvik.system.VMRuntime
 
