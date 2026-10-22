@@ -93,6 +93,7 @@ public class InstallConfirmationFragment extends BaseDialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        mDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setFocusedByDefault(true);
         mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setFilterTouchesWhenObscured(true);
         if (!mDialogData.apkLite.needSplit()) {
             mDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setVisibility(View.GONE);
