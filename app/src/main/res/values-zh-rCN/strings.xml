@@ -65,5 +65,6 @@
     <string name="error_shizuku_unavailable">Shizuku 不可用。</string>
     <string name="error_create">无法开始安装。</string>
     <string name="error_write">无法写入文件。</string>
+    <string name="error_cancelled">安装已取消。</string>
     <string name="error_info">此软件是 %s 下的开源软件。</string>
 </resources>

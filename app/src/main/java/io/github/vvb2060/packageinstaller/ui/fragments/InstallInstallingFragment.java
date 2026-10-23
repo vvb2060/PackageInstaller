@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.installmodel.InstallInstalling;
 
-public class InstallInstallingFragment extends BaseDialogFragment {
+public final class InstallInstallingFragment extends BaseDialogFragment {
 
     private final InstallInstalling mDialogData;
     private AlertDialog mDialog;
@@ -32,6 +32,8 @@ public class InstallInstallingFragment extends BaseDialogFragment {
         ProgressBar progressBar = dialogView.requireViewById(R.id.progress);
         progressBar.setVisibility(View.VISIBLE);
         mViewModel.getStagingProgress().observe(this, progress -> {
+            var button = mDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+            button.setEnabled(progress < 100);
             textView.setText(progress <= 100 ? R.string.copying : R.string.installing);
             progressBar.setIndeterminate(progress < 0 || progress > 100);
             progressBar.setProgress(progress, true);
@@ -41,14 +43,8 @@ public class InstallInstallingFragment extends BaseDialogFragment {
             .setTitle(mDialogData.apkLite.getLabel())
             .setIcon(mDialogData.apkLite.getIcon())
             .setView(dialogView)
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(android.R.string.cancel, (_, _) -> mViewModel.cleanup())
             .create();
         return mDialog;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
     }
 }

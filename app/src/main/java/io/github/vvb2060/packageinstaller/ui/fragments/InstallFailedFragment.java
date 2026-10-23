@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.installmodel.InstallFailed;
 
-public class InstallFailedFragment extends BaseDialogFragment {
+public final class InstallFailedFragment extends BaseDialogFragment {
 
     private final InstallFailed mDialogData;
 

@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.installmodel.PackageUserAction;
 
-public class UninstallConfirmationFragment extends BaseDialogFragment {
+public final class UninstallConfirmationFragment extends BaseDialogFragment {
 
     private final PackageUserAction mDialogData;
     private AlertDialog mDialog;

@@ -32,7 +32,7 @@ import io.github.vvb2060.packageinstaller.apksig.Signer;
 import io.github.vvb2060.packageinstaller.apksig.Span;
 import io.github.vvb2060.packageinstaller.installmodel.InstallUserAction;
 
-public class InstallConfirmationFragment extends BaseDialogFragment {
+public final class InstallConfirmationFragment extends BaseDialogFragment {
 
     private final InstallUserAction mDialogData;
     private AlertDialog mDialog;

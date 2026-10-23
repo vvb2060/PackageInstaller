@@ -86,7 +86,7 @@ public class InstallLaunch extends FragmentActivity {
                     show(new InstallErrorFragment(aborted));
                 }
             }
-            case InstallParse ignored -> show(new InstallParseFragment());
+            case InstallParse parse -> show(new InstallParseFragment(parse));
             case InstallUserAction action -> show(new InstallConfirmationFragment(action));
             case PackageUserAction action -> show(new UninstallConfirmationFragment(action));
             case InstallInstalling installing -> show(new InstallInstallingFragment(installing));

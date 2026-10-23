@@ -162,6 +162,7 @@ public class InstallRepository {
             } else {
                 zipParser.sessionWrite(session, stagingProgress);
                 closeable.close();
+                closeable = null;
                 zipParser = null;
             }
             if (commit) {
@@ -170,7 +171,7 @@ public class InstallRepository {
                 installResult.postValue(new InstallAborted(InstallAborted.ABORT_CLOSE));
             }
         } catch (IOException | RuntimeException e) {
-            cleanupInstall();
+            cleanup();
             Log.e(TAG, "Could not write APK.", e);
             var aborted = new InstallAborted(InstallAborted.ABORT_WRITE, e.toString());
             installResult.postValue(aborted);
@@ -184,7 +185,7 @@ public class InstallRepository {
             // noinspection RequestInstallPackagesPolicy
             session.commit(receiver.getIntentSender());
         } catch (RuntimeException e) {
-            cleanupInstall();
+            cleanup();
             Log.e(TAG, "Failed to commit session", e);
             setStageBasedOnResult(PackageInstaller.STATUS_FAILURE,
                 PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR, e.toString());
@@ -430,7 +431,7 @@ public class InstallRepository {
         }
     }
 
-    public void cleanupInstall() {
+    public void cleanup() {
         if (sessionId != SessionInfo.INVALID_ID) {
             try {
                 packageInstaller.abandonSession(sessionId);

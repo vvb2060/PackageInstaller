@@ -65,5 +65,6 @@
     <string name="error_shizuku_unavailable">Shizuku is unavailable.</string>
     <string name="error_create">Failed to create install session.</string>
     <string name="error_write">Failed to copy file.</string>
+    <string name="error_cancelled">Installation cancelled.</string>
     <string name="error_info">This software is open source under %s.</string>
 </resources>

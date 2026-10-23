@@ -18,6 +18,7 @@ public class InstallViewModel extends AndroidViewModel {
 
     private final Executor executor = Executors.newFixedThreadPool(1);
     private final InstallRepository repository;
+    private boolean cancelled = false;
 
     public InstallViewModel(@NonNull Application application) {
         super(application);
@@ -40,8 +41,14 @@ public class InstallViewModel extends AndroidViewModel {
         });
     }
 
-    public void cleanupInstall() {
-        repository.cleanupInstall();
+    public void cleanup() {
+        if (cancelled) return;
+        repository.cleanup();
+        cancelled = true;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     public void initiateInstall(

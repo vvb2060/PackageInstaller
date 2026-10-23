@@ -11,7 +11,10 @@ import androidx.lifecycle.ViewModelProvider;
 import io.github.vvb2060.packageinstaller.installmodel.InstallStage;
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
-public class BaseDialogFragment extends DialogFragment {
+public abstract sealed class BaseDialogFragment extends DialogFragment permits
+    InstallConfirmationFragment, InstallErrorFragment, InstallFailedFragment,
+    InstallInstallingFragment, InstallParseFragment, InstallSuccessFragment,
+    UninstallConfirmationFragment {
 
     public final InstallStage mDialogData;
     InstallViewModel mViewModel;
@@ -34,7 +37,7 @@ public class BaseDialogFragment extends DialogFragment {
     }
 
     void cleanAndFinish() {
-        mViewModel.cleanupInstall();
+        mViewModel.cleanup();
         requireActivity().finishAndRemoveTask();
     }
 }

@@ -14,7 +14,7 @@ import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.core.BinderWrapper;
 import io.github.vvb2060.packageinstaller.installmodel.InstallSuccess;
 
-public class InstallSuccessFragment extends BaseDialogFragment {
+public final class InstallSuccessFragment extends BaseDialogFragment {
 
     private final InstallSuccess mDialogData;
     private AlertDialog mDialog;

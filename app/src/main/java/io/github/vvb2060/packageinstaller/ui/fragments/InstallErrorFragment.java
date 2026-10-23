@@ -16,7 +16,7 @@ import io.github.vvb2060.packageinstaller.R;
 import io.github.vvb2060.packageinstaller.installmodel.InstallAborted;
 import rikka.shizuku.Shizuku;
 
-public class InstallErrorFragment extends BaseDialogFragment {
+public final class InstallErrorFragment extends BaseDialogFragment {
 
     private final InstallAborted mAborted;
 
@@ -65,6 +65,9 @@ public class InstallErrorFragment extends BaseDialogFragment {
     }
 
     private String getErrorMessage(Context context, int code) {
+        if (mViewModel.isCancelled()) {
+            return context.getString(R.string.error_cancelled);
+        }
         switch (code) {
             case InstallAborted.ABORT_SHIZUKU -> {
                 if (!Shizuku.pingBinder()) {

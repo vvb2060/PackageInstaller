@@ -10,13 +10,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 
 import io.github.vvb2060.packageinstaller.R;
+import io.github.vvb2060.packageinstaller.installmodel.InstallParse;
 
-public class InstallParseFragment extends DialogFragment {
+public final class InstallParseFragment extends BaseDialogFragment {
 
     private AlertDialog mDialog;
+
+    public InstallParseFragment(InstallParse dialogData) {
+        super(dialogData);
+    }
 
     @NonNull
     @Override
@@ -31,15 +35,8 @@ public class InstallParseFragment extends DialogFragment {
             .setTitle(R.string.app_name)
             .setIcon(R.drawable.ic_app_icon)
             .setView(dialogView)
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(android.R.string.cancel, (_, _) -> mViewModel.cleanup())
             .create();
         return mDialog;
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
-    }
-
 }
