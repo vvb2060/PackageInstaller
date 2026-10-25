@@ -89,7 +89,7 @@ public class Cert {
     }
 
     public void appendCertInfo(SpannableStringBuilder sb) {
-        var name = certificate.getSubjectX500Principal().getName();
+        var name = certificate.getSubjectX500Principal().toString();
         var index1 = sb.length();
         sb.append(name).append("\n");
         var index2 = sb.length();
