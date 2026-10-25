@@ -1,8 +1,6 @@
 package io.github.vvb2060.packageinstaller.datamodel;
 
 import android.net.TrafficStats;
-import android.os.Process;
-import android.os.RemoteException;
 import android.util.ArraySet;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -34,7 +32,6 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 
-import io.github.vvb2060.packageinstaller.BuildConfig;
 import io.github.vvb2060.packageinstaller.core.BinderWrapper;
 
 public class DownloadEngine extends Thread implements Closeable {
@@ -109,13 +106,7 @@ public class DownloadEngine extends Thread implements Closeable {
     }
 
     long open(URI uri, ByteBuffer buffer) throws IOException {
-        try {
-            BinderWrapper.deviceIdle.addPowerSaveTempWhitelistApp(BuildConfig.APPLICATION_ID,
-                1000, Process.myUserHandle().hashCode(), 316, "shell");
-            BinderWrapper.deviceIdle.addPowerSaveWhitelistApp(BuildConfig.APPLICATION_ID);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Failed to add power save whitelist", e);
-        }
+        BinderWrapper.addPowerSaveWhitelistApp();
 
         if (uri.getHost() == null) {
             uri = URI.create("https://" + uri);
@@ -194,11 +185,7 @@ public class DownloadEngine extends Thread implements Closeable {
     @Override
     public void close() {
         interrupt();
-        try {
-            BinderWrapper.deviceIdle.removePowerSaveWhitelistApp(BuildConfig.APPLICATION_ID);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Failed to remove power save whitelist", e);
-        }
+        BinderWrapper.removePowerSaveWhitelistApp();
     }
 
     @Override
@@ -290,9 +277,10 @@ public class DownloadEngine extends Thread implements Closeable {
     }
 
     private class ChannelSlot {
+        static final SSLEngineResult emptyResult = new SSLEngineResult(SSLEngineResult.Status.OK,
+            SSLEngineResult.HandshakeStatus.FINISHED, 0, 0);
         final SocketChannel socketChannel;
         final SSLEngine engine;
-        final SSLEngineResult emptyResult;
         final ByteBuffer headerAccumulator = ByteBuffer.allocate(8 * 1024);
 
         ByteBuffer myAppData;
@@ -316,8 +304,6 @@ public class DownloadEngine extends Thread implements Closeable {
                 peerAppData = ByteBuffer.allocateDirect(appBufferSize);
                 myNetData = myAppData.duplicate();
                 peerNetData = peerAppData.duplicate();
-                emptyResult = new SSLEngineResult(SSLEngineResult.Status.OK,
-                    SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0);
             } else {
                 state = HttpState.HANDSHAKING;
                 var session = engine.getSession();
@@ -327,7 +313,6 @@ public class DownloadEngine extends Thread implements Closeable {
                 peerAppData = ByteBuffer.allocateDirect(appBufferSize);
                 myNetData = ByteBuffer.allocateDirect(netBufferSize);
                 peerNetData = ByteBuffer.allocateDirect(netBufferSize);
-                emptyResult = null;
             }
         }
 
@@ -467,7 +452,9 @@ public class DownloadEngine extends Thread implements Closeable {
                         return;
                     }
                     case NEED_UNWRAP -> {
-                        key.interestOps(SelectionKey.OP_READ);
+                        if (myNetData.position() == 0) {
+                            key.interestOps(SelectionKey.OP_READ);
+                        }
                         return;
                     }
                 }

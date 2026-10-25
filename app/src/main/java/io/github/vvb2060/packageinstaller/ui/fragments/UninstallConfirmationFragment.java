@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.github.vvb2060.packageinstaller.R;
+import io.github.vvb2060.packageinstaller.core.BinderWrapper;
 import io.github.vvb2060.packageinstaller.installmodel.PackageUserAction;
 
 public final class UninstallConfirmationFragment extends BaseDialogFragment {
@@ -37,22 +38,28 @@ public final class UninstallConfirmationFragment extends BaseDialogFragment {
             var button = mDialog.getButton(DialogInterface.BUTTON_POSITIVE);
             button.setText(isChecked ? R.string.clear : R.string.uninstall);
         });
-        var info = mDialogData.oldApk.applicationInfo;
-        assert info != null;
-        int text = info.enabled ? R.string.disable : R.string.enable;
+        var app = mDialogData.info.applicationInfo;
+        assert app != null;
+        var enabled = app.enabled;
+        int text = enabled ? R.string.disable : R.string.enable;
+        var apk = mDialogData.apkLite;
         mDialog = new AlertDialog.Builder(requireContext())
-            .setTitle(mDialogData.apkLite.getLabel())
-            .setIcon(mDialogData.apkLite.getIcon())
+            .setTitle(apk.getLabel())
+            .setIcon(apk.getIcon())
             .setView(dialogView)
             .setNegativeButton(android.R.string.cancel, (dialog, which) ->
                 requireActivity().finishAndRemoveTask())
             .setPositiveButton(R.string.uninstall, (dialog, which) -> {
                 requireActivity().finishAndRemoveTask();
-                mViewModel.uninstallPackage(mDialogData.oldApk, checkBox.isChecked());
+                if (checkBox.isChecked()) {
+                    BinderWrapper.clearApplicationUserData(apk.packageName);
+                } else {
+                    BinderWrapper.uninstallPackage(mDialogData.info);
+                }
             })
             .setNeutralButton(text, (dialog, which) -> {
                 requireActivity().finishAndRemoveTask();
-                mViewModel.setPackageEnabled(info.packageName, !info.enabled);
+                BinderWrapper.setPackageEnabled(apk.packageName, !enabled);
             })
             .create();
         return mDialog;

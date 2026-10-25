@@ -28,6 +28,7 @@ import androidx.annotation.RequiresApi;
 
 import org.lsposed.hiddenapibypass.LSPass;
 
+import io.github.vvb2060.packageinstaller.BuildConfig;
 import rikka.shizuku.Shizuku;
 import rikka.shizuku.ShizukuBinderWrapper;
 import rikka.shizuku.SystemServiceHelper;
@@ -36,10 +37,11 @@ public class BinderWrapper {
     private static final String TAG = BinderWrapper.class.getSimpleName();
     private static boolean initialized;
 
-    public static IActivityManager am;
-    public static IDeviceIdleController deviceIdle;
-    public static PackageManager pm;
-    public static PackageInstaller installer;
+    private static IActivityManager am;
+    private static IDeviceIdleController deviceIdle;
+    private static IPackageInstaller pi;
+    static PackageManager pm;
+    static PackageInstaller installer;
 
     static {
         LSPass.setHiddenApiExemptions("");
@@ -73,7 +75,8 @@ public class BinderWrapper {
             field.setAccessible(true);
             var mInstaller = (IPackageInstaller) field.get(installer);
             wrapper = new ShizukuBinderWrapper(mInstaller.asBinder());
-            field.set(installer, IPackageInstaller.Stub.asInterface(wrapper));
+            pi = IPackageInstaller.Stub.asInterface(wrapper);
+            field.set(installer, pi);
 
             initialized = true;
         } catch (ReflectiveOperationException e) {
@@ -167,6 +170,85 @@ public class BinderWrapper {
             | PackageManager_rename.MATCH_STATIC_SHARED_AND_SDK_LIBRARIES;
         var pkg = new VersionedPackage(packageName, PackageManager.VERSION_CODE_HIGHEST);
         return pm.getPackageInfo(pkg, matchAll);
+    }
+
+    public static void uninstallPackage(PackageInfo info) {
+        var receiver = new LocalIntentReceiver((statusCode, legacyStatus, message) ->
+            Log.v(TAG, "Uninstall result: " + statusCode + ", " + legacyStatus + ", " + message));
+        var versionedPackage = new VersionedPackage(info.packageName, info.getLongVersionCode());
+        try {
+            // noinspection MissingPermission NewApi WrongConstant
+            installer.uninstall(versionedPackage, PackageManager_rename.DELETE_SYSTEM_APP,
+                receiver.getIntentSender());
+        } catch (SecurityException e) {
+            Log.w(TAG, "Failed to uninstall package", e);
+        }
+    }
+
+    public static void setPackageEnabled(String packageName, boolean enabled) {
+        var newState = enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+            : PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER;
+        try {
+            pm.setApplicationEnabledSetting(packageName, newState, 0);
+        } catch (SecurityException e) {
+            Log.w(TAG, "Failed to set package enabled state", e);
+        }
+    }
+
+    public static void clearApplicationUserData(String packageName) {
+        try {
+            var rename = (PackageManager_rename) (Object) pm;
+            rename.clearApplicationUserData(packageName, null);
+        } catch (SecurityException e) {
+            Log.w(TAG, "Failed to clear application user data", e);
+        }
+    }
+
+    public static void addPowerSaveWhitelistApp() {
+        try {
+            int userId = Os.getuid() / 100000;
+            deviceIdle.addPowerSaveTempWhitelistApp(BuildConfig.APPLICATION_ID,
+                1000, userId, 316, "shell");
+            deviceIdle.addPowerSaveWhitelistApp(BuildConfig.APPLICATION_ID);
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
+    }
+
+    public static void removePowerSaveWhitelistApp() {
+        try {
+            deviceIdle.removePowerSaveWhitelistApp(BuildConfig.APPLICATION_ID);
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
+    }
+
+    public static void disableVerificationForUid() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                pi.disableVerificationForUid(Os.getuid());
+            }
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
+    }
+
+    public static void addDeveloperVerificationExperiment(String packageName) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+                pi.addDeveloperVerificationExperiment(packageName, 3, new int[]{1});
+            }
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
+    }
+
+    public static void setPermissionsResult(int sessionId) {
+        try {
+            pi.setPermissionsResult(sessionId, true);
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
     }
 
     private static final class ShizukuContext extends ContextWrapper {

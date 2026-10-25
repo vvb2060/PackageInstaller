@@ -61,18 +61,4 @@ public class InstallViewModel extends AndroidViewModel {
             repository.install(setInstaller, commit, full, removeSplit)
         );
     }
-
-    public void uninstallPackage(PackageInfo info, boolean clearData) {
-        executor.execute(() -> {
-            if (clearData) {
-                repository.clearApplicationUserData(info.packageName);
-            } else {
-                repository.uninstallPackage(info);
-            }
-        });
-    }
-
-    public void setPackageEnabled(String packageName, boolean enabled) {
-        executor.execute(() -> repository.setPackageEnabled(packageName, enabled));
-    }
 }

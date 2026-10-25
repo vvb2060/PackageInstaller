@@ -146,8 +146,9 @@ public class InstallRepository {
         if (sessionId == SessionInfo.INVALID_ID) {
             try {
                 var params = createSessionParams(setInstaller, full);
+                BinderWrapper.disableVerificationForUid();
                 sessionId = packageInstaller.createSession(params);
-            } catch (IOException e) {
+            } catch (IOException | RuntimeException e) {
                 Log.e(TAG, "Failed to create a new session", e);
                 var aborted = new InstallAborted(InstallAborted.ABORT_CREATE, e.toString());
                 installResult.postValue(aborted);
@@ -182,6 +183,7 @@ public class InstallRepository {
         stagingProgress.postValue(101);
         var receiver = new LocalIntentReceiver(this::setStageBasedOnResult);
         try {
+            BinderWrapper.addDeveloperVerificationExperiment(apkLite.packageName);
             // noinspection RequestInstallPackagesPolicy
             session.commit(receiver.getIntentSender());
         } catch (RuntimeException e) {
@@ -423,6 +425,8 @@ public class InstallRepository {
             } catch (PackageManager.NameNotFoundException ignored) {
             }
             installResult.postValue(new InstallSuccess(apkLite, startIntent));
+        } else if (statusCode == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            BinderWrapper.setPermissionsResult(sessionId);
         } else {
             if (message == null) {
                 message = PackageManager_rename.installStatusToString(legacyStatus);
@@ -448,31 +452,4 @@ public class InstallRepository {
         }
     }
 
-    public void uninstallPackage(PackageInfo info) {
-        var receiver = new LocalIntentReceiver((statusCode, legacyStatus, message) ->
-            Log.v(TAG, "Uninstall result: " + statusCode + ", " + legacyStatus + ", " + message));
-        var versionedPackage = new VersionedPackage(info.packageName, info.getLongVersionCode());
-        // noinspection MissingPermission NewApi WrongConstant
-        packageInstaller.uninstall(versionedPackage, PackageManager_rename.DELETE_SYSTEM_APP,
-            receiver.getIntentSender());
-    }
-
-    public void setPackageEnabled(String packageName, boolean enabled) {
-        var newState = enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            : PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER;
-        try {
-            BinderWrapper.pm.setApplicationEnabledSetting(packageName, newState, 0);
-        } catch (SecurityException e) {
-            Log.w(TAG, "Failed to set package enabled state", e);
-        }
-    }
-
-    public void clearApplicationUserData(String packageName) {
-        try {
-            var pm = (PackageManager_rename) (Object) BinderWrapper.pm;
-            pm.clearApplicationUserData(packageName, null);
-        } catch (SecurityException e) {
-            Log.w(TAG, "Failed to clear application user data", e);
-        }
-    }
 }
