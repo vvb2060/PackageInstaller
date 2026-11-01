@@ -1,56 +1,71 @@
 <resources>
-    <string name="app_name">"Shizuku 安裝器"</string>
+    <string name="app_name">Shizuku 安裝器</string>
 
-    <string name="install">"安裝"</string>
-    <string name="update">"更新"</string>
-    <string name="archive">封存</string>
+    <string name="install">安裝</string>
+    <string name="update">更新</string>
+    <string name="uninstall">解除安裝</string>
+    <string name="clear">清除</string>
     <string name="add_more">繼續新增</string>
+    <string name="remove_more">繼續移除</string>
     <string name="enable">啟用</string>
     <string name="disable">停用</string>
-    <string name="done">"完成"</string>
-    <string name="launch">"開啟"</string>
+    <string name="done">完成</string>
+    <string name="launch">開啟</string>
 
     <string name="copying">正在複製…</string>
-    <string name="installing">"正在安裝…"</string>
-    <string name="parsing">"正在解析…"</string>
+    <string name="installing">正在安裝…</string>
+    <string name="parsing">正在解析…</string>
 
     <string name="set_installer">設定安裝來源</string>
-    <string name="uninstall_keep_data">同時解除安裝此應用程式但保留資料</string>
+    <string name="only_clear_data">僅清除資料</string>
+    <string name="safe_mode">安全模式</string>
 
     <string name="package_name">"套件名稱："</string>
+    <string name="size">"大小："</string>
     <string name="split_name">"分割："</string>
     <string name="split_types">"類型："</string>
     <string name="required_split_types">"需求："</string>
+    <string name="config_for_split">"設定："</string>
     <string name="version">"版本："</string>
     <string name="min_sdk">"最低："</string>
     <string name="target_sdk">"目標："</string>
+    <string name="signing_block">"簽名："</string>
 
-    <string name="install_confirm_question">"要安裝此應用程式嗎？"</string>
-    <string name="install_confirm_question_update">"要更新此應用程式嗎？"</string>
-    <string name="install_confirm_question_split">"要將分割套件新增至此應用程式嗎？"</string>
-    <string name="install_confirm_question_split_remove">"要移除此分割套件嗎？"</string>
+    <string name="google_source">由 Google 於 %1$s 產生</string>
+    <string name="google_source_play">由 Google 於 %1$s 產生，透過 Play 商店發布</string>
 
-    <string name="archive_confirm_question">要封存此應用程式的套件嗎？</string>
+    <string name="install_confirm_warn_content">"內容相同，"</string>
+    <string name="install_confirm_warn_signer">"簽名不同，"</string>
+    <string name="install_confirm_question_warn">真的要更新此應用程式嗎？</string>
+    <string name="install_confirm_question">要安裝此應用程式嗎？</string>
+    <string name="install_confirm_question_update">要更新此應用程式嗎？</string>
+    <string name="install_confirm_question_split">要將分割套件新增至此應用程式嗎？</string>
+    <string name="install_confirm_question_split_remove">要移除此分割套件嗎？</string>
 
-    <string name="install_done">"已安裝應用程式。"</string>
-    <string name="archive_done">"已封存至："</string>
+    <string name="uninstall_confirm_question">要解除安裝此應用程式嗎？</string>
 
-    <string name="install_failed">"未安裝應用程式。"</string>
-    <string name="install_failed_blocked">"系統已禁止安裝此套件。"</string>
-    <string name="install_failed_conflict">"應用程式未安裝，因為套件與現有套件衝突。"</string>
-    <string name="install_failed_incompatible">"應用程式未安裝，因為與您的裝置不相容。"</string>
-    <string name="install_failed_invalid_apk">"應用程式未安裝，因為套件似乎無效。"</string>
-    <string name="install_failed_storage">"儲存空間不足"</string>
+    <string name="install_done">已安裝應用程式。</string>
 
-    <string name="error_title">"錯誤"</string>
-    <string name="error_parse">"解析套件時發生問題。"</string>
-    <string name="error_split">"找不到相符的基礎套件。"</string>
-    <string name="error_notfound">"在已安裝的應用程式清單中找不到此應用程式。"</string>
-    <string name="error_shizuku_notfound">"尚未安裝 Shizuku。"</string>
-    <string name="error_shizuku_notrunning">"Shizuku 尚未執行。"</string>
-    <string name="error_shizuku_notpermitted">"尚未授予 Shizuku 權限。"</string>
-    <string name="error_shizuku_unavailable">"無法使用 Shizuku。"</string>
-    <string name="error_create">"無法建立安裝工作階段。"</string>
-    <string name="error_write">"無法複製 APK。"</string>
-    <string name="error_info">"此軟體是 %s 授權下的開放原始碼軟體。"</string>
+    <string name="install_failed">未安裝應用程式。</string>
+    <string name="install_failed_blocked">系統已禁止安裝此套件。</string>
+    <string name="install_failed_aborted">未安裝應用程式，因為安裝已被中止。</string>
+    <string name="install_failed_conflict">未安裝應用程式，因為套件與現有套件衝突。</string>
+    <string name="install_failed_incompatible">未安裝應用程式，因為此應用程式與您的裝置不相容。</string>
+    <string name="install_failed_invalid_apk">未安裝應用程式，因為套件似乎無效。</string>
+    <string name="install_failed_storage">若要安裝此應用程式，請先釋出部分空間，然後再試一次。</string>
+    <string name="install_failed_timeout">未安裝應用程式，因為安裝逾時。</string>
+
+    <string name="error_title">錯誤</string>
+    <string name="error_parse">解析套件時發生問題。</string>
+    <string name="error_split">找不到相符的基礎套件。</string>
+    <string name="error_notfound">在已安裝的應用程式清單中找不到此應用程式。</string>
+    <string name="error_shizuku_notfound">尚未安裝 Shizuku。</string>
+    <string name="error_shizuku_notrunning">Shizuku 尚未執行。</string>
+    <string name="error_shizuku_notpermitted">尚未授予 Shizuku 權限。</string>
+    <string name="error_shizuku_unavailable">無法使用 Shizuku。</string>
+    <string name="error_create">無法建立安裝工作階段。</string>
+    <string name="error_write">無法複製檔案。</string>
+    <string name="error_cancelled">已取消安裝。</string>
+
+    <string name="settings_safe_mode">安全模式會停用部分危險功能，僅在必要時啟用</string>
 </resources>

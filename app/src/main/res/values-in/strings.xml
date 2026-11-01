@@ -3,8 +3,10 @@
 
     <string name="install">Pasang</string>
     <string name="update">Perbarui</string>
-    <string name="archive">Arsipkan</string>
+    <string name="uninstall">Copot pemasangan</string>
+    <string name="clear">Hapus</string>
     <string name="add_more">Tambah lagi</string>
+    <string name="remove_more">Hapus lagi</string>
     <string name="enable">Aktifkan</string>
     <string name="disable">Nonaktifkan</string>
     <string name="done">Selesai</string>
@@ -14,33 +16,44 @@
     <string name="installing">Memasang…</string>
     <string name="parsing">Mengurai…</string>
 
-    <string name="set_installer">Setel pemasang</string>
-    <string name="uninstall_keep_data">Juga copot aplikasi ini tapi simpan data</string>
+    <string name="set_installer">Tetapkan pemasang</string>
+    <string name="only_clear_data">Hanya hapus data</string>
+    <string name="safe_mode">Mode aman</string>
 
     <string name="package_name">"Paket: "</string>
+    <string name="size">"Ukuran: "</string>
     <string name="split_name">"Pisahan: "</string>
     <string name="split_types">"Jenis: "</string>
     <string name="required_split_types">"Diperlukan: "</string>
+    <string name="config_for_split">"Konfigurasi: "</string>
     <string name="version">"Versi: "</string>
     <string name="min_sdk">"Min: "</string>
     <string name="target_sdk">"Target: "</string>
+    <string name="signing_block">"Tanda tangan: "</string>
 
-    <string name="install_confirm_question">Anda ingin memasang aplikasi ini?</string>
-    <string name="install_confirm_question_update">Anda ingin memperbarui aplikasi ini?</string>
-    <string name="install_confirm_question_split">Anda ingin menambahkan paket terpisah ke aplikasi ini?</string>
-    <string name="install_confirm_question_split_remove">Anda ingin menghapus paket terpisah ini?</string>
+    <string name="google_source">Dibuat oleh Google pada %1$s</string>
+    <string name="google_source_play">Dibuat oleh Google pada %1$s, didistribusikan melalui Play Store</string>
 
-    <string name="archive_confirm_question">Anda ingin mengarsipkan paket aplikasi ini?</string>
+    <string name="install_confirm_warn_content">"Konten identik, "</string>
+    <string name="install_confirm_warn_signer">"Tanda tangan berbeda, "</string>
+    <string name="install_confirm_question_warn">apakah Anda benar-benar ingin memperbarui aplikasi ini?</string>
+    <string name="install_confirm_question">Apakah Anda ingin memasang aplikasi ini?</string>
+    <string name="install_confirm_question_update">Apakah Anda ingin memperbarui aplikasi ini?</string>
+    <string name="install_confirm_question_split">Apakah Anda ingin menambahkan paket terpisah ke aplikasi ini?</string>
+    <string name="install_confirm_question_split_remove">Apakah Anda ingin menghapus paket terpisah ini?</string>
+
+    <string name="uninstall_confirm_question">Apakah Anda ingin mencopot pemasangan aplikasi ini?</string>
 
     <string name="install_done">Aplikasi terpasang.</string>
-    <string name="archive_done">"Diarsipkan ke: "</string>
 
     <string name="install_failed">Aplikasi tidak terpasang.</string>
     <string name="install_failed_blocked">Paket diblokir agar tidak dipasang.</string>
+    <string name="install_failed_aborted">Aplikasi tidak dipasang karena pemasangan dibatalkan.</string>
     <string name="install_failed_conflict">Aplikasi tidak dipasang karena paket berkonflik dengan paket yang ada.</string>
     <string name="install_failed_incompatible">Aplikasi tidak dipasang karena tidak kompatibel dengan perangkat Anda.</string>
     <string name="install_failed_invalid_apk">Aplikasi tidak dipasang karena paket tampaknya tidak valid.</string>
-    <string name="install_failed_storage">Kehabisan ruang</string>
+    <string name="install_failed_storage">Untuk memasang aplikasi ini, kosongkan sebagian ruang penyimpanan lalu coba lagi.</string>
+    <string name="install_failed_timeout">Aplikasi tidak dipasang karena pemasangan kehabisan waktu.</string>
 
     <string name="error_title">Kesalahan</string>
     <string name="error_parse">Terjadi masalah saat mengurai paket.</string>
@@ -51,6 +64,8 @@
     <string name="error_shizuku_notpermitted">Shizuku tidak diizinkan.</string>
     <string name="error_shizuku_unavailable">Shizuku tidak tersedia.</string>
     <string name="error_create">Gagal membuat sesi pemasangan.</string>
-    <string name="error_write">Gagal menyalin apk.</string>
-    <string name="error_info">Perangkat lunak ini adalah sumber terbuka di bawah %s.</string>
+    <string name="error_write">Gagal menyalin file.</string>
+    <string name="error_cancelled">Pemasangan dibatalkan.</string>
+
+    <string name="settings_safe_mode">Mode aman menonaktifkan beberapa fitur berbahaya, aktifkan hanya jika diperlukan</string>
 </resources>

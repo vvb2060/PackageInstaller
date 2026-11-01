@@ -3,8 +3,10 @@
 
     <string name="install">Yükle</string>
     <string name="update">Güncelle</string>
-    <string name="archive">Arşivle</string>
+    <string name="uninstall">Kaldır</string>
+    <string name="clear">Temizle</string>
     <string name="add_more">Daha fazla ekle</string>
+    <string name="remove_more">Daha fazla kaldır</string>
     <string name="enable">Etkinleştir</string>
     <string name="disable">Devre dışı bırak</string>
     <string name="done">Bitti</string>
@@ -15,32 +17,43 @@
     <string name="parsing">Ayrıştırılıyor…</string>
 
     <string name="set_installer">Yükleyiciyi ayarla</string>
-    <string name="uninstall_keep_data">Bu uygulamayı da kaldır ancak verileri sakla</string>
+    <string name="only_clear_data">Yalnızca verileri temizle</string>
+    <string name="safe_mode">Güvenli mod</string>
 
     <string name="package_name">"Paket: "</string>
+    <string name="size">"Boyut: "</string>
     <string name="split_name">"Bölünmüş: "</string>
     <string name="split_types">"Türler: "</string>
     <string name="required_split_types">"Gerekli: "</string>
+    <string name="config_for_split">"Yapılandırma: "</string>
     <string name="version">"Sürüm: "</string>
     <string name="min_sdk">"Min: "</string>
     <string name="target_sdk">"Hedef: "</string>
+    <string name="signing_block">"İmza: "</string>
 
+    <string name="google_source">%1$s tarihinde Google tarafından oluşturuldu</string>
+    <string name="google_source_play">%1$s tarihinde Google tarafından oluşturuldu, Play Store üzerinden dağıtıldı</string>
+
+    <string name="install_confirm_warn_content">"İçerik aynı, "</string>
+    <string name="install_confirm_warn_signer">"İmza farklı, "</string>
+    <string name="install_confirm_question_warn">bu uygulamayı gerçekten güncellemek istiyor musunuz?</string>
     <string name="install_confirm_question">Bu uygulamayı yüklemek istiyor musunuz?</string>
     <string name="install_confirm_question_update">Bu uygulamayı güncellemek istiyor musunuz?</string>
     <string name="install_confirm_question_split">Bu uygulamaya bölünmüş paket eklemek istiyor musunuz?</string>
     <string name="install_confirm_question_split_remove">Bu bölünmüş paketi kaldırmak istiyor musunuz?</string>
 
-    <string name="archive_confirm_question">Bu uygulamanın paketini arşivlemek istiyor musunuz?</string>
+    <string name="uninstall_confirm_question">Bu uygulamayı kaldırmak istiyor musunuz?</string>
 
     <string name="install_done">Uygulama yüklendi.</string>
-    <string name="archive_done">"Arşivlendi: "</string>
 
     <string name="install_failed">Uygulama yüklenmedi.</string>
     <string name="install_failed_blocked">Paketin yüklenmesi engellendi.</string>
+    <string name="install_failed_aborted">Yükleme iptal edildiğinden uygulama y��klenmedi.</string>
     <string name="install_failed_conflict">Paket mevcut bir paketle çakıştığı için uygulama yüklenmedi.</string>
     <string name="install_failed_incompatible">Uygulama cihazınızla uyumlu olmadığı için yüklenmedi.</string>
     <string name="install_failed_invalid_apk">Paket geçersiz göründüğü için uygulama yüklenmedi.</string>
-    <string name="install_failed_storage">Yetersiz alan</string>
+    <string name="install_failed_storage">Bu uygulamayı yüklemek için biraz yer açıp tekrar deneyin.</string>
+    <string name="install_failed_timeout">Yükleme zaman aşımına uğradığı için uygulama yüklenmedi.</string>
 
     <string name="error_title">Hata</string>
     <string name="error_parse">Paket ayrıştırılırken bir sorun oluştu.</string>
@@ -51,6 +64,8 @@
     <string name="error_shizuku_notpermitted">Shizuku\'ya izin verilmedi.</string>
     <string name="error_shizuku_unavailable">Shizuku kullanılamıyor.</string>
     <string name="error_create">Yükleme oturumu oluşturulamadı.</string>
-    <string name="error_write">Apk kopyalanamadı.</string>
-    <string name="error_info">Bu yazılım, %s altında açık kaynaklıdır.</string>
+    <string name="error_write">Dosya kopyalanamadı.</string>
+    <string name="error_cancelled">Yükleme iptal edildi.</string>
+
+    <string name="settings_safe_mode">Güvenli mod bazı tehlikeli özellikleri devre dışı bırakır, yalnızca gerektiğinde etkinleştirin</string>
 </resources>

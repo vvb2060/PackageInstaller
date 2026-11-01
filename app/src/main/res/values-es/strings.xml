@@ -3,11 +3,13 @@
 
     <string name="install">Instalar</string>
     <string name="update">Actualizar</string>
-    <string name="archive">Archivar</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="clear">Borrar</string>
     <string name="add_more">Añadir más</string>
-    <string name="enable">Activar</string>
-    <string name="disable">Desactivar</string>
-    <string name="done">Hecho</string>
+    <string name="remove_more">Quitar más</string>
+    <string name="enable">Habilitar</string>
+    <string name="disable">Inhabilitar</string>
+    <string name="done">Listo</string>
     <string name="launch">Abrir</string>
 
     <string name="copying">Copiando…</string>
@@ -15,42 +17,55 @@
     <string name="parsing">Analizando…</string>
 
     <string name="set_installer">Establecer instalador</string>
-    <string name="uninstall_keep_data">También desinstalar esta aplicación pero mantener los datos</string>
+    <string name="only_clear_data">Solo borrar datos</string>
+    <string name="safe_mode">Modo seguro</string>
 
     <string name="package_name">"Paquete: "</string>
+    <string name="size">"Tamaño: "</string>
     <string name="split_name">"División: "</string>
     <string name="split_types">"Tipos: "</string>
     <string name="required_split_types">"Requerido: "</string>
+    <string name="config_for_split">"Configuración: "</string>
     <string name="version">"Versión: "</string>
-    <string name="min_sdk">"Mín: "</string>
+    <string name="min_sdk">"Mín.: "</string>
     <string name="target_sdk">"Objetivo: "</string>
+    <string name="signing_block">"Firma: "</string>
 
+    <string name="google_source">Generado por Google el %1$s</string>
+    <string name="google_source_play">Generado por Google el %1$s, distribuido a través de Play Store</string>
+
+    <string name="install_confirm_warn_content">"El contenido es idéntico, "</string>
+    <string name="install_confirm_warn_signer">"La firma es diferente, "</string>
+    <string name="install_confirm_question_warn">¿realmente quieres actualizar esta aplicación?</string>
     <string name="install_confirm_question">¿Quieres instalar esta aplicación?</string>
     <string name="install_confirm_question_update">¿Quieres actualizar esta aplicación?</string>
     <string name="install_confirm_question_split">¿Quieres añadir un paquete dividido a esta aplicación?</string>
-    <string name="install_confirm_question_split_remove">¿Quieres eliminar este paquete dividido?</string>
+    <string name="install_confirm_question_split_remove">¿Quieres quitar este paquete dividido?</string>
 
-    <string name="archive_confirm_question">¿Quieres archivar el paquete de esta aplicación?</string>
+    <string name="uninstall_confirm_question">¿Quieres desinstalar esta aplicación?</string>
 
-    <string name="install_done">Aplicación instalada.</string>
-    <string name="archive_done">"Archivado en: "</string>
+    <string name="install_done">Se ha instalado la aplicación.</string>
 
-    <string name="install_failed">Aplicación no instalada.</string>
-    <string name="install_failed_blocked">La instalación del paquete fue bloqueada.</string>
-    <string name="install_failed_conflict">Aplicación no instalada porque el paquete entra en conflicto con un paquete existente.</string>
-    <string name="install_failed_incompatible">Aplicación no instalada porque la aplicación no es compatible con tu dispositivo.</string>
-    <string name="install_failed_invalid_apk">Aplicación no instalada porque el paquete parece no ser válido.</string>
-    <string name="install_failed_storage">Sin espacio</string>
+    <string name="install_failed">No se ha instalado la aplicación.</string>
+    <string name="install_failed_blocked">Se ha bloqueado la instalación del paquete.</string>
+    <string name="install_failed_aborted">No se instaló la aplicación porque se canceló la instalación.</string>
+    <string name="install_failed_conflict">No se instaló la aplicación porque el paquete entra en conflicto con un paquete existente.</string>
+    <string name="install_failed_incompatible">No se instaló la aplicación porque no es compatible con tu dispositivo.</string>
+    <string name="install_failed_invalid_apk">No se instaló la aplicación porque el paquete parece no ser válido.</string>
+    <string name="install_failed_storage">Para instalar esta aplicación, libera espacio y vuelve a intentarlo.</string>
+    <string name="install_failed_timeout">No se instaló la aplicación porque se agotó el tiempo de espera de la instalación.</string>
 
     <string name="error_title">Error</string>
-    <string name="error_parse">Hubo un problema al analizar el paquete.</string>
+    <string name="error_parse">Se ha producido un problema al analizar el paquete.</string>
     <string name="error_split">Falta el paquete base correspondiente.</string>
-    <string name="error_notfound">La aplicación no se encontró en la lista de aplicaciones instaladas.</string>
+    <string name="error_notfound">No se encontró la aplicación en la lista de aplicaciones instaladas.</string>
     <string name="error_shizuku_notfound">Shizuku no está instalado.</string>
     <string name="error_shizuku_notrunning">Shizuku no se está ejecutando.</string>
-    <string name="error_shizuku_notpermitted">Shizuku no está permitido.</string>
+    <string name="error_shizuku_notpermitted">Shizuku no tiene permisos.</string>
     <string name="error_shizuku_unavailable">Shizuku no está disponible.</string>
-    <string name="error_create">No se pudo crear una sesión de instalación.</string>
-    <string name="error_write">No se pudo copiar el apk.</string>
-    <string name="error_info">Este software es de código abierto bajo %s.</string>
+    <string name="error_create">No se pudo crear la sesión de instalación.</string>
+    <string name="error_write">No se pudo copiar el archivo.</string>
+    <string name="error_cancelled">Instalación cancelada.</string>
+
+    <string name="settings_safe_mode">El modo seguro inhabilita algunas funciones peligrosas; actívalo solo si es necesario</string>
 </resources>

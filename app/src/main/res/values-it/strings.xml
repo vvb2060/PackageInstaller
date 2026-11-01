@@ -3,11 +3,13 @@
 
     <string name="install">Installa</string>
     <string name="update">Aggiorna</string>
-    <string name="archive">Archivia</string>
+    <string name="uninstall">Disinstalla</string>
+    <string name="clear">Cancella</string>
     <string name="add_more">Aggiungi altro</string>
+    <string name="remove_more">Rimuovi altro</string>
     <string name="enable">Abilita</string>
     <string name="disable">Disabilita</string>
-    <string name="done">Fatto</string>
+    <string name="done">Fine</string>
     <string name="launch">Apri</string>
 
     <string name="copying">Copia in corso…</string>
@@ -15,32 +17,43 @@
     <string name="parsing">Analisi in corso…</string>
 
     <string name="set_installer">Imposta programma di installazione</string>
-    <string name="uninstall_keep_data">Disinstalla anche questa app ma mantieni i dati</string>
+    <string name="only_clear_data">Cancella solo i dati</string>
+    <string name="safe_mode">Modalità provvisoria</string>
 
     <string name="package_name">"Pacchetto: "</string>
+    <string name="size">"Dimensioni: "</string>
     <string name="split_name">"Divisione: "</string>
     <string name="split_types">"Tipi: "</string>
     <string name="required_split_types">"Richiesto: "</string>
+    <string name="config_for_split">"Configurazione: "</string>
     <string name="version">"Versione: "</string>
     <string name="min_sdk">"Min: "</string>
-    <string name="target_sdk">"Obiettivo: "</string>
+    <string name="target_sdk">"Target: "</string>
+    <string name="signing_block">"Firma: "</string>
 
+    <string name="google_source">Generato da Google il %1$s</string>
+    <string name="google_source_play">Generato da Google il %1$s, distribuito tramite il Play Store</string>
+
+    <string name="install_confirm_warn_content">"Il contenuto è identico, "</string>
+    <string name="install_confirm_warn_signer">"La firma è diversa, "</string>
+    <string name="install_confirm_question_warn">vuoi davvero aggiornare questa app?</string>
     <string name="install_confirm_question">Vuoi installare questa app?</string>
     <string name="install_confirm_question_update">Vuoi aggiornare questa app?</string>
     <string name="install_confirm_question_split">Vuoi aggiungere un pacchetto diviso a questa app?</string>
     <string name="install_confirm_question_split_remove">Vuoi rimuovere questo pacchetto diviso?</string>
 
-    <string name="archive_confirm_question">Vuoi archiviare il pacchetto di questa app?</string>
+    <string name="uninstall_confirm_question">Vuoi disinstallare questa app?</string>
 
     <string name="install_done">App installata.</string>
-    <string name="archive_done">"Archiviato in: "</string>
 
     <string name="install_failed">App non installata.</string>
     <string name="install_failed_blocked">L\'installazione del pacchetto è stata bloccata.</string>
+    <string name="install_failed_aborted">App non installata perché l\'installazione è stata interrotta.</string>
     <string name="install_failed_conflict">App non installata perché il pacchetto è in conflitto con un pacchetto esistente.</string>
     <string name="install_failed_incompatible">App non installata perché non è compatibile con il tuo dispositivo.</string>
     <string name="install_failed_invalid_apk">App non installata perché il pacchetto sembra non valido.</string>
-    <string name="install_failed_storage">Spazio esaurito</string>
+    <string name="install_failed_storage">Per installare questa app, libera spazio e riprova.</string>
+    <string name="install_failed_timeout">App non installata perché l\'installazione è scaduta.</string>
 
     <string name="error_title">Errore</string>
     <string name="error_parse">Si è verificato un problema durante l\'analisi del pacchetto.</string>
@@ -50,7 +63,9 @@
     <string name="error_shizuku_notrunning">Shizuku non è in esecuzione.</string>
     <string name="error_shizuku_notpermitted">Shizuku non è consentito.</string>
     <string name="error_shizuku_unavailable">Shizuku non è disponibile.</string>
-    <string name="error_create">Impossibile creare una sessione di installazione.</string>
-    <string name="error_write">Impossibile copiare l\'apk.</string>
-    <string name="error_info">Questo software è open source sotto %s.</string>
+    <string name="error_create">Impossibile creare la sessione di installazione.</string>
+    <string name="error_write">Impossibile copiare il file.</string>
+    <string name="error_cancelled">Installazione annullata.</string>
+
+    <string name="settings_safe_mode">La modalità provvisoria disattiva alcune funzionalità pericolose; attivala solo se necessario</string>
 </resources>

@@ -1,56 +1,71 @@
 <resources>
-    <string name="app_name">"Shizuku インストーラー"</string>
+    <string name="app_name">Shizuku インストーラー</string>
 
-    <string name="install">"インストール"</string>
-    <string name="update">"更新"</string>
-    <string name="archive">アーカイブ</string>
-    <string name="add_more">"追加"</string>
+    <string name="install">インストール</string>
+    <string name="update">更新</string>
+    <string name="uninstall">アンインストール</string>
+    <string name="clear">クリア</string>
+    <string name="add_more">さらに追加</string>
+    <string name="remove_more">さらに削除</string>
     <string name="enable">有効にする</string>
     <string name="disable">無効にする</string>
-    <string name="done">"完了"</string>
-    <string name="launch">"開く"</string>
+    <string name="done">完了</string>
+    <string name="launch">開く</string>
 
-    <string name="copying">"コピー中…"</string>
-    <string name="installing">"インストール中…"</string>
-    <string name="parsing">"解析中…"</string>
+    <string name="copying">コピー中…</string>
+    <string name="installing">インストール中…</string>
+    <string name="parsing">解析中…</string>
 
-    <string name="set_installer">"インストーラーを設定"</string>
-    <string name="uninstall_keep_data">このアプリをアンインストールしますが、データは保持します</string>
+    <string name="set_installer">インストーラーを設定</string>
+    <string name="only_clear_data">データのみ消去</string>
+    <string name="safe_mode">セーフモード</string>
 
     <string name="package_name">"パッケージ: "</string>
-    <string name="split_name">"Split: "</string>
+    <string name="size">"サイズ: "</string>
+    <string name="split_name">"分割: "</string>
     <string name="split_types">"タイプ: "</string>
     <string name="required_split_types">"必須: "</string>
+    <string name="config_for_split">"設定: "</string>
     <string name="version">"バージョン: "</string>
-    <string name="min_sdk">"最小SDK: "</string>
-    <string name="target_sdk">"対象SDK: "</string>
+    <string name="min_sdk">"最小: "</string>
+    <string name="target_sdk">"対象: "</string>
+    <string name="signing_block">"署名: "</string>
 
-    <string name="install_confirm_question">"このアプリをインストールしますか？"</string>
-    <string name="install_confirm_question_update">"このアプリを更新しますか？"</string>
-    <string name="install_confirm_question_split">"このアプリに分割パッケージを追加しますか？"</string>
-    <string name="install_confirm_question_split_remove">"この分割パッケージを削除しますか？"</string>
+    <string name="google_source">%1$s に Google によって生成されました</string>
+    <string name="google_source_play">%1$s に Google によって生成され、Play ストアを通じて配信されました</string>
 
-    <string name="archive_confirm_question">このアプリのパッケージをアーカイブしますか？</string>
+    <string name="install_confirm_warn_content">"内容が同一です、"</string>
+    <string name="install_confirm_warn_signer">"署名が異なります、"</string>
+    <string name="install_confirm_question_warn">本当にこのアプリを更新しますか？</string>
+    <string name="install_confirm_question">このアプリをインストールしますか？</string>
+    <string name="install_confirm_question_update">このアプリを更新しますか？</string>
+    <string name="install_confirm_question_split">このアプリに分割パッケージを追加しますか？</string>
+    <string name="install_confirm_question_split_remove">この分割パッケージを削除しますか？</string>
 
-    <string name="install_done">"アプリはインストールされました。"</string>
-    <string name="archive_done">"アーカイブ先: "</string>
+    <string name="uninstall_confirm_question">このアプリをアンインストールしますか？</string>
 
-    <string name="install_failed">"アプリはインストールされませんでした。"</string>
-    <string name="install_failed_blocked">"パッケージのインストールはブロックされました。"</string>
-    <string name="install_failed_conflict">"既存のパッケージと競合するため、アプリはインストールされませんでした。"</string>
-    <string name="install_failed_incompatible">"お使いのデバイスと互換性がないため、アプリはインストールされませんでした。"</string>
-    <string name="install_failed_invalid_apk">"パッケージが無効なため、アプリはインストールされませんでした。"</string>
-    <string name="install_failed_storage">"空き容量がありません"</string>
+    <string name="install_done">アプリをインストールしました。</string>
 
-    <string name="error_title">"エラー"</string>
-    <string name="error_parse">"パッケージの解析中に問題が発生しました。"</string>
-    <string name="error_split">"一致するベースパッケージが見つかりません。"</string>
-    <string name="error_notfound">"インストール済みのアプリ一覧にこのアプリが見つかりませんでした。"</string>
-    <string name="error_shizuku_notfound">"Shizukuがインストールされていません。"</string>
-    <string name="error_shizuku_notrunning">"Shizukuが実行されていません。"</string>
-    <string name="error_shizuku_notpermitted">"Shizukuが許可されていません。"</string>
-    <string name="error_shizuku_unavailable">"Shizukuは利用できません。"</string>
-    <string name="error_create">"インストールセッションの作成に失敗しました。"</string>
-    <string name="error_write">"APKのコピーに失敗しました。"</string>
-    <string name="error_info">"このソフトウェアは%sの下でオープンソースです。"</string>
+    <string name="install_failed">アプリがインストールされませんでした。</string>
+    <string name="install_failed_blocked">パッケージのインストールはブロックされました。</string>
+    <string name="install_failed_aborted">インストールが中止されたため、アプリはインストールされませんでした。</string>
+    <string name="install_failed_conflict">既存のパッケージと競合するため、アプリはインストールされませんでした。</string>
+    <string name="install_failed_incompatible">お使いのデバイスと互換性がないため、アプリはインストールされませんでした。</string>
+    <string name="install_failed_invalid_apk">パッケージが無効であると思われるため、アプリはインストールされませんでした。</string>
+    <string name="install_failed_storage">このアプリをインストールする���は、空き容量を増やしてからもう一度お試しください。</string>
+    <string name="install_failed_timeout">インストールがタイムアウトしたため、アプリはインストールされませんでした。</string>
+
+    <string name="error_title">エラー</string>
+    <string name="error_parse">パッケージの解析中に問題が発生しました。</string>
+    <string name="error_split">一致する基本パッケージが見つかりません。</string>
+    <string name="error_notfound">インストール済みのアプリ一覧にこのアプリが見つかりませんでした。</string>
+    <string name="error_shizuku_notfound">Shizuku がインストールされていません。</string>
+    <string name="error_shizuku_notrunning">Shizuku が実行されていません。</string>
+    <string name="error_shizuku_notpermitted">Shizuku が許可されていません。</string>
+    <string name="error_shizuku_unavailable">Shizuku を利用できません。</string>
+    <string name="error_create">インストールセッションの作成に失敗しました。</string>
+    <string name="error_write">ファイルのコピーに失敗しました。</string>
+    <string name="error_cancelled">インストールがキャンセルされました。</string>
+
+    <string name="settings_safe_mode">セーフモードでは一部の危険な機能が無効になります。必要な場合にのみ有効にしてください</string>
 </resources>

@@ -3,54 +3,69 @@
 
     <string name="install">설치</string>
     <string name="update">업데이트</string>
-    <string name="archive">아카이브</string>
+    <string name="uninstall">제거</string>
+    <string name="clear">지우기</string>
     <string name="add_more">더 추가</string>
-    <string name="enable">활성화</string>
-    <string name="disable">비활성화</string>
+    <string name="remove_more">더 제거</string>
+    <string name="enable">사용</string>
+    <string name="disable">사용 중지</string>
     <string name="done">완료</string>
     <string name="launch">열기</string>
 
     <string name="copying">복사 중…</string>
     <string name="installing">설치 중…</string>
-    <string name="parsing">파싱 중…</string>
+    <string name="parsing">분석 중…</string>
 
     <string name="set_installer">설치 프로그램 설정</string>
-    <string name="uninstall_keep_data">이 앱도 제거하지만 데이터는 유지</string>
+    <string name="only_clear_data">데이터만 지우기</string>
+    <string name="safe_mode">안전 모드</string>
 
     <string name="package_name">"패키지: "</string>
+    <string name="size">"크기: "</string>
     <string name="split_name">"분할: "</string>
     <string name="split_types">"유형: "</string>
     <string name="required_split_types">"필수: "</string>
+    <string name="config_for_split">"구성: "</string>
     <string name="version">"버전: "</string>
     <string name="min_sdk">"최소: "</string>
     <string name="target_sdk">"대상: "</string>
+    <string name="signing_block">"서명: "</string>
 
+    <string name="google_source">%1$s에 Google에서 생성됨</string>
+    <string name="google_source_play">%1$s에 Google에서 생성되었으며 Play 스토어를 통해 배포됨</string>
+
+    <string name="install_confirm_warn_content">"콘텐츠가 동일합니다, "</string>
+    <string name="install_confirm_warn_signer">"서명이 다릅니다, "</string>
+    <string name="install_confirm_question_warn">이 앱을 정말 업데이트하시겠습니까?</string>
     <string name="install_confirm_question">이 앱을 설치하시겠습니까?</string>
     <string name="install_confirm_question_update">이 앱을 업데이트하시겠습니까?</string>
     <string name="install_confirm_question_split">이 앱에 분할 패키지를 추가하시겠습니까?</string>
     <string name="install_confirm_question_split_remove">이 분할 패키지를 제거하시겠습니까?</string>
 
-    <string name="archive_confirm_question">이 앱의 패키지를 아카이브하시겠습니까?</string>
+    <string name="uninstall_confirm_question">이 앱을 제거하시겠습니까?</string>
 
     <string name="install_done">앱이 설치되었습니다.</string>
-    <string name="archive_done">"아카이브 위치: "</string>
 
     <string name="install_failed">앱이 설치되지 않았습니다.</string>
     <string name="install_failed_blocked">패키지 설치가 차단되었습니다.</string>
+    <string name="install_failed_aborted">설치가 중단되어 앱이 설치되지 않았습니다.</string>
     <string name="install_failed_conflict">기존 패키지와 충돌하여 앱이 설치되지 않았습니다.</string>
     <string name="install_failed_incompatible">앱이 기기와 호환되지 않아 설치되지 않았습니다.</string>
-    <string name="install_failed_invalid_apk">패키지가 잘못된 것 같아 앱이 설치되지 않았습니다.</string>
-    <string name="install_failed_storage">공간 부족</string>
+    <string name="install_failed_invalid_apk">패키지가 유효하지 않아 앱이 설치되지 않았습니다.</string>
+    <string name="install_failed_storage">이 앱을 설치하려면 여유 공간을 확보한 후 다시 시도하세요.</string>
+    <string name="install_failed_timeout">설치 시간이 초과되어 앱이 설치되지 않았습니다.</string>
 
     <string name="error_title">오류</string>
-    <string name="error_parse">패키지를 파싱하는 중에 문제가 발생했습니다.</string>
+    <string name="error_parse">패키지를 분석하는 중에 문제가 발생했습니다.</string>
     <string name="error_split">일치하는 기본 패키지가 없습니다.</string>
     <string name="error_notfound">설치된 앱 목록에서 앱을 찾을 수 없습니다.</string>
     <string name="error_shizuku_notfound">Shizuku가 설치되어 있지 않습니다.</string>
     <string name="error_shizuku_notrunning">Shizuku가 실행되고 있지 않습니다.</string>
-    <string name="error_shizuku_notpermitted">Shizuku가 허용되지 않았습니다.</string>
+    <string name="error_shizuku_notpermitted">Shizuku 권한이 허용되지 않았습니다.</string>
     <string name="error_shizuku_unavailable">Shizuku를 사용할 수 없습니다.</string>
-    <string name="error_create">설치 세션을 만들지 못했습니다.</string>
-    <string name="error_write">apk를 복사하지 못했습니다.</string>
-    <string name="error_info">이 소프트웨어는 %s에 따라 오픈 소스입니다.</string>
+    <string name="error_create">설치 세션을 생성하지 못했습니다.</string>
+    <string name="error_write">파일을 복사하지 못했습니다.</string>
+    <string name="error_cancelled">설치가 취소되었습니다.</string>
+
+    <string name="settings_safe_mode">안전 모드는 일부 위험한 기능을 비활성화합니다. 필요한 경우에만 사용 설정하세요</string>
 </resources>

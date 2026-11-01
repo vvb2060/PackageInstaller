@@ -3,8 +3,10 @@
 
     <string name="install">Installieren</string>
     <string name="update">Aktualisieren</string>
-    <string name="archive">Archivieren</string>
+    <string name="uninstall">Deinstallieren</string>
+    <string name="clear">Löschen</string>
     <string name="add_more">Mehr hinzufügen</string>
+    <string name="remove_more">Mehr entfernen</string>
     <string name="enable">Aktivieren</string>
     <string name="disable">Deaktivieren</string>
     <string name="done">Fertig</string>
@@ -15,32 +17,43 @@
     <string name="parsing">Analysieren…</string>
 
     <string name="set_installer">Installationsprogramm festlegen</string>
-    <string name="uninstall_keep_data">Diese App auch deinstallieren, aber Daten behalten</string>
+    <string name="only_clear_data">Nur Daten löschen</string>
+    <string name="safe_mode">Abgesicherter Modus</string>
 
     <string name="package_name">"Paket: "</string>
+    <string name="size">"Größe: "</string>
     <string name="split_name">"Split: "</string>
     <string name="split_types">"Typen: "</string>
     <string name="required_split_types">"Erforderlich: "</string>
+    <string name="config_for_split">"Konfiguration: "</string>
     <string name="version">"Version: "</string>
     <string name="min_sdk">"Min: "</string>
     <string name="target_sdk">"Ziel: "</string>
+    <string name="signing_block">"Signatur: "</string>
 
+    <string name="google_source">Von Google am %1$s generiert</string>
+    <string name="google_source_play">Von Google am %1$s generiert, über den Play Store vertrieben</string>
+
+    <string name="install_confirm_warn_content">"Inhalt ist identisch, "</string>
+    <string name="install_confirm_warn_signer">"Signatur ist unterschiedlich, "</string>
+    <string name="install_confirm_question_warn">möchten Sie diese App wirklich aktualisieren?</string>
     <string name="install_confirm_question">Möchten Sie diese App installieren?</string>
     <string name="install_confirm_question_update">Möchten Sie diese App aktualisieren?</string>
     <string name="install_confirm_question_split">Möchten Sie dieser App ein Split-Paket hinzufügen?</string>
     <string name="install_confirm_question_split_remove">Möchten Sie dieses Split-Paket entfernen?</string>
 
-    <string name="archive_confirm_question">Möchten Sie das Paket dieser App archivieren?</string>
+    <string name="uninstall_confirm_question">Möchten Sie diese App deinstallieren?</string>
 
     <string name="install_done">App installiert.</string>
-    <string name="archive_done">"Archiviert in: "</string>
 
     <string name="install_failed">App nicht installiert.</string>
     <string name="install_failed_blocked">Die Installation des Pakets wurde blockiert.</string>
+    <string name="install_failed_aborted">App nicht installiert, da die Installation abgebrochen wurde.</string>
     <string name="install_failed_conflict">App nicht installiert, da das Paket mit einem vorhandenen Paket in Konflikt steht.</string>
     <string name="install_failed_incompatible">App nicht installiert, da die App nicht mit Ihrem Gerät kompatibel ist.</string>
     <string name="install_failed_invalid_apk">App nicht installiert, da das Paket ungültig zu sein scheint.</string>
-    <string name="install_failed_storage">Nicht genügend Speicherplatz</string>
+    <string name="install_failed_storage">Geben Sie Speicherplatz frei und versuchen Sie es noch einmal, um diese App zu installieren.</string>
+    <string name="install_failed_timeout">App nicht installiert, da bei der Installation eine Zeitüberschreitung aufgetreten ist.</string>
 
     <string name="error_title">Fehler</string>
     <string name="error_parse">Beim Analysieren des Pakets ist ein Problem aufgetreten.</string>
@@ -48,9 +61,11 @@
     <string name="error_notfound">Die App wurde nicht in der Liste der installierten Apps gefunden.</string>
     <string name="error_shizuku_notfound">Shizuku ist nicht installiert.</string>
     <string name="error_shizuku_notrunning">Shizuku wird nicht ausgeführt.</string>
-    <string name="error_shizuku_notpermitted">Shizuku ist nicht zulässig.</string>
+    <string name="error_shizuku_notpermitted">Shizuku ist nicht autorisiert.</string>
     <string name="error_shizuku_unavailable">Shizuku ist nicht verfügbar.</string>
-    <string name="error_create">Fehler beim Erstellen einer Installationssitzung.</string>
-    <string name="error_write">Fehler beim Kopieren der APK.</string>
-    <string name="error_info">Diese Software ist Open Source unter %s.</string>
+    <string name="error_create">Fehler beim Erstellen der Installationssitzung.</string>
+    <string name="error_write">Fehler beim Kopieren der Datei.</string>
+    <string name="error_cancelled">Installation abgebrochen.</string>
+
+    <string name="settings_safe_mode">Im abgesicherten Modus werden einige riskante Funktionen deaktiviert. Nur bei Bedarf aktivieren</string>
 </resources>

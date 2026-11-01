@@ -3,8 +3,10 @@
 
     <string name="install">Zainstaluj</string>
     <string name="update">Zaktualizuj</string>
-    <string name="archive">Archiwizuj</string>
+    <string name="uninstall">Odinstaluj</string>
+    <string name="clear">Wyczyść</string>
     <string name="add_more">Dodaj więcej</string>
+    <string name="remove_more">Usuń więcej</string>
     <string name="enable">Włącz</string>
     <string name="disable">Wyłącz</string>
     <string name="done">Gotowe</string>
@@ -15,42 +17,55 @@
     <string name="parsing">Analizowanie…</string>
 
     <string name="set_installer">Ustaw instalator</string>
-    <string name="uninstall_keep_data">Również odinstaluj tę aplikację, ale zachowaj dane</string>
+    <string name="only_clear_data">Wyczyść tylko dane</string>
+    <string name="safe_mode">Tryb bezpieczny</string>
 
     <string name="package_name">"Pakiet: "</string>
+    <string name="size">"Rozmiar: "</string>
     <string name="split_name">"Podział: "</string>
     <string name="split_types">"Typy: "</string>
     <string name="required_split_types">"Wymagane: "</string>
+    <string name="config_for_split">"Konfiguracja: "</string>
     <string name="version">"Wersja: "</string>
     <string name="min_sdk">"Min: "</string>
     <string name="target_sdk">"Cel: "</string>
+    <string name="signing_block">"Podpis: "</string>
 
+    <string name="google_source">Wygenerowano przez Google w dniu %1$s</string>
+    <string name="google_source_play">Wygenerowano przez Google w dniu %1$s, dystrybuowane przez sklep Google Play</string>
+
+    <string name="install_confirm_warn_content">"Zawartość jest identyczna, "</string>
+    <string name="install_confirm_warn_signer">"Podpis jest inny, "</string>
+    <string name="install_confirm_question_warn">czy na pewno chcesz zaktualizować tę aplikację?</string>
     <string name="install_confirm_question">Czy chcesz zainstalować tę aplikację?</string>
     <string name="install_confirm_question_update">Czy chcesz zaktualizować tę aplikację?</string>
     <string name="install_confirm_question_split">Czy chcesz dodać podzielony pakiet do tej aplikacji?</string>
     <string name="install_confirm_question_split_remove">Czy chcesz usunąć ten podzielony pakiet?</string>
 
-    <string name="archive_confirm_question">Czy chcesz zarchiwizować pakiet tej aplikacji?</string>
+    <string name="uninstall_confirm_question">Czy chcesz odinstalować tę aplikację?</string>
 
-    <string name="install_done">Aplikacja zainstalowana.</string>
-    <string name="archive_done">"Zarchiwizowano w: "</string>
+    <string name="install_done">Aplikacja została zainstalowana.</string>
 
     <string name="install_failed">Aplikacja nie została zainstalowana.</string>
     <string name="install_failed_blocked">Instalacja pakietu została zablokowana.</string>
+    <string name="install_failed_aborted">Aplikacja nie została zainstalowana, ponieważ instalacja została przerwana.</string>
     <string name="install_failed_conflict">Aplikacja nie została zainstalowana, ponieważ pakiet jest w konflikcie z istniejącym pakietem.</string>
     <string name="install_failed_incompatible">Aplikacja nie została zainstalowana, ponieważ nie jest zgodna z Twoim urządzeniem.</string>
-    <string name="install_failed_invalid_apk">Aplikacja nie została zainstalowana, ponieważ pakiet wydaje się być nieprawidłowy.</string>
-    <string name="install_failed_storage">Brak miejsca</string>
+    <string name="install_failed_invalid_apk">Aplikacja nie została zainstalowana, ponieważ pakiet wydaje się nieprawidłowy.</string>
+    <string name="install_failed_storage">Aby zainstalować tę aplikację, zwolnij trochę miejsca i spróbuj ponownie.</string>
+    <string name="install_failed_timeout">Aplikacja nie została zainstalowana z powodu przekroczenia limitu czasu instalacji.</string>
 
     <string name="error_title">Błąd</string>
     <string name="error_parse">Wystąpił problem podczas analizowania pakietu.</string>
     <string name="error_split">Brak pasującego pakietu podstawowego.</string>
-    <string name="error_notfound">Aplikacji nie znaleziono na liście zainstalowanych aplikacji.</string>
+    <string name="error_notfound">Nie znaleziono aplikacji na liście zainstalowanych aplikacji.</string>
     <string name="error_shizuku_notfound">Shizuku nie jest zainstalowany.</string>
     <string name="error_shizuku_notrunning">Shizuku nie jest uruchomiony.</string>
     <string name="error_shizuku_notpermitted">Shizuku nie ma uprawnień.</string>
     <string name="error_shizuku_unavailable">Shizuku jest niedostępny.</string>
-    <string name="error_create">Nie udało się utworzyć sesji instalacyjnej.</string>
-    <string name="error_write">Nie udało się skopiować pliku apk.</string>
-    <string name="error_info">To oprogramowanie jest oprogramowaniem typu open source na licencji %s.</string>
+    <string name="error_create">Nie udało się utworzyć sesji instalacji.</string>
+    <string name="error_write">Nie udało się skopiować pliku.</string>
+    <string name="error_cancelled">Instalacja została anulowana.</string>
+
+    <string name="settings_safe_mode">Tryb bezpieczny wyłącza niektóre niebezpieczne funkcje, włączaj tylko w razie potrzeby</string>
 </resources>

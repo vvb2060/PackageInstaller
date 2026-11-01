@@ -3,8 +3,10 @@
 
     <string name="install">Instalar</string>
     <string name="update">Atualizar</string>
-    <string name="archive">Arquivar</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="clear">Limpar</string>
     <string name="add_more">Adicionar mais</string>
+    <string name="remove_more">Remover mais</string>
     <string name="enable">Ativar</string>
     <string name="disable">Desativar</string>
     <string name="done">Concluído</string>
@@ -15,42 +17,55 @@
     <string name="parsing">Analisando…</string>
 
     <string name="set_installer">Definir instalador</string>
-    <string name="uninstall_keep_data">Também desinstalar este aplicativo mas manter os dados</string>
+    <string name="only_clear_data">Apenas limpar dados</string>
+    <string name="safe_mode">Modo de segurança</string>
 
     <string name="package_name">"Pacote: "</string>
+    <string name="size">"Tamanho: "</string>
     <string name="split_name">"Divisão: "</string>
     <string name="split_types">"Tipos: "</string>
-    <string name="required_split_types">"Requerido: "</string>
+    <string name="required_split_types">"Necessário: "</string>
+    <string name="config_for_split">"Configuração: "</string>
     <string name="version">"Versão: "</string>
-    <string name="min_sdk">"Mín: "</string>
-    <string name="target_sdk">"Alvo: "</string>
+    <string name="min_sdk">"Mín.: "</string>
+    <string name="target_sdk">"Destino: "</string>
+    <string name="signing_block">"Assinatura: "</string>
 
-    <string name="install_confirm_question">Deseja instalar este aplicativo?</string>
-    <string name="install_confirm_question_update">Deseja atualizar este aplicativo?</string>
-    <string name="install_confirm_question_split">Deseja adicionar um pacote dividido a este aplicativo?</string>
+    <string name="google_source">Gerado pelo Google em %1$s</string>
+    <string name="google_source_play">Gerado pelo Google em %1$s, distribuído pela Play Store</string>
+
+    <string name="install_confirm_warn_content">"O conteúdo é idêntico, "</string>
+    <string name="install_confirm_warn_signer">"A assinatura é diferente, "</string>
+    <string name="install_confirm_question_warn">você realmente deseja atualizar este app?</string>
+    <string name="install_confirm_question">Deseja instalar este app?</string>
+    <string name="install_confirm_question_update">Deseja atualizar este app?</string>
+    <string name="install_confirm_question_split">Deseja adicionar um pacote dividido a este app?</string>
     <string name="install_confirm_question_split_remove">Deseja remover este pacote dividido?</string>
 
-    <string name="archive_confirm_question">Deseja arquivar o pacote deste aplicativo?</string>
+    <string name="uninstall_confirm_question">Deseja desinstalar este app?</string>
 
-    <string name="install_done">Aplicativo instalado.</string>
-    <string name="archive_done">"Arquivado em: "</string>
+    <string name="install_done">App instalado.</string>
 
-    <string name="install_failed">Aplicativo não instalado.</string>
+    <string name="install_failed">O app não foi instalado.</string>
     <string name="install_failed_blocked">A instalação do pacote foi bloqueada.</string>
-    <string name="install_failed_conflict">Aplicativo não instalado pois o pacote conflita com um pacote existente.</string>
-    <string name="install_failed_incompatible">Aplicativo não instalado pois não é compatível com o seu dispositivo.</string>
-    <string name="install_failed_invalid_apk">Aplicativo não instalado pois o pacote parece ser inválido.</string>
-    <string name="install_failed_storage">Sem espaço</string>
+    <string name="install_failed_aborted">O app não foi instalado porque a instalação foi cancelada.</string>
+    <string name="install_failed_conflict">O app não foi instalado porque o pacote está em conflito com um pacote existente.</string>
+    <string name="install_failed_incompatible">O app não foi instalado porque não é compatível com seu dispositivo.</string>
+    <string name="install_failed_invalid_apk">O app não foi instalado porque o pacote parece ser inválido.</string>
+    <string name="install_failed_storage">Para instalar este app, libere espaço e tente novamente.</string>
+    <string name="install_failed_timeout">O app não foi instalado porque o tempo limite da instalação expirou.</string>
 
     <string name="error_title">Erro</string>
     <string name="error_parse">Houve um problema ao analisar o pacote.</string>
-    <string name="error_split">Faltando pacote base correspondente.</string>
-    <string name="error_notfound">O aplicativo não foi encontrado na lista de aplicativos instalados.</string>
+    <string name="error_split">Pacote base correspondente ausente.</string>
+    <string name="error_notfound">O app não foi encontrado na lista de apps instalados.</string>
     <string name="error_shizuku_notfound">O Shizuku não está instalado.</string>
     <string name="error_shizuku_notrunning">O Shizuku não está em execução.</string>
     <string name="error_shizuku_notpermitted">O Shizuku não tem permissão.</string>
     <string name="error_shizuku_unavailable">O Shizuku não está disponível.</string>
-    <string name="error_create">Falha ao criar uma sessão de instalação.</string>
-    <string name="error_write">Falha ao copiar o apk.</string>
-    <string name="error_info">Este software é de código aberto sob %s.</string>
+    <string name="error_create">Falha ao criar a sessão de instalação.</string>
+    <string name="error_write">Falha ao copiar o arquivo.</string>
+    <string name="error_cancelled">Instalação cancelada.</string>
+
+    <string name="settings_safe_mode">O modo de segurança desativa alguns recursos perigosos; ative apenas quando necessário</string>
 </resources>
