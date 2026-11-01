@@ -7,12 +7,12 @@ import io.github.vvb2060.packageinstaller.apk.ApkLite;
 public final class PackageUserAction extends InstallStage {
 
     public final ApkLite apkLite;
-    public final PackageInfo oldApk;
+    public final PackageInfo info;
 
-    public PackageUserAction(ApkLite apkLite, PackageInfo oldApk) {
-        super(STAGE_ARCHIVE);
+    public PackageUserAction(ApkLite apkLite, PackageInfo info) {
+        super(PACKAGE_USER_ACTION);
         this.apkLite = apkLite;
-        this.oldApk = oldApk;
+        this.info = info;
     }
 
 }

@@ -10,11 +10,13 @@ public final class InstallSuccess extends InstallStage {
     public final ApkLite apkLite;
     @Nullable
     public final Intent startIntent;
+    public final boolean safeMode;
 
-    public InstallSuccess(ApkLite apkLite, Intent startIntent) {
+    public InstallSuccess(ApkLite apkLite, Intent startIntent, boolean safeMode) {
         super(STAGE_SUCCESS);
         this.apkLite = apkLite;
         this.startIntent = startIntent;
+        this.safeMode = safeMode;
     }
 
 }

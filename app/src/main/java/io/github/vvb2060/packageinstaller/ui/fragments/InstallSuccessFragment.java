@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.github.vvb2060.packageinstaller.R;
-import io.github.vvb2060.packageinstaller.core.BinderWrapper;
 import io.github.vvb2060.packageinstaller.installmodel.InstallSuccess;
 
 public final class InstallSuccessFragment extends BaseDialogFragment {
@@ -33,11 +32,10 @@ public final class InstallSuccessFragment extends BaseDialogFragment {
             .setTitle(mDialogData.apkLite.getLabel())
             .setIcon(mDialogData.apkLite.getIcon())
             .setMessage(message)
-            .setNegativeButton(R.string.done,
-                (dialog, which) -> cleanAndFinish())
-            .setPositiveButton(R.string.launch, (dialog, which) -> {
-                cleanAndFinish();
-                BinderWrapper.startActivity(mDialogData.startIntent);
+            .setNegativeButton(R.string.done, (_, _) -> finish())
+            .setPositiveButton(R.string.launch, (_, _) -> {
+                startActivitySafe(mDialogData.startIntent, mDialogData.safeMode);
+                finish();
             })
             .create();
         return mDialog;

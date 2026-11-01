@@ -18,6 +18,7 @@
 
     <string name="set_installer">Set installer</string>
     <string name="only_clear_data">Only clear data</string>
+    <string name="safe_mode">Safe mode</string>
 
     <string name="package_name">"Package: "</string>
     <string name="size">"Size: "</string>
@@ -46,7 +47,6 @@
     <string name="install_done">App installed.</string>
 
     <string name="install_failed">App not installed.</string>
-    <string name="install_failed_user_action">App not installed as user action was required.</string>
     <string name="install_failed_blocked">The package was blocked from being installed.</string>
     <string name="install_failed_aborted">App not installed as installation was aborted.</string>
     <string name="install_failed_conflict">App not installed as package conflicts with an existing package.</string>
@@ -66,5 +66,6 @@
     <string name="error_create">Failed to create install session.</string>
     <string name="error_write">Failed to copy file.</string>
     <string name="error_cancelled">Installation cancelled.</string>
-    <string name="error_info">This software is open source under %s.</string>
+
+    <string name="settings_safe_mode">Safe mode disables some dangerous features, enable only when necessary</string>
 </resources>

@@ -6,8 +6,8 @@ import android.os.StrictMode;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentFactory;
@@ -23,6 +23,7 @@ import io.github.vvb2060.packageinstaller.installmodel.InstallStage;
 import io.github.vvb2060.packageinstaller.installmodel.InstallSuccess;
 import io.github.vvb2060.packageinstaller.installmodel.InstallUserAction;
 import io.github.vvb2060.packageinstaller.installmodel.PackageUserAction;
+import io.github.vvb2060.packageinstaller.installmodel.SettingsUserAction;
 import io.github.vvb2060.packageinstaller.ui.fragments.BaseDialogFragment;
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallConfirmationFragment;
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallErrorFragment;
@@ -30,6 +31,7 @@ import io.github.vvb2060.packageinstaller.ui.fragments.InstallFailedFragment;
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallInstallingFragment;
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallParseFragment;
 import io.github.vvb2060.packageinstaller.ui.fragments.InstallSuccessFragment;
+import io.github.vvb2060.packageinstaller.ui.fragments.SettingsFragment;
 import io.github.vvb2060.packageinstaller.ui.fragments.UninstallConfirmationFragment;
 import io.github.vvb2060.packageinstaller.viewmodel.InstallViewModel;
 
@@ -48,19 +50,12 @@ public class InstallLaunch extends FragmentActivity {
         fragmentManager = getSupportFragmentManager();
         installViewModel = new ViewModelProvider(this).get(InstallViewModel.class);
         fragmentManager.setFragmentFactory(new FragmentFactory() {
+            @NonNull
             @Override
-            public Fragment instantiate(ClassLoader classLoader, String className) {
-                try {
-                    var fragmentClass = loadFragmentClass(classLoader, className);
-                    var constructor = fragmentClass.getConstructors()[0];
-                    if (constructor.getParameterCount() == 1) {
-                        var stage = installViewModel.getCurrentInstallStage().getValue();
-                        return (Fragment) constructor.newInstance(stage);
-                    }
-                    return (Fragment) constructor.newInstance();
-                } catch (ReflectiveOperationException e) {
-                    throw new Fragment.InstantiationException(className, e);
-                }
+            public Fragment instantiate(@NonNull ClassLoader classLoader, @NonNull String className) {
+                var stage = installViewModel.getCurrentInstallStage().getValue();
+                assert stage != null;
+                return stageToFragment(stage);
             }
         });
 
@@ -70,43 +65,38 @@ public class InstallLaunch extends FragmentActivity {
             StrictMode.enableDefaults();
         }
 
-        if (savedInstanceState == null) {
+        var currentInstallStage = installViewModel.getCurrentInstallStage();
+        var stage = currentInstallStage.getValue();
+        assert stage != null;
+        if (stage.stageCode == InstallStage.STAGE_PARSE) {
             installViewModel.preprocessIntent(getIntent());
         }
-        installViewModel.getCurrentInstallStage().observe(this, this::onInstallStageChange);
+
+        currentInstallStage.observe(this, installStage ->
+            show(stageToFragment(installStage)));
     }
 
-    private void onInstallStageChange(InstallStage installStage) {
-        switch (installStage) {
-            case InstallAborted aborted -> {
-                if (aborted.abortReason == InstallAborted.ABORT_CLOSE) {
-                    show(null);
-                    finishAndRemoveTask();
-                } else {
-                    show(new InstallErrorFragment(aborted));
-                }
-            }
-            case InstallParse parse -> show(new InstallParseFragment(parse));
-            case InstallUserAction action -> show(new InstallConfirmationFragment(action));
-            case PackageUserAction action -> show(new UninstallConfirmationFragment(action));
-            case InstallInstalling installing -> show(new InstallInstallingFragment(installing));
-            case InstallSuccess success -> show(new InstallSuccessFragment(success));
-            case InstallFailed failed -> show(new InstallFailedFragment(failed));
-        }
+    private static BaseDialogFragment stageToFragment(InstallStage installStage) {
+        return switch (installStage) {
+            case InstallAborted aborted -> new InstallErrorFragment(aborted);
+            case InstallParse parse -> new InstallParseFragment(parse);
+            case InstallUserAction action -> new InstallConfirmationFragment(action);
+            case PackageUserAction action -> new UninstallConfirmationFragment(action);
+            case SettingsUserAction action -> new SettingsFragment(action);
+            case InstallInstalling installing -> new InstallInstallingFragment(installing);
+            case InstallSuccess success -> new InstallSuccessFragment(success);
+            case InstallFailed failed -> new InstallFailedFragment(failed);
+        };
     }
 
-    private void show(@Nullable DialogFragment newDialog) {
-        var currentDialog = (DialogFragment) fragmentManager.findFragmentByTag("dialog");
-        if (currentDialog instanceof BaseDialogFragment current &&
-            newDialog instanceof BaseDialogFragment next &&
-            current.mDialogData.stageCode == next.mDialogData.stageCode) {
-            return;
-        }
+    private void show(BaseDialogFragment newDialog) {
+        var currentDialog = (BaseDialogFragment) fragmentManager.findFragmentByTag("dialog");
         if (currentDialog != null) {
+            if (currentDialog.stageCode == newDialog.stageCode) {
+                return;
+            }
             currentDialog.dismissAllowingStateLoss();
         }
-        if (newDialog != null) {
-            newDialog.show(fragmentManager, "dialog");
-        }
+        newDialog.show(fragmentManager, "dialog");
     }
 }

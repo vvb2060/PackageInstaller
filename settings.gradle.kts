@@ -13,7 +13,7 @@ pluginManagement {
         gradlePluginPortal()
     }
     plugins {
-        val agp = "9.4.1"
+        val agp = "9.5.0"
         id("com.android.application") version agp
         id("com.android.library") version agp
         id("com.android.settings") version agp

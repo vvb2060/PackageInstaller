@@ -2,7 +2,6 @@ package io.github.vvb2060.packageinstaller.ui.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,68 +24,62 @@ public final class InstallErrorFragment extends BaseDialogFragment {
         mAborted = aborted;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (mAborted.abortReason == InstallAborted.ABORT_CLOSE) {
+            finish();
+        }
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         var code = mAborted.abortReason;
         var context = requireContext();
-        return new AlertDialog.Builder(requireContext())
-            .setTitle(code == InstallAborted.ABORT_INFO ? R.string.app_name : R.string.error_title)
+        return new AlertDialog.Builder(context)
+            .setTitle(R.string.error_title)
             .setIcon(R.drawable.ic_app_icon)
             .setMessage(getErrorMessage(context, code))
-            .setPositiveButton(android.R.string.ok,
-                (dialog, which) -> {
-                    cleanAndFinish();
-                    if (code == InstallAborted.ABORT_SHIZUKU) {
-                        checkShizuku(context);
-                    }
-                })
+            .setPositiveButton(android.R.string.ok, (_, _) -> {
+                if (code == InstallAborted.ABORT_SHIZUKU) {
+                    checkShizuku();
+                }
+                finish();
+            })
             .create();
     }
 
-    private void checkShizuku(Context context) {
+    private void checkShizuku() {
         if (Shizuku.pingBinder()) {
             Shizuku.requestPermission(1);
             return;
         }
         var intent = mAborted.intent;
         if (intent == null) {
-            Uri web = Uri.parse(context.getString(R.string.shizuku_url));
+            var web = Uri.parse("https://github.com/RikkaApps/Shizuku");
             intent = new Intent(Intent.ACTION_VIEW, web);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
-        startActivitySafe(intent);
-    }
-
-    private void startActivitySafe(Intent intent) {
-        try {
-            requireActivity().startActivity(intent);
-        } catch (ActivityNotFoundException | SecurityException _) {
-        }
+        startActivitySafe(intent, false);
     }
 
     private String getErrorMessage(Context context, int code) {
         if (mViewModel.isCancelled()) {
             return context.getString(R.string.error_cancelled);
         }
-        switch (code) {
-            case InstallAborted.ABORT_SHIZUKU -> {
-                if (!Shizuku.pingBinder()) {
-                    if (mAborted.intent == null) {
-                        return context.getString(R.string.error_shizuku_notfound);
-                    } else {
-                        return context.getString(R.string.error_shizuku_notrunning);
-                    }
-                }
-                if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-                    return context.getString(R.string.error_shizuku_notpermitted);
+        if (code == InstallAborted.ABORT_SHIZUKU) {
+            if (!Shizuku.pingBinder()) {
+                if (mAborted.intent == null) {
+                    return context.getString(R.string.error_shizuku_notfound);
                 } else {
-                    return context.getString(R.string.error_shizuku_unavailable);
+                    return context.getString(R.string.error_shizuku_notrunning);
                 }
             }
-            case InstallAborted.ABORT_INFO -> {
-                return getString(R.string.error_info,
-                    context.getString(R.string.license)) + "\n\n" +
-                    context.getString(R.string.copyright);
+            if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+                return context.getString(R.string.error_shizuku_notpermitted);
+            } else {
+                return context.getString(R.string.error_shizuku_unavailable);
             }
         }
         var id = switch (code) {

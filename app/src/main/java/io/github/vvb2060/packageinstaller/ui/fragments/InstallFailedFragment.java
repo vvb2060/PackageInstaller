@@ -27,13 +27,12 @@ public final class InstallFailedFragment extends BaseDialogFragment {
             .setTitle(mDialogData.apkLite.getLabel())
             .setIcon(mDialogData.apkLite.getIcon())
             .setMessage(getExplanation())
-            .setPositiveButton(R.string.done, (dialogInt, which) -> cleanAndFinish())
+            .setPositiveButton(R.string.done, (_, _) -> finish())
             .create();
     }
 
     private String getExplanation() {
         int res = switch (mDialogData.statusCode) {
-            case PackageInstaller.STATUS_PENDING_USER_ACTION -> R.string.install_failed_user_action;
             case PackageInstaller.STATUS_FAILURE_BLOCKED -> R.string.install_failed_blocked;
             case PackageInstaller.STATUS_FAILURE_ABORTED -> R.string.install_failed_aborted;
             case PackageInstaller.STATUS_FAILURE_INVALID -> R.string.install_failed_invalid_apk;

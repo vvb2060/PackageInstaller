@@ -1,5 +1,6 @@
 package io.github.vvb2060.packageinstaller.core;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -45,10 +46,16 @@ public class PreferredActivity {
             .setDataAndType(uri, PACKAGE_MIME_TYPE);
     }
 
-    public static String getSystemInstaller(PackageManager pm) {
+    private static String getSystemInstaller(PackageManager pm) {
         var intent = makeIntent(Intent.ACTION_INSTALL_PACKAGE);
         var matches = pm.queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY);
         return matches.get(0).activityInfo.packageName;
+    }
+
+    public static boolean needSafeMode(PackageManager pm) {
+        var packageName = getSystemInstaller(pm);
+        return pm.checkPermission(Manifest.permission.INTERNET, packageName)
+            == PackageManager.PERMISSION_GRANTED;
     }
 
     private static boolean check(PackageManager pm, String action) {

@@ -51,7 +51,7 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
         mTextView = dialogView.requireViewById(R.id.message);
         mCheckBox = dialogView.requireViewById(R.id.checkbox);
-        if (!mDialogData.skipCreate) {
+        if (mDialogData.setInstaller) {
             mCheckBox.setText(R.string.set_installer);
             mCheckBox.setVisibility(View.VISIBLE);
         }
@@ -77,14 +77,11 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
             .setIcon(mDialogData.apkLite.getIcon())
             .setTitle(mDialogData.apkLite.getLabel())
             .setView(dialogView)
-            .setPositiveButton(old != null ? R.string.update : R.string.install,
-                (dialogInt, which) ->
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), true, full, remove))
-            .setNegativeButton(android.R.string.cancel,
-                (dialogInt, which) -> cleanAndFinish())
-            .setNeutralButton(remove ? R.string.remove_more : R.string.add_more,
-                (dialogInt, which) ->
-                    mViewModel.initiateInstall(mCheckBox.isChecked(), false, full, remove))
+            .setPositiveButton(old != null ? R.string.update : R.string.install, (_, _) ->
+                mViewModel.initiateInstall(mCheckBox.isChecked(), true, full, remove))
+            .setNegativeButton(android.R.string.cancel, (_, _) -> finish())
+            .setNeutralButton(remove ? R.string.remove_more : R.string.add_more, (_, _) ->
+                mViewModel.initiateInstall(mCheckBox.isChecked(), false, full, remove))
             .create();
         mDialog.setCanceledOnTouchOutside(false);
         return mDialog;
@@ -251,7 +248,7 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
             var flags = old.applicationInfo.flags;
             var system = (flags & ApplicationInfo.FLAG_SYSTEM) != 0;
             var installed = (flags & ApplicationInfo.FLAG_INSTALLED) != 0;
-            if (system && needDefault) {
+            if (mDialogData.setInstaller && system && needDefault) {
                 mCheckBox.setChecked(true);
             }
             if (installed) {

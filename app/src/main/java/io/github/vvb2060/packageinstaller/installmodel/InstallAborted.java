@@ -13,7 +13,6 @@ public final class InstallAborted extends InstallStage {
     public static final int ABORT_NOTFOUND = 4;
     public static final int ABORT_CREATE = 5;
     public static final int ABORT_WRITE = 6;
-    public static final int ABORT_INFO = 7;
 
     public final int abortReason;
     @Nullable
@@ -22,17 +21,23 @@ public final class InstallAborted extends InstallStage {
     public final Intent intent;
 
     public InstallAborted(int abortReason) {
-        this(abortReason, null, null);
+        super(STAGE_ABORTED);
+        this.abortReason = abortReason;
+        this.message = null;
+        this.intent = null;
     }
 
     public InstallAborted(int abortReason, String message) {
-        this(abortReason, message, null);
-    }
-
-    public InstallAborted(int abortReason, String message, Intent intent) {
         super(STAGE_ABORTED);
         this.abortReason = abortReason;
         this.message = message;
+        this.intent = null;
+    }
+
+    public InstallAborted(int abortReason, Intent intent) {
+        super(STAGE_ABORTED);
+        this.abortReason = abortReason;
+        this.message = null;
         this.intent = intent;
     }
 

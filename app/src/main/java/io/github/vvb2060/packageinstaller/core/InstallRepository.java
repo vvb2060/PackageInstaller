@@ -1,8 +1,7 @@
 package io.github.vvb2060.packageinstaller.core;
 
-import android.Manifest;
-import android.app.Application;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Intent_rename;
 import android.content.pm.ApplicationInfo;
@@ -13,13 +12,13 @@ import android.content.pm.PackageInstaller.SessionParams;
 import android.content.pm.PackageInstaller_rename;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager_rename;
-import android.content.pm.VersionedPackage;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
 import android.provider.OpenableColumns;
+import android.system.Os;
 import android.util.Log;
 
 import androidx.core.graphics.drawable.DrawableKt;
@@ -43,59 +42,47 @@ import io.github.vvb2060.packageinstaller.datamodel.NetDataSource;
 import io.github.vvb2060.packageinstaller.installmodel.InstallAborted;
 import io.github.vvb2060.packageinstaller.installmodel.InstallFailed;
 import io.github.vvb2060.packageinstaller.installmodel.InstallInstalling;
-import io.github.vvb2060.packageinstaller.installmodel.InstallParse;
 import io.github.vvb2060.packageinstaller.installmodel.InstallStage;
 import io.github.vvb2060.packageinstaller.installmodel.InstallSuccess;
 import io.github.vvb2060.packageinstaller.installmodel.InstallUserAction;
 import io.github.vvb2060.packageinstaller.installmodel.PackageUserAction;
-import io.github.vvb2060.packageinstaller.provider.ShizukuProvider;
+import io.github.vvb2060.packageinstaller.installmodel.SettingsUserAction;
 import rikka.shizuku.Shizuku;
 
-public class InstallRepository {
+public class InstallRepository implements Closeable {
     private static final String TAG = InstallRepository.class.getSimpleName();
 
-    public final MutableLiveData<InstallStage> installResult = new MutableLiveData<>();
-    public final MutableLiveData<Integer> stagingProgress = new MutableLiveData<>();
-    private final Application context;
-    private PackageManager packageManager;
-    private PackageInstaller packageInstaller;
+    private final MutableLiveData<InstallStage> installResult;
+    private final MutableLiveData<Integer> stagingProgress;
+    private final ContentResolver contentResolver;
+    private final PackageManager packageManager;
+    private final PackageInstaller packageInstaller;
+    private final boolean safeMode;
     private int sessionId = SessionInfo.INVALID_ID;
     private int callingUid = Process.INVALID_UID;
-    private Intent intent;
     private ApkLite apkLite;
     private ZipParser zipParser;
     private Closeable closeable;
 
-    public InstallRepository(Application context) {
-        this.context = context;
-    }
-
-    public boolean preCheck(Intent intent) {
-        ShizukuProvider.waitForBinder(context);
-        if (!Shizuku.pingBinder()
-            || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
-            || Shizuku.checkRemotePermission(Manifest.permission.INSTALL_PACKAGES)
-            != PackageManager.PERMISSION_GRANTED) {
-            installResult.postValue(new InstallAborted(InstallAborted.ABORT_SHIZUKU, null,
-                context.getPackageManager().getLaunchIntentForPackage(
-                    rikka.shizuku.ShizukuProvider.MANAGER_APPLICATION_ID)));
-            return false;
-        }
-
-        this.intent = intent;
-        Log.v(TAG, "Intent: " + intent);
-
-        BinderWrapper.init(context);
+    public InstallRepository(Context context, boolean safeMode,
+                             MutableLiveData<InstallStage> installResult,
+                             MutableLiveData<Integer> stagingProgress) {
+        contentResolver = context.getContentResolver();
         packageManager = context.getPackageManager();
-        packageInstaller = BinderWrapper.installer;
-        BinderWrapper.disableAdbVerify(context);
-        PreferredActivity.set(packageManager);
-
-        installResult.postValue(new InstallParse());
-        return true;
+        if (safeMode) {
+            packageInstaller = packageManager.getPackageInstaller();
+        } else {
+            packageInstaller = BinderWrapper.installer;
+        }
+        this.safeMode = safeMode;
+        this.installResult = installResult;
+        this.stagingProgress = stagingProgress;
     }
 
-    public void parseUri() {
+    public void parseUri(Intent intent) {
+        Log.v(TAG, "Intent: " + intent);
+        callingUid = intent.getIntExtra(Intent_rename.EXTRA_ORIGINATING_UID, Process.INVALID_UID);
+
         var uri = intent.getData();
         if (uri == null) {
             uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -133,7 +120,7 @@ public class InstallRepository {
             installResult.postValue(processUrl(url));
             return;
         }
-        installResult.postValue(new InstallAborted(InstallAborted.ABORT_INFO));
+        installResult.postValue(new SettingsUserAction(safeMode));
     }
 
     public void install(boolean setInstaller, boolean commit, boolean full, boolean removeSplit) {
@@ -145,8 +132,8 @@ public class InstallRepository {
 
         if (sessionId == SessionInfo.INVALID_ID) {
             try {
-                var params = createSessionParams(setInstaller, full);
                 BinderWrapper.disableVerificationForUid();
+                var params = createSessionParams(!safeMode && setInstaller, full);
                 sessionId = packageInstaller.createSession(params);
             } catch (IOException | RuntimeException e) {
                 Log.e(TAG, "Failed to create a new session", e);
@@ -157,7 +144,7 @@ public class InstallRepository {
         }
 
         try (var session = packageInstaller.openSession(sessionId)) {
-            BinderWrapper.wrap(session);
+            if (!safeMode) BinderWrapper.wrap(session);
             if (removeSplit) {
                 session.removeSplit(apkLite.splitName);
             } else {
@@ -169,10 +156,10 @@ public class InstallRepository {
             if (commit) {
                 commit(session);
             } else {
+                sessionId = SessionInfo.INVALID_ID;
                 installResult.postValue(new InstallAborted(InstallAborted.ABORT_CLOSE));
             }
         } catch (IOException | RuntimeException e) {
-            cleanup();
             Log.e(TAG, "Could not write APK.", e);
             var aborted = new InstallAborted(InstallAborted.ABORT_WRITE, e.toString());
             installResult.postValue(aborted);
@@ -187,7 +174,6 @@ public class InstallRepository {
             // noinspection RequestInstallPackagesPolicy
             session.commit(receiver.getIntentSender());
         } catch (RuntimeException e) {
-            cleanup();
             Log.e(TAG, "Failed to commit session", e);
             setStageBasedOnResult(PackageInstaller.STATUS_FAILURE,
                 PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR, e.toString());
@@ -219,15 +205,10 @@ public class InstallRepository {
 
     private InstallStage processContentUri(Uri uri) {
         Log.v(TAG, "URI: " + uri);
-        var provider = packageManager.resolveContentProvider(uri.getAuthority(), 0);
-        if (provider != null) {
-            callingUid = provider.applicationInfo.uid;
-        }
-        var cr = context.getContentResolver();
 
         ApkLite parsedApk;
         try {
-            var afd = cr.openAssetFileDescriptor(uri, "r");
+            var afd = contentResolver.openAssetFileDescriptor(uri, "r");
             if (afd == null) throw new IOException("Failed to open uri");
             closeable = afd;
             var dataSource = FileDataSource.asDataSource(afd);
@@ -238,9 +219,14 @@ public class InstallRepository {
             return new InstallAborted(InstallAborted.ABORT_PARSE, e.toString());
         }
 
+        if (callingUid == Process.INVALID_UID) {
+            var provider = packageManager.resolveContentProvider(uri.getAuthority(), 0);
+            callingUid = provider.applicationInfo.uid;
+        }
+
         var stage = processApkLite(parsedApk);
         if (parsedApk.label == null) {
-            try (var cursor = cr.query(uri, null, null, null, null)) {
+            try (var cursor = contentResolver.query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     var displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                     if (displayNameIndex != -1) {
@@ -294,8 +280,8 @@ public class InstallRepository {
         }
 
         apkLite = apk;
-        var skipCreate = sessionId != SessionInfo.INVALID_ID;
-        return new InstallUserAction(apk, old, full, skipCreate);
+        var setInstaller = !safeMode && sessionId == SessionInfo.INVALID_ID;
+        return new InstallUserAction(apk, old, full, setInstaller);
     }
 
     private boolean findBaseSessionId(ApkLite apk) {
@@ -305,12 +291,15 @@ public class InstallRepository {
             var item = allSessions.get(i);
             if (!apk.packageName.equals(item.getAppPackageName())) continue;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                var uid = safeMode ? Os.getuid() : Shizuku.getUid();
                 // noinspection NewApi
-                if (item.getInstallerUid() != Shizuku.getUid()) continue;
+                if (item.getInstallerUid() != uid) continue;
             }
             if (item.getInstallReason() != PackageManager.INSTALL_REASON_USER) continue;
             var rename = (PackageInstaller_rename.SessionInfo) (Object) item;
-            if ((rename.installFlags & PackageManager_rename.INSTALL_FROM_ADB) == 0) continue;
+            if (!safeMode && (rename.installFlags & PackageManager_rename.INSTALL_FROM_ADB) == 0) {
+                continue;
+            }
 
             var id = item.getSessionId();
             full = item.getMode() == SessionParams.MODE_FULL_INSTALL;
@@ -322,7 +311,7 @@ public class InstallRepository {
             rename = (PackageInstaller_rename.SessionInfo) (Object) fullInfo;
             var appIcon = rename.appIcon;
             if (appIcon != null) {
-                apk.icon = new BitmapDrawable(context.getResources(), appIcon);
+                apk.icon = new BitmapDrawable(appIcon);
             }
             sessionId = id;
             break;
@@ -384,10 +373,7 @@ public class InstallRepository {
                     ? PackageInstaller.PACKAGE_SOURCE_DOWNLOADED_FILE
                     : PackageInstaller.PACKAGE_SOURCE_LOCAL_FILE);
             }
-            Uri referrerUri = intent.getParcelableExtra(Intent.EXTRA_REFERRER);
-            params.setReferrerUri(referrerUri);
-            params.setOriginatingUri(intent.getParcelableExtra(Intent.EXTRA_ORIGINATING_URI));
-            params.setOriginatingUid(intent.getIntExtra(Intent_rename.EXTRA_ORIGINATING_UID, callingUid));
+            params.setOriginatingUid(callingUid);
             installer = BuildConfig.APPLICATION_ID;
         }
         // noinspection NewApi
@@ -424,7 +410,7 @@ public class InstallRepository {
                 apkLite.label = info.applicationInfo.loadLabel(packageManager).toString();
             } catch (PackageManager.NameNotFoundException ignored) {
             }
-            installResult.postValue(new InstallSuccess(apkLite, startIntent));
+            installResult.postValue(new InstallSuccess(apkLite, startIntent, safeMode));
         } else if (statusCode == PackageInstaller.STATUS_PENDING_USER_ACTION) {
             BinderWrapper.setPermissionsResult(sessionId);
         } else {
@@ -435,7 +421,8 @@ public class InstallRepository {
         }
     }
 
-    public void cleanup() {
+    @Override
+    public void close() {
         if (sessionId != SessionInfo.INVALID_ID) {
             try {
                 packageInstaller.abandonSession(sessionId);

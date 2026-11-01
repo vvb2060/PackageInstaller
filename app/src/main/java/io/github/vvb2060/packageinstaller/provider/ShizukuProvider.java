@@ -74,7 +74,7 @@ public class ShizukuProvider extends ContentProvider {
 
     @SuppressLint("RestrictedApi")
     public static void waitForBinder(Context context) {
-        if (Sui.isSui()) return;
+        if (Shizuku.pingBinder()) return;
 
         var latch = new CountDownLatch(1);
         var receiver = new Binder() {

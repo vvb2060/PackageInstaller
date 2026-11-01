@@ -47,19 +47,18 @@ public final class UninstallConfirmationFragment extends BaseDialogFragment {
             .setTitle(apk.getLabel())
             .setIcon(apk.getIcon())
             .setView(dialogView)
-            .setNegativeButton(android.R.string.cancel, (dialog, which) ->
-                requireActivity().finishAndRemoveTask())
-            .setPositiveButton(R.string.uninstall, (dialog, which) -> {
-                requireActivity().finishAndRemoveTask();
+            .setNegativeButton(android.R.string.cancel, (_, _) -> finish())
+            .setPositiveButton(R.string.uninstall, (_, _) -> {
                 if (checkBox.isChecked()) {
                     BinderWrapper.clearApplicationUserData(apk.packageName);
                 } else {
                     BinderWrapper.uninstallPackage(mDialogData.info);
                 }
+                finish();
             })
-            .setNeutralButton(text, (dialog, which) -> {
-                requireActivity().finishAndRemoveTask();
+            .setNeutralButton(text, (_, _) -> {
                 BinderWrapper.setPackageEnabled(apk.packageName, !enabled);
+                finish();
             })
             .create();
         return mDialog;

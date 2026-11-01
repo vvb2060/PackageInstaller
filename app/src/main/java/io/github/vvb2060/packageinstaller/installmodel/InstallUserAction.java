@@ -12,23 +12,23 @@ public final class InstallUserAction extends InstallStage {
     @Nullable
     public final PackageInfo oldApk;
     public final boolean fullInstall;
-    public final boolean skipCreate;
+    public final boolean setInstaller;
 
     public InstallUserAction(ApkLite apkLite, PackageInfo oldApk) {
-        this(apkLite, oldApk, true, true);
+        this(apkLite, oldApk, true, false);
     }
 
     public InstallUserAction(
         ApkLite apkLite,
         PackageInfo oldApk,
         boolean fullInstall,
-        boolean skipCreate
+        boolean setInstaller
     ) {
         super(STAGE_USER_ACTION);
         this.apkLite = apkLite;
         this.oldApk = oldApk;
         this.fullInstall = fullInstall;
-        this.skipCreate = skipCreate;
+        this.setInstaller = setInstaller;
     }
 
 }
