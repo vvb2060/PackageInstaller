@@ -16,7 +16,7 @@ android {
     enableKotlin = false
     namespace = "io.github.vvb2060.packageinstaller"
     defaultConfig {
-        versionCode = 12
+        versionCode = 14
         versionName = "2.0"
     }
     buildTypes {
