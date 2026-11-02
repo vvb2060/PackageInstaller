@@ -163,13 +163,13 @@ public class BinderWrapper {
         }
     }
 
-    public static PackageInfo getPackageInfo(String packageName)
+    public static PackageInfo getPackageInfo(String packageName, int flags)
         throws PackageManager.NameNotFoundException {
         var matchAll = PackageManager_rename.MATCH_KNOWN_PACKAGES
             | PackageManager_rename.MATCH_HIDDEN_UNTIL_INSTALLED_COMPONENTS
             | PackageManager_rename.MATCH_STATIC_SHARED_AND_SDK_LIBRARIES;
         var pkg = new VersionedPackage(packageName, PackageManager.VERSION_CODE_HIGHEST);
-        return pm.getPackageInfo(pkg, matchAll);
+        return pm.getPackageInfo(pkg, flags | matchAll);
     }
 
     public static void uninstallPackage(PackageInfo info) {

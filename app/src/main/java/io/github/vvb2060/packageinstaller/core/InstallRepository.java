@@ -241,7 +241,7 @@ public class InstallRepository implements Closeable {
     private InstallStage processApkLite(ApkLite apk) {
         PackageInfo old;
         try {
-            old = BinderWrapper.getPackageInfo(apk.packageName);
+            old = BinderWrapper.getPackageInfo(apk.packageName, 0);
         } catch (PackageManager.NameNotFoundException ignored) {
             old = null;
         }
@@ -322,7 +322,7 @@ public class InstallRepository implements Closeable {
     private InstallStage processPackageUri(String packageName) {
         PackageInfo info;
         try {
-            info = BinderWrapper.getPackageInfo(packageName);
+            info = BinderWrapper.getPackageInfo(packageName, 0);
         } catch (PackageManager.NameNotFoundException e) {
             return new InstallAborted(InstallAborted.ABORT_NOTFOUND, e.toString());
         }
@@ -405,7 +405,7 @@ public class InstallRepository implements Closeable {
         if (statusCode == PackageInstaller.STATUS_SUCCESS) {
             var startIntent = BinderWrapper.pm.getLaunchIntentForPackage(apkLite.packageName);
             try {
-                var info = BinderWrapper.getPackageInfo(apkLite.packageName);
+                var info = BinderWrapper.getPackageInfo(apkLite.packageName, 0);
                 apkLite.icon = info.applicationInfo.loadIcon(packageManager);
                 apkLite.label = info.applicationInfo.loadLabel(packageManager).toString();
             } catch (PackageManager.NameNotFoundException ignored) {

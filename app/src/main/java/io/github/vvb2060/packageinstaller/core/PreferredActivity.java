@@ -13,7 +13,10 @@ import android.system.Os;
 import android.util.Log;
 import android.util.LogPrinter;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import io.github.vvb2060.packageinstaller.BuildConfig;
 import io.github.vvb2060.packageinstaller.ui.InstallLaunch;
@@ -46,16 +49,13 @@ public class PreferredActivity {
             .setDataAndType(uri, PACKAGE_MIME_TYPE);
     }
 
-    private static String getSystemInstaller(PackageManager pm) {
+    @Nullable
+    public static String getSystemInstaller() {
+        var pm = BinderWrapper.pm;
         var intent = makeIntent(Intent.ACTION_INSTALL_PACKAGE);
         var matches = pm.queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY);
+        if (matches.isEmpty()) return null;
         return matches.get(0).activityInfo.packageName;
-    }
-
-    public static boolean needSafeMode(PackageManager pm) {
-        var packageName = getSystemInstaller(pm);
-        return pm.checkPermission(Manifest.permission.INTERNET, packageName)
-            == PackageManager.PERMISSION_GRANTED;
     }
 
     private static boolean check(PackageManager pm, String action) {
@@ -115,7 +115,7 @@ public class PreferredActivity {
         Log.v(TAG, "Preferred activities set for " + BuildConfig.APPLICATION_ID);
 
         if (BuildConfig.DEBUG) {
-            list(pm, getSystemInstaller(pm));
+            list(pm, getSystemInstaller());
         }
     }
 }
