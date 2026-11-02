@@ -31,8 +31,9 @@ public class InstallViewModel extends AndroidViewModel {
     private final MutableLiveData<InstallStage> installResult;
     private final MutableLiveData<Integer> stagingProgress;
     private final SharedPreferences sp;
-    private final InstallRepository repository;
-    private boolean cancelled = false;
+
+    private InstallRepository repository;
+    private boolean cancelled;
 
     public InstallViewModel(@NonNull Application application) {
         super(application);
@@ -40,10 +41,6 @@ public class InstallViewModel extends AndroidViewModel {
         installResult = new MutableLiveData<>(new InstallParse());
         stagingProgress = new MutableLiveData<>(-1);
         sp = application.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
-        var pm = application.getPackageManager();
-        var safeMode = sp.getBoolean("safe_mode", PreferredActivity.needSafeMode(pm));
-        repository = new InstallRepository(application, safeMode, installResult, stagingProgress);
-        addCloseable(repository);
     }
 
     public LiveData<InstallStage> getCurrentInstallStage() {
@@ -57,20 +54,25 @@ public class InstallViewModel extends AndroidViewModel {
     public void preprocessIntent(Intent intent) {
         executor.execute(() -> {
             var context = getApplication();
+            var pm = context.getPackageManager();
             ShizukuProvider.waitForBinder(context);
             if (Shizuku.getBinder() == null
                 || Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
                 || Shizuku.checkRemotePermission(Manifest.permission.INSTALL_PACKAGES)
                 != PackageManager.PERMISSION_GRANTED) {
+                var packageName = rikka.shizuku.ShizukuProvider.MANAGER_APPLICATION_ID;
                 installResult.postValue(new InstallAborted(InstallAborted.ABORT_SHIZUKU,
-                    context.getPackageManager().getLaunchIntentForPackage(
-                        rikka.shizuku.ShizukuProvider.MANAGER_APPLICATION_ID)));
+                    pm.getLaunchIntentForPackage(packageName)));
                 return;
             }
             BinderWrapper.init(context);
             BinderWrapper.disableAdbVerify(context);
-            PreferredActivity.set(context.getPackageManager());
+            PreferredActivity.set(pm);
 
+            var def = PreferredActivity.needSafeMode(pm);
+            var safeMode = sp.getBoolean("safe_mode", def);
+            repository = new InstallRepository(context, safeMode, installResult, stagingProgress);
+            addCloseable(repository);
             repository.parseUri(intent);
         });
     }
