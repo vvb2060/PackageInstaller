@@ -4,7 +4,6 @@ import android.content.res.AssetFileDescriptor;
 import android.os.ParcelFileDescriptor;
 
 import java.io.FileInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -67,12 +66,13 @@ public class FileDataSource implements DataSource {
     public InputStream openStream(long offset, long size) throws IOException {
         checkChunkValid(offset, size, mSize);
 
-        var afd = new AssetFileDescriptor(mPfd, mOffset + offset, size);
-        return new FilterInputStream(afd.createInputStream()) {
+        var pfd = new ParcelFileDescriptor(mPfd) {
             @Override
             public void close() {
             }
         };
+        var afd = new AssetFileDescriptor(pfd, mOffset + offset, size);
+        return afd.createInputStream();
     }
 
     @Override
