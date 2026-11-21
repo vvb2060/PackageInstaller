@@ -48,8 +48,8 @@ public abstract sealed class BaseDialogFragment extends DialogFragment permits
         handler.postDelayed(activity::finishAndRemoveTask, 100);
     }
 
-    protected void startActivitySafe(Intent intent, boolean safeMode) {
-        if (safeMode) {
+    protected void startActivitySafe(Intent intent, boolean useShizuku) {
+        if (useShizuku) {
             BinderWrapper.startActivity(intent);
         } else try {
             requireActivity().startActivity(intent);

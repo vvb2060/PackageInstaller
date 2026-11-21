@@ -34,7 +34,7 @@ public final class InstallSuccessFragment extends BaseDialogFragment {
             .setMessage(message)
             .setNegativeButton(R.string.done, (_, _) -> finish())
             .setPositiveButton(R.string.launch, (_, _) -> {
-                startActivitySafe(mDialogData.startIntent, mDialogData.safeMode);
+                startActivitySafe(mDialogData.startIntent, true);
                 finish();
             })
             .create();
