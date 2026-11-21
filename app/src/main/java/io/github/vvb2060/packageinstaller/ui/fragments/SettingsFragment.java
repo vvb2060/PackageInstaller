@@ -28,7 +28,6 @@ public final class SettingsFragment extends BaseDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Log.d("SettingsFragment", "onCreateDialog: " + savedInstanceState);
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
         TextView textView = dialogView.requireViewById(R.id.message);
         textView.setText(R.string.settings_safe_mode);
