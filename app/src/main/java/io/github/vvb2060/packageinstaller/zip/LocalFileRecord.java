@@ -378,7 +378,7 @@ public class LocalFileRecord {
         } catch (IOException e) {
             throw new IOException(
                     "Failed to read data of " + ((mDataCompressed) ? "compressed" : "uncompressed")
-                        + " entry " + mName,
+                        + " entry " + mName + ": " + e.getMessage(),
                     e);
         }
         // Interestingly, Android doesn't check that uncompressed data's CRC-32 is as expected. We
