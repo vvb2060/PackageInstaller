@@ -36,7 +36,6 @@ import io.github.vvb2060.packageinstaller.core.BinderWrapper;
 
 public class DownloadEngine extends Thread implements Closeable {
     private static final String TAG = DownloadEngine.class.getSimpleName();
-    private static final int MAX_CHANNEL_COUNT = 16;
     private static final long IDLE_TIMEOUT = TimeUnit.SECONDS.toNanos(5);
     private static final int MAX_RETRY_COUNT = 6;
 
@@ -103,6 +102,10 @@ public class DownloadEngine extends Thread implements Closeable {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public void setConcurrent(int concurrent) {
+        this.concurrent = concurrent;
     }
 
     long open(URI uri, ByteBuffer buffer) throws IOException {
@@ -610,7 +613,7 @@ public class DownloadEngine extends Thread implements Closeable {
                     var slashIndex = line.indexOf('/');
                     var sizeStr = line.substring(slashIndex + 1).trim();
                     fileSize = Long.parseLong(sizeStr);
-                    concurrent = MAX_CHANNEL_COUNT;
+                    concurrent = 4;
                     if (fileSize < task.buffer.limit()) {
                         task.buffer.limit((int) fileSize);
                     }

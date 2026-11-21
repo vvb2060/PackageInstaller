@@ -191,6 +191,7 @@ public class InstallRepository implements Closeable {
             zipParser = new ZipParser(dataSource);
             parsedApk = zipParser.parse();
             dataSource.stopPersistentCache();
+            engine.setConcurrent(16);
         } catch (Exception e) {
             Log.e(TAG, "Failed to parse APK: " + url, e);
             return new InstallAborted(InstallAborted.ABORT_PARSE, e.toString());
