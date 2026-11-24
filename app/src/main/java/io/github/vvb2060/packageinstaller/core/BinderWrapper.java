@@ -207,8 +207,13 @@ public class BinderWrapper {
     public static void addPowerSaveWhitelistApp() {
         try {
             int userId = Os.getuid() / 100000;
-            deviceIdle.addPowerSaveTempWhitelistApp(BuildConfig.APPLICATION_ID,
-                1000, userId, 316, "shell");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                deviceIdle.addPowerSaveTempWhitelistApp(BuildConfig.APPLICATION_ID,
+                    1000, userId, 316, "shell");
+            } else {
+                deviceIdle.addPowerSaveTempWhitelistApp(BuildConfig.APPLICATION_ID,
+                    1000, userId, "shell");
+            }
             deviceIdle.addPowerSaveWhitelistApp(BuildConfig.APPLICATION_ID);
         } catch (RemoteException e) {
             e.rethrowFromSystemServer();
