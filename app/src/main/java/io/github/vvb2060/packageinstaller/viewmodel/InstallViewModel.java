@@ -77,14 +77,14 @@ public class InstallViewModel extends AndroidViewModel {
         });
     }
 
-    public void initiateInstall(boolean setInstaller, boolean commit,
+    public void initiateInstall(int sessionId, boolean setInstaller, boolean commit,
                                 boolean full, boolean removeSplit) {
         if (cancelled) {
             installResult.setValue(new InstallAborted(InstallAborted.ABORT_WRITE));
             return;
         }
         executor.execute(() ->
-            repository.install(setInstaller, commit, full, removeSplit)
+            repository.install(sessionId, setInstaller, commit, full, removeSplit)
         );
     }
 
@@ -113,6 +113,10 @@ public class InstallViewModel extends AndroidViewModel {
         if (cancelled) return;
         repository.close();
         cancelled = true;
+    }
+
+    public void abandonSession(int sessionId){
+        repository.abandonSession(sessionId);
     }
 
     public boolean isCancelled() {

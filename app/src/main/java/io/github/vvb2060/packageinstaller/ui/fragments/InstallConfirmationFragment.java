@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInstaller.SessionInfo;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -51,7 +52,7 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
         View dialogView = getLayoutInflater().inflate(R.layout.install_content_view, null);
         mTextView = dialogView.requireViewById(R.id.message);
         mCheckBox = dialogView.requireViewById(R.id.checkbox);
-        if (mDialogData.setInstaller) {
+        if (!mDialogData.safeMode && mDialogData.sessionId == SessionInfo.INVALID_ID) {
             mCheckBox.setText(R.string.set_installer);
             mCheckBox.setVisibility(View.VISIBLE);
         }
@@ -73,15 +74,19 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
 
         var old = mDialogData.oldApk;
         var full = mDialogData.fullInstall;
+        var sessionId = mDialogData.sessionId;
         mDialog = new AlertDialog.Builder(context)
             .setIcon(mDialogData.apkLite.getIcon())
             .setTitle(mDialogData.apkLite.getLabel())
             .setView(dialogView)
             .setPositiveButton(old != null ? R.string.update : R.string.install, (_, _) ->
-                mViewModel.initiateInstall(mCheckBox.isChecked(), true, full, remove))
-            .setNegativeButton(android.R.string.cancel, (_, _) -> finish())
-            .setNeutralButton(remove ? R.string.remove_more : R.string.add_more, (_, _) ->
-                mViewModel.initiateInstall(mCheckBox.isChecked(), false, full, remove))
+                mViewModel.initiateInstall(sessionId, mCheckBox.isChecked(), true, full, remove))
+            .setNegativeButton(android.R.string.cancel, (_, _) -> {
+                mViewModel.abandonSession(sessionId);
+                finish();
+            })
+            .setNeutralButton(R.string.more, (_, _) ->
+                mViewModel.initiateInstall(sessionId, mCheckBox.isChecked(), false, full, remove))
             .create();
         mDialog.setCanceledOnTouchOutside(false);
         return mDialog;
@@ -244,14 +249,21 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
             }
         }
 
-        if (full && old != null) {
+        var more = mDialogData.sessionId != SessionInfo.INVALID_ID;
+        if (more) {
+            if (removeSplit) {
+                question = R.string.install_confirm_question_remove;
+            } else {
+                question = R.string.install_confirm_question_add;
+            }
+        } else if (old != null) {
             var flags = old.applicationInfo.flags;
             var system = (flags & ApplicationInfo.FLAG_SYSTEM) != 0;
             var installed = (flags & ApplicationInfo.FLAG_INSTALLED) != 0;
-            if (mDialogData.setInstaller && system && needDefault) {
+            if (system && needDefault) {
                 mCheckBox.setChecked(true);
             }
-            if (installed) {
+            if (full && installed) {
                 question = R.string.install_confirm_question_update;
             }
         }
@@ -274,6 +286,13 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
             }
         }
 
+        if (mDialogData.apkLite.requiredSplitTypes != null) {
+            string = string + resources.getString(R.string.install_confirm_question_more);
+        }
+        if (more) {
+            string = string + resources.getString(R.string.install_confirm_question_commit);
+        }
+
         sb.append("\n");
         sb.append(string, new StyleSpan(Typeface.ITALIC),
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -285,7 +304,7 @@ public final class InstallConfirmationFragment extends BaseDialogFragment {
         if (bytes < 1024) return bytes + " bytes";
         int unit = (int) (Math.log(bytes) / Math.log(1024));
         double value = bytes / Math.pow(1024, unit);
-        return String.format(Locale.ROOT, "%.2f %ciB", value, "KMGTPE".charAt(unit - 1));
+        return String.format(Locale.getDefault(), "%.2f %ciB", value, "KMGTPE".charAt(unit - 1));
     }
 
     private static String getAndroidName(String apiLevel) {

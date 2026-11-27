@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 public class LocalIntentReceiver {
-    private final ResultObserver mResultObserver;
+    private final IntentReceiver receiver;
 
     private final IIntentSender.Stub mLocalSender = new IIntentSender.Stub() {
         @Override
@@ -22,19 +22,20 @@ public class LocalIntentReceiver {
             String statusMessage = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE);
             int legacyStatus = intent.getIntExtra(PackageInstaller_rename.EXTRA_LEGACY_STATUS,
                 PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR);
-            mResultObserver.onResult(status, legacyStatus, statusMessage);
+            int sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, PackageInstaller.SessionInfo.INVALID_ID);
+            receiver.onReceive(sessionId, status, legacyStatus, statusMessage);
         }
     };
 
-    public LocalIntentReceiver(ResultObserver observer) {
-        mResultObserver = observer;
+    public LocalIntentReceiver(IntentReceiver receiver) {
+        this.receiver = receiver;
     }
 
     public IntentSender getIntentSender() {
         return (IntentSender) (Object) new IntentSender_rename((IIntentSender) mLocalSender);
     }
 
-    public interface ResultObserver {
-        void onResult(int status, int legacyStatus, String message);
+    public interface IntentReceiver {
+        void onReceive(int sessionId, int status, int legacyStatus, String message);
     }
 }

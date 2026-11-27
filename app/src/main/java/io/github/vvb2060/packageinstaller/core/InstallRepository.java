@@ -49,7 +49,7 @@ import io.github.vvb2060.packageinstaller.installmodel.PackageUserAction;
 import io.github.vvb2060.packageinstaller.installmodel.SettingsUserAction;
 import rikka.shizuku.Shizuku;
 
-public class InstallRepository implements Closeable {
+public class InstallRepository implements Closeable, LocalIntentReceiver.IntentReceiver {
     private static final String TAG = InstallRepository.class.getSimpleName();
 
     private final MutableLiveData<InstallStage> installResult;
@@ -58,7 +58,7 @@ public class InstallRepository implements Closeable {
     private final PackageManager packageManager;
     private final PackageInstaller packageInstaller;
     private final boolean safeMode;
-    private int sessionId = SessionInfo.INVALID_ID;
+
     private int callingUid = Process.INVALID_UID;
     private ApkLite apkLite;
     private ZipParser zipParser;
@@ -123,7 +123,8 @@ public class InstallRepository implements Closeable {
         installResult.postValue(new SettingsUserAction(safeMode));
     }
 
-    public void install(boolean setInstaller, boolean commit, boolean full, boolean removeSplit) {
+    public void install(int sessionId, boolean setInstaller, boolean commit,
+                        boolean full, boolean removeSplit) {
         installResult.postValue(new InstallInstalling(apkLite));
         if (zipParser == null) {
             installPackageUri();
@@ -156,11 +157,11 @@ public class InstallRepository implements Closeable {
             if (commit) {
                 commit(session);
             } else {
-                sessionId = SessionInfo.INVALID_ID;
                 installResult.postValue(new InstallAborted(InstallAborted.ABORT_CLOSE));
             }
         } catch (IOException | RuntimeException e) {
             Log.e(TAG, "Could not write APK.", e);
+            abandonSession(sessionId);
             var aborted = new InstallAborted(InstallAborted.ABORT_WRITE, e.toString());
             installResult.postValue(aborted);
         }
@@ -168,14 +169,15 @@ public class InstallRepository implements Closeable {
 
     private void commit(PackageInstaller.Session session) {
         stagingProgress.postValue(101);
-        var receiver = new LocalIntentReceiver(this::setStageBasedOnResult);
+        var receiver = new LocalIntentReceiver(this);
         try {
             BinderWrapper.addDeveloperVerificationExperiment(apkLite.packageName);
             // noinspection RequestInstallPackagesPolicy
             session.commit(receiver.getIntentSender());
         } catch (RuntimeException e) {
             Log.e(TAG, "Failed to commit session", e);
-            setStageBasedOnResult(PackageInstaller.STATUS_FAILURE,
+            session.abandon();
+            onReceive(SessionInfo.INVALID_ID, PackageInstaller.STATUS_FAILURE,
                 PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR, e.toString());
         }
     }
@@ -248,8 +250,11 @@ public class InstallRepository implements Closeable {
         }
 
         var full = true;
+        var sessionId = SessionInfo.INVALID_ID;
         if (apk.isSplit()) {
-            full = findBaseSessionId(apk);
+            var pack = findBaseSessionId(apk);
+            full = (pack & 1L << 32) != 0;
+            sessionId = (int) pack;
             if (sessionId == SessionInfo.INVALID_ID) {
                 if (old != null && old.getLongVersionCode() == apk.versionCode) {
                     full = false;
@@ -268,7 +273,7 @@ public class InstallRepository implements Closeable {
             }
         }
 
-        if (full && old != null && Block.findBlock(apk.signingBlock) != null) {
+        if (!apk.isSplit() && old != null && Block.findBlock(apk.signingBlock) != null) {
             var base = old.applicationInfo.sourceDir;
             try (var pfd = ParcelFileDescriptor.open(new File(base),
                 ParcelFileDescriptor.MODE_READ_ONLY)) {
@@ -281,12 +286,13 @@ public class InstallRepository implements Closeable {
         }
 
         apkLite = apk;
-        var setInstaller = !safeMode && sessionId == SessionInfo.INVALID_ID;
-        return new InstallUserAction(apk, old, full, setInstaller);
+        return new InstallUserAction(apk, old, full, safeMode, sessionId);
     }
 
-    private boolean findBaseSessionId(ApkLite apk) {
+    private long findBaseSessionId(ApkLite apk) {
         var full = true;
+        var sessionId = SessionInfo.INVALID_ID;
+
         var allSessions = packageInstaller.getAllSessions();
         for (int i = 0, allSessionsSize = allSessions.size(); i < allSessionsSize; i++) {
             var item = allSessions.get(i);
@@ -302,22 +308,25 @@ public class InstallRepository implements Closeable {
                 continue;
             }
 
-            var id = item.getSessionId();
+            sessionId = item.getSessionId();
             full = item.getMode() == SessionParams.MODE_FULL_INSTALL;
+
             var appLabel = item.getAppLabel();
             if (appLabel != null) {
                 apk.label = appLabel.toString();
             }
-            var fullInfo = packageInstaller.getSessionInfo(id);
+            var fullInfo = packageInstaller.getSessionInfo(sessionId);
             rename = (PackageInstaller_rename.SessionInfo) (Object) fullInfo;
             var appIcon = rename.appIcon;
             if (appIcon != null) {
                 apk.icon = new BitmapDrawable(appIcon);
             }
-            sessionId = id;
             break;
         }
-        return full;
+
+        long pack = sessionId;
+        if (full) pack |= 1L << 32;
+        return pack;
     }
 
     private InstallStage processPackageUri(String packageName) {
@@ -345,10 +354,10 @@ public class InstallRepository implements Closeable {
         try {
             var pm = (PackageManager_rename) (Object) BinderWrapper.pm;
             pm.installExistingPackage(apkLite.packageName, PackageManager.INSTALL_REASON_USER);
-            setStageBasedOnResult(PackageInstaller.STATUS_SUCCESS,
+            onReceive(SessionInfo.INVALID_ID, PackageInstaller.STATUS_SUCCESS,
                 PackageManager_rename.INSTALL_SUCCEEDED, null);
         } catch (PackageManager.NameNotFoundException e) {
-            setStageBasedOnResult(PackageInstaller.STATUS_FAILURE,
+            onReceive(SessionInfo.INVALID_ID, PackageInstaller.STATUS_FAILURE,
                 PackageManager_rename.INSTALL_FAILED_INTERNAL_ERROR, e.toString());
         }
     }
@@ -402,7 +411,7 @@ public class InstallRepository implements Closeable {
         return params;
     }
 
-    private void setStageBasedOnResult(int statusCode, int legacyStatus, String message) {
+    public void onReceive(int sessionId, int statusCode, int legacyStatus, String message) {
         if (statusCode == PackageInstaller.STATUS_SUCCESS) {
             var startIntent = BinderWrapper.pm.getLaunchIntentForPackage(apkLite.packageName);
             try {
@@ -422,21 +431,24 @@ public class InstallRepository implements Closeable {
         }
     }
 
+    public void abandonSession(int sessionId) {
+        try {
+            packageInstaller.abandonSession(sessionId);
+        } catch (RuntimeException e) {
+            Log.w(TAG, Log.getStackTraceString(e));
+        }
+    }
+
     @Override
     public void close() {
-        if (sessionId != SessionInfo.INVALID_ID) {
+        var c = closeable;
+        if (c != null) {
             try {
-                packageInstaller.abandonSession(sessionId);
-            } catch (SecurityException ignored) {
+                c.close();
+                closeable = null;
+            } catch (IOException e) {
+                Log.w(TAG, Log.getStackTraceString(e));
             }
-            sessionId = SessionInfo.INVALID_ID;
-        }
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException ignored) {
-            }
-            closeable = null;
         }
     }
 

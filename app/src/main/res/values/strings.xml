@@ -5,8 +5,7 @@
     <string name="update">Update</string>
     <string name="uninstall">Uninstall</string>
     <string name="clear">Clear</string>
-    <string name="add_more">Add more</string>
-    <string name="remove_more">Remove more</string>
+    <string name="more">More</string>
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="done">Done</string>
@@ -41,6 +40,10 @@
     <string name="install_confirm_question_update">Do you want to update this app?</string>
     <string name="install_confirm_question_split">Do you want to add split package to this app?</string>
     <string name="install_confirm_question_split_remove">Do you want to remove this split package?</string>
+    <string name="install_confirm_question_more">" You may need to select more split packages."</string>
+    <string name="install_confirm_question_add">"This split package will be added, "</string>
+    <string name="install_confirm_question_remove">"This split package will be removed, "</string>
+    <string name="install_confirm_question_commit">do you want to start the installation now? Canceling will discard all previously selected files, returning will only discard the current file.</string>
 
     <string name="uninstall_confirm_question">Do you want to uninstall this app?</string>
 

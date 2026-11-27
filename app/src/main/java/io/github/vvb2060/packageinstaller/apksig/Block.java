@@ -44,13 +44,13 @@ public class Block {
             isSame[1] = false;
             var oldCerts = oldSigners.get(0).certs;
             var oldCert = oldCerts.get(0);
-            var newcerts = newSigners.get(0).certs;
-            for (int i = 0, certsSize = newcerts.size(); i < certsSize; i++) {
-                var cert = newcerts.get(i);
+            var newCerts = newSigners.get(0).certs;
+            for (int i = 0, certsSize = newCerts.size(); i < certsSize; i++) {
+                var cert = newCerts.get(i);
                 if (cert.equals(oldCert) &&
                     (cert.flags & Cert.CertCapabilities.INSTALLED_DATA) != 0) {
                     if (oldBlock.id == Parser.APK_SIGNATURE_SCHEME_V32_BLOCK_ID) {
-                        isSame[1] = newcerts.get(i + 1).equals(oldCerts.get(1));
+                        isSame[1] = newCerts.get(i + 1).equals(oldCerts.get(1));
                     } else {
                         isSame[1] = true;
                     }
@@ -61,14 +61,14 @@ public class Block {
                 return isSame;
             }
 
-            var newCert = newcerts.get(0);
+            var newCert = newCerts.get(0);
             for (int i = 1, certListSize = oldCerts.size(); i < certListSize; i++) {
                 oldCert = oldCerts.get(i);
                 if ((oldCert.flags & Cert.CertCapabilities.ROLLBACK) == 0) continue;
                 if (newCert.equals(oldCert) &&
                     (newCert.flags & Cert.CertCapabilities.INSTALLED_DATA) != 0) {
                     if (newBlock.id == Parser.APK_SIGNATURE_SCHEME_V32_BLOCK_ID) {
-                        isSame[1] = oldCerts.get(i + 1).equals(newcerts.get(1));
+                        isSame[1] = oldCerts.get(i + 1).equals(newCerts.get(1));
                     } else {
                         isSame[1] = true;
                     }

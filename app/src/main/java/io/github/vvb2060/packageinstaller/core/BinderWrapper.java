@@ -173,7 +173,7 @@ public class BinderWrapper {
     }
 
     public static void uninstallPackage(PackageInfo info) {
-        var receiver = new LocalIntentReceiver((statusCode, legacyStatus, message) ->
+        var receiver = new LocalIntentReceiver((sessionId, statusCode, legacyStatus, message) ->
             Log.v(TAG, "Uninstall result: " + statusCode + ", " + legacyStatus + ", " + message));
         var versionedPackage = new VersionedPackage(info.packageName, info.getLongVersionCode());
         try {

@@ -5,8 +5,7 @@
     <string name="update">更新</string>
     <string name="uninstall">卸载</string>
     <string name="clear">清除</string>
-    <string name="add_more">继续添加</string>
-    <string name="remove_more">继续移除</string>
+    <string name="more">更多</string>
     <string name="enable">启用</string>
     <string name="disable">停用</string>
     <string name="done">完成</string>
@@ -41,6 +40,10 @@
     <string name="install_confirm_question_update">要更新此应用吗？</string>
     <string name="install_confirm_question_split">要添加此拆分包吗？</string>
     <string name="install_confirm_question_split_remove">要移除此拆分包吗？</string>
+    <string name="install_confirm_question_more">你可能需要选择更多拆分包。</string>
+    <string name="install_confirm_question_add">将添加此拆分包，</string>
+    <string name="install_confirm_question_remove">将移除此拆分包，</string>
+    <string name="install_confirm_question_commit">现在开始安装吗？取消会放弃之前选择的所有文件，返回仅放弃当前文件。</string>
 
     <string name="uninstall_confirm_question">要卸载此应用吗？</string>
 
@@ -67,5 +70,5 @@
     <string name="error_write">无法写入文件。</string>
     <string name="error_cancelled">安装已取消。</string>
 
-    <string name="settings_safe_mode">安全模式禁用了部分危险功能，仅在必要时启用</string>
+    <string name="settings_safe_mode">安全模式会禁用部分危险功能，仅在必要时启用</string>
 </resources>
