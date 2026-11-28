@@ -555,10 +555,14 @@ public class DownloadEngine extends Thread implements Closeable {
             }
         }
 
-        private void writeToBuffer() {
+        private void writeToBuffer() throws IOException {
             if (task == null) {
                 state = HttpState.READY_TO_REQUEST;
                 return;
+            }
+            if (peerAppData.remaining() > task.buffer.remaining()) {
+                throw new IOException("Response body larger than expected: "
+                    + peerAppData.remaining() + " > " + task.buffer.remaining());
             }
             task.buffer.put(peerAppData);
             if (!task.buffer.hasRemaining()) {
@@ -668,6 +672,7 @@ public class DownloadEngine extends Thread implements Closeable {
 
             task.retryCount++;
             tasks.offerFirst(task);
+            Log.w(TAG, "Retry task " + task.retryCount + " / " + MAX_RETRY_COUNT, e);
         }
     }
 
